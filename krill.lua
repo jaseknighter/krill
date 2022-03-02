@@ -4,9 +4,13 @@
 -- llllllll.co/t/XXXXXX
 --
 --[[
-engine.kr_start();
-engine.kr_env_time(3);
-engine.kr_rise_fall(0.1,0.3)
+engine.kr_start()
+engine.kr_env_time(1)
+engine.kr_env_shape('log')
+engine.kr_env_time(10)
+engine.kr_rise_fall(0.001,0.01)
+engine.kr_rc_fdbk(50000)
+engine.kr_rc_mult(0.2)
 ]]
 -- 
 --
@@ -44,27 +48,77 @@ shift=false
 markov_mode=false
 sel_note=1
 disable_transport=false
+chaos_x={}
+chaos_y={}
+
 function init()
   clock.run(setup_polling)
 end
 
 function setup_polling()
   rise_poll = poll.set("rise_poll", function(value)
-    print("rise done",value)
+    -- print("rise done",value)
+    -- table.insert(chaos_x,value)
   end)
+
   fall_poll = poll.set("fall_poll", function(value)
-    print("fall done",value)
+    -- print("fall done",value)
+    -- table.insert(chaos_y,value)
+    
+  end)
+
+  rc1_sample_poll = poll.set("rc1_sample_poll", function(value)
+    print("rc1_sample_poll",value)
+    table.insert(chaos_x,value)
+    
+  end)
+
+  rc2_sample_poll = poll.set("rc2_sample_poll", function(value)
+    print("rc2_sample_poll",value)
+    table.insert(chaos_y,value)
   end)
 
   clock.sleep(1)
   polling_start()
+  clock.sleep(0.25)
+  clock.run(function()
+      while true do
+        clock.sleep(1/10)
+        redraw()
+      end
+    end)
+  engine.kr_start();
+  -- engine.kr_env_time(0.5);
 end
 
 function polling_start()
   rise_poll:start()
   fall_poll:start()
+  rc1_sample_poll:start()
+  rc2_sample_poll:start()
 end
 
+function redraw()
+  -- print("redraw",#chaos_x)
+  screen.level(15)
+  -- if #chaos_x > 1000 then
+    -- chaos_x = {}
+    -- chaos_y = {}
+  -- end
+  
+  if #chaos_x >= 1 then
+    for i=1,#chaos_x,1 do
+      local x = math.floor(util.linlin(-1,1,1,128,chaos_x[i]))
+      local y = math.floor(util.linlin(-1,1,1,64,chaos_y[i]))
+      -- print(x,y)
+      screen.move(x,y)
+      -- screen.line(x,y)
+      screen.pixel(x,y)
+      screen.stroke()
+    end
+    screen.update()
+  end
+end
 -- function init_acit_test()
 --   -- setup midi
 --   midis={}
