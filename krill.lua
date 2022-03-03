@@ -7,10 +7,18 @@
 engine.kr_start()
 engine.kr_env_time(1)
 engine.kr_env_shape('log')
-engine.kr_env_time(10)
-engine.kr_rise_fall(0.001,0.01)
-engine.kr_rc_fdbk(50000)
-engine.kr_rc_mult(0.2)
+engine.kr_rise_fall(0.3,1.1)
+engine.kr_rc_fdbk(500)
+engine.kr_rc_freq(15000)
+engine.kr_env_time(12)
+engine.kr_rise_fall(0.01,0.01)
+engine.kr_rc_mul(0.3)
+engine.kr_rc_a(0.36)
+engine.kr_rc_b(0.35)
+engine.kr_rc_c(4.7)
+engine.kr_rc_h(0.01)
+engine.kr_rc_xi(0.5)
+
 ]]
 -- 
 --
@@ -39,6 +47,9 @@ engine.kr_rc_mult(0.2)
 -- hs=include('lib/halfsecond')
 
 engine.name="Krill"
+
+lorentz = include("lib/lorentz.lua")
+
 -- engine.name="AcidTest"
 
 note_last=nil
@@ -99,6 +110,8 @@ function polling_start()
 end
 
 function redraw()
+  local rand = math.random()*3+1
+  engine.kr_rc_c(rand)
   -- print("redraw",#chaos_x)
   screen.level(15)
   -- if #chaos_x > 1000 then

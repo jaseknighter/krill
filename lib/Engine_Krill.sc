@@ -8,12 +8,14 @@ Engine_Krill : CroneEngine {
 	var fallPoll,fallPollFunc;
 	var rc1SamplePoll,rc1SamplePollFunc;
 	var rc2SamplePoll,rc2SamplePollFunc;
-	var rc_freq=2,rc_mult=0.3,rc_fdbk=2;
 	var krillFn;
 	var sh1=1, sh2=1;
 	var rise=0.1, fall=0.5, looping=1,running=false, env_time=1;
 	var env_shape='exp';
-
+	var rc_freq=22050,rc_a=0.2,rc_b=0.2,rc_c=5.7,rc_h=0.05,
+	// var rc_freq=22050,rc_a=0.36,rc_b=0.35,rc_c=4.5,rc_h=0.05,
+	rc_xi=0.1,rc_yi=0,rc_zi=0,rc_mul=1.0,rc_add=0.0;
+	var rc_fdbk=1;
 
 	*new { arg context, doneCallback;
 		^super.new(context, doneCallback);
@@ -31,7 +33,9 @@ Engine_Krill : CroneEngine {
 			foc1Val,
 			env_time=1, env_shape='exp',
 			sh1=1,sh2=1,
-			rand_chaos_mode=3, rc_freq=2, rc_mult=0.3,rc_fdbk=2;
+			rand_chaos_mode=3, 
+			rc_fdbk=1,
+			rc_freq=22050,rc_a=0.2,rc_b=0.2,rc_c=5.7,rc_h=0.05,rc_xi=0.1,rc_yi=0,rc_zi=0,rc_mul=1.0,rc_add=0.0;
 
 			var out, osc, rise_phase, env_phase, rise_rate, fall_rate, 
 			env_rate, env_pos, amp_env, env_gen, sig, done, env_changed,
@@ -55,7 +59,8 @@ Engine_Krill : CroneEngine {
 			pitch = DegreeToKey.kr(
                 scale.as(LocalBuf),
                 // MouseX.kr(0,15), // mouse indexes into scale
-								LinLin.kr((sh1/2+1),0,1,1,15),
+								// LinLin.kr((sh1+sh2/2+1),-2,2,1,15),
+								LinLin.kr((sh1+sh2),-2,2,1,15).floor,
                 scale.stepsPerOctave,
                 1, // mul = 1
                 30 // offset by 72 notes
@@ -79,18 +84,23 @@ Engine_Krill : CroneEngine {
 			
 			//random/chaotic generator modes
 			// 1: LFNoise0
-			rc1a = LFNoise0.ar(10);
+			// rc1a = LFNoise0.ar(10);
 			// rc1b = rc1a;
-			rc2a = LFNoise0.ar(10);
+			// rc2a = LFNoise0.ar(10);
 			// rc2b = rc2a;
 
 			// 2: RosslerL #1
-			// #rc1a, rc2a = RosslerL.ar(SampleRate.ir/rc_freq, 0.36, 0.35, 4.5) * rc_mult;
+			
+			#rc1b, rc1a, rc2a = RosslerL.ar(rc_freq,rc_a,rc_b,rc_c,rc_h,rc_xi,rc_yi,rc_zi,rc_mul,rc_add);
+			// freq= 22050, a= 0.2, b= 0.2, c= 5.7, h= 0.05, xi= 0.1, yi= 0, zi= 0, mul= 1.0, add= 0.0
+			// #rc1b, rc1a, rc2a = RosslerL.ar(1000, 0.36, 0.35, 4.5, 0.05, 0.1, 0,0) * rc_mul;
+			// #rc1b, rc1a, rc2a = RosslerL.ar(1000, 0.36, 0.35, 4.5, 0.05, 0.1, 0,0) * rc_mul;
+			// #rc1a, rc2a = RosslerL.ar(SampleRate.ir/rc_freq, 0.36, 0.35, 4.5) * rc_mul;
 			
 			// 3: RosslerL #2
-			// #rc1a, rc2a = RosslerL.ar(freq:rc_freq,h:rc_mult);
+			// #rc1a, rc2a = RosslerL.ar(freq:rc_freq,h:rc_mul);
 			// 4: SinOscFB
-			// #rc1a, rc2a = SinOscFB.ar([800,700,600,500,400,301], rc_fdbk, rc_mult);
+			// #rc1a, rc2a = SinOscFB.ar([800,700,600,500,400,301], rc_fdbk, rc_mul);
 			// ([rc1a,rc2a]).poll;
 
 
@@ -134,7 +144,7 @@ Engine_Krill : CroneEngine {
 			// create a new synth on completion of old synth if looping == 1
 			context.server.sendMsg("/n_free", msg[1]);				
 			if(looping == 1){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_mult,rc_mult,\rc_fdbk,rc_fdbk]);
+				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_a,rc_a,\rc_b,rc_b,\rc_c,rc_c,\rc_h,rc_h,\rc_xi,rc_xi,\rc_yi,rc_yi,\rc_zi,rc_zi,\rc_mul,rc_mul,\rc_add,rc_add]);
 
 			}{
 				running = false;
@@ -170,7 +180,7 @@ Engine_Krill : CroneEngine {
 
 		this.addCommand("kr_start","",{ arg msg;
 			if (running == false){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_mult,rc_mult,\rc_fdbk,rc_fdbk]);
+				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_a,rc_a,\rc_b,rc_b,\rc_c,rc_c,\rc_h,rc_h,\rc_xi,rc_xi,\rc_yi,rc_yi,\rc_zi,rc_zi,\rc_mul,rc_mul,\rc_add,rc_add]);
 				running = true;
 			}
 		});
@@ -178,7 +188,7 @@ Engine_Krill : CroneEngine {
 		this.addCommand("kr_looping","f",{ arg msg;
 			looping = msg[1];
 			if (msg[1] == 1.0 && running == false){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_mult,rc_mult,\rc_fdbk,rc_fdbk]);
+				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_a,rc_a,\rc_b,rc_b,\rc_c,rc_c,\rc_h,rc_h,\rc_xi,rc_xi,\rc_yi,rc_yi,\rc_zi,rc_zi,\rc_mul,rc_mul,\rc_add,rc_add]);
 			}
 		});
 		
@@ -219,13 +229,40 @@ Engine_Krill : CroneEngine {
 			env_shape.postln;
 		});
 
+
 		this.addCommand("kr_rc_freq","f",{ arg msg;
 			rc_freq = msg[1];
 		});
-
-		this.addCommand("kr_rc_mult","f",{ arg msg;
-			rc_mult = msg[1];
+		this.addCommand("kr_rc_a","f",{ arg msg;
+			rc_a = msg[1];
 		});
+		this.addCommand("kr_rc_b","f",{ arg msg;
+			rc_b = msg[1];
+		});
+		this.addCommand("kr_rc_c","f",{ arg msg;
+			rc_c = msg[1];
+		});
+		this.addCommand("kr_rc_h","f",{ arg msg;
+			rc_h = msg[1];
+		});
+		this.addCommand("kr_rc_xi","f",{ arg msg;
+			rc_xi = msg[1];
+		});
+		this.addCommand("kr_rc_yi","f",{ arg msg;
+			rc_yi = msg[1];
+		});
+		this.addCommand("kr_rc_zi","f",{ arg msg;
+			rc_zi = msg[1];
+		});
+		this.addCommand("kr_rc_mul","f",{ arg msg;
+			rc_mul = msg[1];
+		});
+		this.addCommand("kr_rc_add","f",{ arg msg;
+			rc_add = msg[1];
+		});
+
+
+
 
 		this.addCommand("kr_rc_fdbk","f",{ arg msg;
 			rc_fdbk = msg[1];
