@@ -48,7 +48,9 @@ engine.kr_rc_xi(0.5)
 
 engine.name="Krill"
 
-lorentz = include("lib/lorentz.lua")
+lorenz = include("lib/lorenz")
+parameters = include("lib/parameters")
+quant_grid = include("lib/quant_grid")
 
 -- engine.name="AcidTest"
 
@@ -63,7 +65,50 @@ chaos_x={}
 chaos_y={}
 
 function init()
-  clock.run(setup_polling)
+  screen.aa(1)
+  lorenz.init()
+  parameters.init()
+  quant_grid:init(2,7)
+  lorenz:reset()
+  -- input[1].mode('change', 1,0.1,'rising')
+  -- input[2].mode('stream',0.001)
+  screenshot = 1
+  clock.run( function()
+    while true do
+
+      lorenz:process()
+      lorenz:update()
+
+      -- draw outline
+      local lb = lorenz.boundary
+      -- screen.rect(0,lb[2],lb[1]-3,lb[4])
+      -- screen.rect(lb[1]+lb[3]+3,lb[2],128,lb[4])
+      -- screen.level(6)
+      -- screen.fill()
+      -- screen.stroke()
+
+      -- screen.rect(lb[1],lb[2],lb[3],lb[4])
+      -- screen.level(2)
+      -- screen.stroke()
+    
+      lorenz.display(true)
+
+      if norns.menu.status()  == false then
+        screen.update()
+      end
+      -- quant_grid:display_sectors()
+      -- if screenshot<1000 then
+      --   screenshot=screenshot+1
+      --   -- print(screenshot)
+      --   _norns.screen_export_png("/home/we/dust/screenshot/screenshot"..screenshot..".png")
+      -- end
+      clock.sleep(1/30)
+      -- clock.sleep(0.005)
+    end
+  end)
+
+
+  -- clock.run(setup_polling)
 end
 
 function setup_polling()
@@ -79,13 +124,13 @@ function setup_polling()
   end)
 
   rc1_sample_poll = poll.set("rc1_sample_poll", function(value)
-    print("rc1_sample_poll",value)
+    -- print("rc1_sample_poll",value)
     table.insert(chaos_x,value)
     
   end)
 
   rc2_sample_poll = poll.set("rc2_sample_poll", function(value)
-    print("rc2_sample_poll",value)
+    -- print("rc2_sample_poll",value)
     table.insert(chaos_y,value)
   end)
 
