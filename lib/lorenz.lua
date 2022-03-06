@@ -12,6 +12,7 @@
 -- pixels
 --------------------------------
 pixels = {}
+pixels.active = nil
 
 function pixels.update(display)
   -- print(#pixels)
@@ -22,6 +23,13 @@ function pixels.update(display)
     if pixels[i] and pixels[i].remove == true then
       -- print("remove"..i)
       table.remove(pixels,i)
+    elseif pixels[i] and pixels[i].remove == false then
+      local lb = lorenz.get_boundary()
+      if display == true then
+        if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
+          pixels.active = i
+        end
+      end
     end
   end
 end
@@ -35,6 +43,9 @@ function pixel:new(x,y)
 
   p.x = x
   p.y = y
+  p.x_display = x
+  p.y_display = y
+
   p.last_x = x
   p.last_y = y
   p.timer = 1
@@ -47,45 +58,46 @@ end
 
 function pixel:update(display)
   self.timer = self.timer + 1
-  if self.timer == 100 then
+  if self.timer == SCREEN_REFRESH_DENOMINATOR then
     self.level = self.level - 1
     self.timer = 1
     self.redraw = true
   end
   if self.level <= 0 then
-    screen.level(0)
-    screen.pixel(self.x,self.y)
-    screen.stroke()
-
     self.remove = true  
   elseif self.level > 0 and self.redraw == true then
+    local lb = lorenz.get_boundary()
     if display == true then
-      local lb = lorenz.boundary
       if (self.last_x>lb[1] and self.last_x<lb[1]+lb[3] and self.last_y>lb[2] and self.last_y<lb[2]+lb[4]) then
         screen.level(0)
+        -- screen.blend_mode (5)
         screen.pixel(self.last_x,self.last_y)
         screen.stroke()
-        end
-
-      
+        -- screen.blend_mode (0)
+      end 
+    end  
       local x_offset = params:get("x_offset")
       local y_offset = params:get("y_offset")
       local x_scale = params:get("x_scale")
       local y_scale = params:get("y_scale")
   
-      screen.level(self.level)
-
-      local x = ((self.x*x_scale)+x_offset)+(64)
-      local y = ((self.y*y_scale)+y_offset)+(32)
+      
+      self.x_display = ((self.x*x_scale)+x_offset)+(64)
+      self.y_display = ((self.y*y_scale)+y_offset)+(32)
+      local x = self.x_display
+      local y = self.y_display
       if (x>lb[1] and x<lb[1]+lb[3] and y>lb[2] and y<lb[2]+lb[4]) then
-        screen.pixel(x,y)
+        -- if (x>lb[1] and x<lb[1]+lb[3] and y>lb[2] and y<lb[2]+lb[4]) then
+        self.last_x = x
+        self.last_y = y
+        if display == true then
+          screen.level(self.level)
+          screen.pixel(x,y)
+          screen.stroke()
+        end
       end
-      self.last_x = x
-      self.last_y = y
-      screen.stroke()
       self.redraw = false
     end
-  end
 end
 
 --------------------------------
@@ -110,7 +122,7 @@ lorenz = {
   third = 0,
   x_map = 0,
   y_map = 0,
-  boundary = {37,1,88,61}
+  boundary = {37,5,74,55}
 }
 
 function lorenz.init()
@@ -134,6 +146,17 @@ function lorenz:process(steps,dt)
   end
 end
 
+function lorenz.get_boundary()
+  
+  local rows = #quant_grid.sectors
+  local cols = #quant_grid.sectors[rows]
+  local x = lorenz.boundary[1]
+  local y = lorenz.boundary[2]
+  local w = quant_grid.sectors[1][1].w*cols
+  local h = quant_grid.sectors[1][1].h*rows
+  local boundary = {x,y,w-2,h-2}
+  return boundary
+end
 function lorenz:reset()
   screen:clear()
   for i=1,3 do self.state[i] = self.origin[i] end
@@ -141,7 +164,7 @@ function lorenz:reset()
 end
 
 lorenz.display = function(display)
-  screen.move(42,1)
+  -- screen.move(42,1)
   pixels.update(display) 
 end
 

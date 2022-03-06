@@ -20,8 +20,6 @@ function quant_sector:display()
   screen.move(self.x,self.y)
   screen.rect(self.x,self.y,self.w,self.h)
   screen.stroke()
-  screen.update()
-  -- print(1)
 end
 
 local quant_grid = {}
@@ -46,7 +44,7 @@ function quant_grid:init(rows,cols)
   end
 end
 
-function quant_grid:display_sectors()
+function quant_grid:display()
   for i=1,#quant_grid.sectors,1 do
     for j=1,#quant_grid.sectors[i],1 do
       quant_grid.sectors[i][j]:display()
@@ -54,4 +52,51 @@ function quant_grid:display_sectors()
   end
 end
 
+function quant_grid:get_active_sector(active)
+  local x=active.x_display
+  local y=active.y_display
+  for i=1,#quant_grid.sectors,1 do
+    for j=1,#quant_grid.sectors[i],1 do
+      local s = quant_grid.sectors[i][j]
+      -- print(x,y.."    /    "..s.x,s.y,s.w,s.h)
+      if x>s.x and x<s.x+s.w and y>s.y and y<s.y+s.h then
+        -- active_sector={i,j}
+        -- print(x,s.x,s.w,s.y,s.h)
+        return {col=i,row=j}
+      end
+    end
+  end
+
+end
+
+function quant_grid:update_note()
+  local active = pixels[pixels.active]
+  if active then 
+    
+    local active_sector=quant_grid:get_active_sector(active)
+    if active_sector then
+      local octave =  active_sector.row
+      local note =    active_sector.col
+      -- local note_to_play = notes[note]
+      -- local note_to_play = notes[octave*note]
+      local note_to_play = (octave*note)+60
+
+      local note_tab = {
+        pitch = note_to_play,
+        level = 5,
+        mode = 1
+      }
+      ext.note_on(1,note_tab, "midi")
+      -- ext.note_on(1,fn.deep_copy(value_tab),1,1,"sequencer", "jf")
+        -- ext.note_on(1,note_tab, "jf")
+        ext.note_on(1,note_tab, "crow")
+        ext.note_on(1,note_tab, "wsyn")
+        -- ext.note_on(1,note_tab, "wdel_ks")
+      
+      -- ext.note_on(1,value_tab,1,1,"sequencer", "jf")
+    
+
+    end
+  end
+end
 return quant_grid
