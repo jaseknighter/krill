@@ -3,117 +3,79 @@
 
 Engine_Krill : CroneEngine {
 	// <Krill>
-	// </Krill>
 	var risePoll,risePollFunc;
 	var fallPoll,fallPollFunc;
-	var rc1SamplePoll,rc1SamplePollFunc;
-	var rc2SamplePoll,rc2SamplePollFunc;
+	var pitchPoll,pitchPollFunc;
+	var noteStartPoll;
 	var krillFn;
 	var sh1=1, sh2=1;
-	var rise=0.1, fall=0.5, looping=1,running=false, env_time=1;
+	var rise=1, fall=1, rise_time=1, fall_time=1, looping=1,running=false, env_time=1;
+	var rise_start=0, fall_start=0;
 	var env_shape='exp';
-	var rc_freq=22050,rc_a=0.2,rc_b=0.2,rc_c=5.7,rc_h=0.05,
-	// var rc_freq=22050,rc_a=0.36,rc_b=0.35,rc_c=4.5,rc_h=0.05,
-	rc_xi=0.1,rc_yi=0,rc_zi=0,rc_mul=1.0,rc_add=0.0;
-	var rc_fdbk=1;
-
+	var lorenz_sample = 1;
+	
 	*new { arg context, doneCallback;
 		^super.new(context, doneCallback);
 	}
 
 	alloc {
-    // install the Maths quark
-		// <Krill>
+
 		var scale = Scale.choose.postln;
+
+    // install the Maths quark
+		Quarks.install("Maths");
+    context.server.sync;
 
 		// add synth defs
 		SynthDef("krill",{ 
       arg outBus=0, logExp=0.5,loop=1,plugged=0,trig,
-			hz=220,amp=0.5,rise=1,fall=1, gate=1,
-			foc1Val,
+			hz=220,amp=0.5, 
+			rise=1,fall=1, rise_time=1, fall_time=1, 
+			gate=1,
 			env_time=1, env_shape='exp',
 			sh1=1,sh2=1,
-			rand_chaos_mode=3, 
-			rc_fdbk=1,
-			rc_freq=22050,rc_a=0.2,rc_b=0.2,rc_c=5.7,rc_h=0.05,rc_xi=0.1,rc_yi=0,rc_zi=0,rc_mul=1.0,rc_add=0.0;
+			logExpBuffer,
+			mathsA,mathsAVal,foc1,eor1,sig1,noise, foc1_num,
+      mathsB,foc2,eor2,sig2;
 
+			
 			var out, osc, rise_phase, env_phase, rise_rate, fall_rate, 
 			env_rate, env_pos, amp_env, env_gen, sig, done, env_changed,
-			rc1a, rc1b, rc2a,rc2b, 
-			pitch,filter_env;
+			filter_env,
+			pitch, freq,
 
-			rise_phase = Decay.kr(Impulse.kr(0), rise);
-			// env_phase = rise_phase > 0;
-			env_phase = rise_phase <= 0.001;
-			rise_rate = 1 / (rise * ((sh1/2)+1) * env_time);
-			fall_rate = 1 / (fall * ((sh2/2)+1) * env_time);
-			
-			env_rate = Select.kr(env_phase, [rise_rate, fall_rate]);
-			env_pos = Sweep.kr(Impulse.kr(0), env_rate);
-			
-			amp_env = Env([0.001, 1, 0.001], [1, 1], env_shape);
-			env_gen = IEnvGen.kr(amp_env, env_pos);
+			fall_start=0,rise_start=0;
 
-			// sig = osc * env_gen * amp;
+			logExpBuffer = Buffer.alloc(context.server, 1,1, {|b| b.setnMsg(0, logExp) });
+      #mathsA, foc1, eor1 = Maths2.ar(rise, fall, logExpBuffer.bufnum, loop);
 
 			pitch = DegreeToKey.kr(
                 scale.as(LocalBuf),
                 // MouseX.kr(0,15), // mouse indexes into scale
 								// LinLin.kr((sh1+sh2/2+1),-2,2,1,15),
-								LinLin.kr((sh1+sh2),-2,2,1,15).floor,
+								LinLin.kr((sh1+sh2),0,2,1,15).floor,
                 scale.stepsPerOctave,
                 1, // mul = 1
-                30 // offset by 72 notes
+                30 // offset by 30 notes (sample code is 72 note offset?!?!?!)
             );
-			// env1 = EnvGen.ar(Env.new([0, 1.0, 0, 0], [0.001, 2.0, 0.04], [0, -4, -4], 2), gate, amp);
+			
+			// pitch.midicps.poll;
+
 			filter_env = EnvGen.ar(Env.adsr(0.001, 0.8, 0, 0.8, 70, -4), gate);
 			out = LFSaw.ar(pitch.midicps, 2, -1);
 
-			out = MoogLadder.ar(out, (pitch + filter_env/2).midicps+(LFNoise1.kr(0.2,1100,1500)),LFNoise1.kr(0.4,0.9).abs+0.3,3);
-			// out = MoogLadder.ar(out, (env_pos/2).midicps+(LFNoise1.kr(0.2,1100,1500)),LFNoise1.kr(0.4,0.9).abs+0.3,3);
-			// out = MoogLadder.ar(out, (pitch * sh2).midicps+(LFNoise1.kr(0.2,1100,1500)),LFNoise1.kr(0.4,0.9).abs+0.3,3);
-			out = LeakDC.ar((out * env_gen*amp).tanh/2.7);
+			// freq = Pitch.kr(out);
+			// freq = Clip.ar(freq, 0.midicps, 127.midicps);
+
+			out = MoogLadder.ar(out, (pitch + filter_env).midicps+(LFNoise1.kr(0.2,1100,1500)),LFNoise1.kr(0.4,0.9).abs+0.3,3);
+			out = LeakDC.ar((out * amp).tanh/2.7);
 
 			sig = out.tanh;
 
-
-			done = env_gen <= 0.001;
-			env_changed = Changed.kr(env_phase);
-
+			SendReply.kr(Impulse.kr(10), '/triggerPitchPoll', pitch.midicps);
+			SendReply.ar(Changed.ar(foc1), '/triggerRiseDonePoll', foc1);
+			SendReply.ar(Changed.ar(eor1), '/triggerFallDonePoll', eor1);
 			
-			
-			//random/chaotic generator modes
-			// 1: LFNoise0
-			// rc1a = LFNoise0.ar(10);
-			// rc1b = rc1a;
-			// rc2a = LFNoise0.ar(10);
-			// rc2b = rc2a;
-
-			// 2: RosslerL #1
-			
-			#rc1b, rc1a, rc2a = RosslerL.ar(rc_freq,rc_a,rc_b,rc_c,rc_h,rc_xi,rc_yi,rc_zi,rc_mul,rc_add);
-			// freq= 22050, a= 0.2, b= 0.2, c= 5.7, h= 0.05, xi= 0.1, yi= 0, zi= 0, mul= 1.0, add= 0.0
-			// #rc1b, rc1a, rc2a = RosslerL.ar(1000, 0.36, 0.35, 4.5, 0.05, 0.1, 0,0) * rc_mul;
-			// #rc1b, rc1a, rc2a = RosslerL.ar(1000, 0.36, 0.35, 4.5, 0.05, 0.1, 0,0) * rc_mul;
-			// #rc1a, rc2a = RosslerL.ar(SampleRate.ir/rc_freq, 0.36, 0.35, 4.5) * rc_mul;
-			
-			// 3: RosslerL #2
-			// #rc1a, rc2a = RosslerL.ar(freq:rc_freq,h:rc_mul);
-			// 4: SinOscFB
-			// #rc1a, rc2a = SinOscFB.ar([800,700,600,500,400,301], rc_fdbk, rc_mul);
-			// ([rc1a,rc2a]).poll;
-
-
-			//send messages to norns
-			SendReply.kr(env_changed * env_phase, '/triggerRiseDonePoll', rc1a);
-			// SendReply.kr(done, '/triggerRC1Poll', sh1);
-			// SendReply.kr(done, '/triggerRC2Poll', sh2);			
-			SendReply.kr(done, '/triggerRC1Poll', rc1a);
-			SendReply.kr(done, '/triggerRC2Poll', rc2a);			
-			SendReply.kr(done, '/triggerFallDonePoll', rc2a);
-			
-
-
 			Out.ar(0, sig.dup);
 		}).add;
 		
@@ -124,95 +86,93 @@ Engine_Krill : CroneEngine {
     /////////////////////////////////
 
     // trigger Polls
-    risePollFunc = OSCFunc({
+    pitchPollFunc = OSCFunc({
       arg msg;
-      var val = msg[3].asStringPrec(3).asFloat;
+			// ("pitchpoll"+msg[3]).postln;
+			pitchPoll.update(msg[3]);
+    }, path: '/triggerPitchPoll', srcID: context.server.addr);
 
 
-			// if (val > -1 && val < 1) {
-				sh1 = val;
-				("rise"+sh1).postln;
-				risePoll.update(val);
-			// };
+		risePollFunc = OSCFunc({
+      arg msg;
+			if (rise_start > 1) {
+				sh1 = lorenz_sample;
+				rise = rise_time * lorenz_sample;
+				// ("rise"+rise_start).postln;
 
+				// ("rise"+rise_start+"/"+fall_start).postln;
+				risePoll.update(sh1);
+				rise_start=0;
+			};
+			rise_start = rise_start + 1;
     }, path: '/triggerRiseDonePoll', srcID: context.server.addr);
 
     fallPollFunc = OSCFunc({ 
 			arg msg;
-      var val = msg[3].asStringPrec(3).asFloat;
-			sh2 = val;
-			// create a new synth on completion of old synth if looping == 1
-			context.server.sendMsg("/n_free", msg[1]);				
-			if(looping == 1){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_a,rc_a,\rc_b,rc_b,\rc_c,rc_c,\rc_h,rc_h,\rc_xi,rc_xi,\rc_yi,rc_yi,\rc_zi,rc_zi,\rc_mul,rc_mul,\rc_add,rc_add]);
-
+			sh2 = lorenz_sample;
+			// if(looping == 1 && fall_start > 1){
+			if(fall_start > 1){
+				fall = fall_time * lorenz_sample;
+				// ("fall"+fall_start).postln;
+				fallPoll.update(sh2);
+				fall_start=0;
+				context.server.sendMsg("/n_free", msg[1]);	
+				if (looping == 1){
+					noteStartPoll.update();
+					krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2]);
+				}{
+					running = false;
+				};
 			}{
-				running = false;
-				("not running, not looping")
 			};
-			("fall"+sh2).postln;
-			//free the active synth
-
-			fallPoll.update(val);
+			fall_start = fall_start + 1;
     }, path: '/triggerFallDonePoll', srcID: context.server.addr);
 
-    rc1SamplePollFunc = OSCFunc({
-			arg msg;
-      var val = msg[3].asStringPrec(3).asFloat;
-			rc1SamplePoll.update(val);
-    }, path: '/triggerRC1Poll', srcID: context.server.addr);
-
-    rc2SamplePollFunc = OSCFunc({
-			arg msg;
-      var val = msg[3].asStringPrec(3).asFloat;
-			rc2SamplePoll.update(val);
-    }, path: '/triggerRC2Poll', srcID: context.server.addr);
-
-		// add polls
+    // add polls
+    pitchPoll = this.addPoll(name: "pitch_poll", periodic: false);
+    noteStartPoll = this.addPoll(name: "note_start_poll", periodic: false);
     risePoll = this.addPoll(name: "rise_poll", periodic: false);
     fallPoll = this.addPoll(name: "fall_poll", periodic: false);
-    rc1SamplePoll = this.addPoll(name: "rc1_sample_poll", periodic: false);
-    rc2SamplePoll = this.addPoll(name: "rc2_sample_poll", periodic: false);
-
+    
     ///////////////////////////////////
 		// add norns commands
     ///////////////////////////////////
 
 		this.addCommand("kr_start","",{ arg msg;
 			if (running == false){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_a,rc_a,\rc_b,rc_b,\rc_c,rc_c,\rc_h,rc_h,\rc_xi,rc_xi,\rc_yi,rc_yi,\rc_zi,rc_zi,\rc_mul,rc_mul,\rc_add,rc_add]);
+				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2]);
 				running = true;
 			}
 		});
 
+		this.addCommand("kr_set_lorenz_sample","f",{ arg msg;
+			lorenz_sample = msg[1];
+		});
+
 		this.addCommand("kr_looping","f",{ arg msg;
 			looping = msg[1];
+			("looping" + msg[1]).postln;
 			if (msg[1] == 1.0 && running == false){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2,\rc_freq,rc_freq,\rc_a,rc_a,\rc_b,rc_b,\rc_c,rc_c,\rc_h,rc_h,\rc_xi,rc_xi,\rc_yi,rc_yi,\rc_zi,rc_zi,\rc_mul,rc_mul,\rc_add,rc_add]);
-			}
+				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2]);
+				running = true;
+			};
+			
 		});
 		
 		this.addCommand("kr_rise_fall","ff",{ arg msg;
 				// rise = msg[1];
 				// fall = msg[2];
 			if (msg[1] != nil){
-				rise = msg[1];
-				("rise"+rise).postln;
+				rise_time = msg[1];
+				("rise_time"+rise_time).postln;
 			};			
 
 			if (msg[2] != nil){
-				fall = msg[2];
-				("fall"+fall).postln;
+				fall_time = msg[2];
+				("fall_time"+fall_time).postln;
 			};
     });
 	  
-		this.addCommand("kr_looping","f",{ arg msg;
-			looping = msg[1];
-			if (msg[1] == 1.0 && running == false){
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time])
-			}
-		});
-
 		this.addCommand("kr_env_time","f",{ arg msg;
 			var time;
 			// if (msg[1] < 1){
@@ -230,44 +190,6 @@ Engine_Krill : CroneEngine {
 		});
 
 
-		this.addCommand("kr_rc_freq","f",{ arg msg;
-			rc_freq = msg[1];
-		});
-		this.addCommand("kr_rc_a","f",{ arg msg;
-			rc_a = msg[1];
-		});
-		this.addCommand("kr_rc_b","f",{ arg msg;
-			rc_b = msg[1];
-		});
-		this.addCommand("kr_rc_c","f",{ arg msg;
-			rc_c = msg[1];
-		});
-		this.addCommand("kr_rc_h","f",{ arg msg;
-			rc_h = msg[1];
-		});
-		this.addCommand("kr_rc_xi","f",{ arg msg;
-			rc_xi = msg[1];
-		});
-		this.addCommand("kr_rc_yi","f",{ arg msg;
-			rc_yi = msg[1];
-		});
-		this.addCommand("kr_rc_zi","f",{ arg msg;
-			rc_zi = msg[1];
-		});
-		this.addCommand("kr_rc_mul","f",{ arg msg;
-			rc_mul = msg[1];
-		});
-		this.addCommand("kr_rc_add","f",{ arg msg;
-			rc_add = msg[1];
-		});
-
-
-
-
-		this.addCommand("kr_rc_fdbk","f",{ arg msg;
-			rc_fdbk = msg[1];
-		});
-
 	}
 
 	free {
@@ -275,10 +197,6 @@ Engine_Krill : CroneEngine {
 		risePollFunc.free;
 		fallPoll.free;
 		fallPollFunc.free;
-		rc1SamplePoll.free;
-		rc1SamplePollFunc.free;
-		rc2SamplePoll.free;
-		rc2SamplePollFunc.free;
 		krillFn.free;
 		sh1.free;
 		sh2.free;

@@ -16,7 +16,8 @@ function quant_sector:new(x,y,w,h,row,col)
 end
 
 function quant_sector:display()
-  screen.level(2)
+  local level = math.floor(5 * gui_level)
+  screen.level(level)
   screen.move(self.x,self.y)
   screen.rect(self.x,self.y,self.w,self.h)
   screen.stroke()
@@ -86,12 +87,14 @@ function quant_grid:update_note()
         level = 5,
         mode = 1
       }
+
+      
       ext.note_on(1,note_tab, "midi")
       -- ext.note_on(1,fn.deep_copy(value_tab),1,1,"sequencer", "jf")
-        -- ext.note_on(1,note_tab, "jf")
-        ext.note_on(1,note_tab, "crow")
-        ext.note_on(1,note_tab, "wsyn")
-        -- ext.note_on(1,note_tab, "wdel_ks")
+      -- ext.note_on(1,note_tab, "jf")
+      ext.note_on(1,note_tab, "crow")
+      ext.note_on(1,note_tab, "wsyn")
+      -- ext.note_on(1,note_tab, "wdel_ks")
       
       -- ext.note_on(1,value_tab,1,1,"sequencer", "jf")
     

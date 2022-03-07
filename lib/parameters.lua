@@ -96,13 +96,15 @@ function parameters.init()
   params:add{
     type="number", id = "x_offset", name = "x offset",min=-64, max=64, default = 0,
     action=function(x) 
-      lorenz:reset()
+      -- lorenz:reset()
+      screen:clear()
     end
   }
   params:add{
     type="number", id = "y_offset", name = "y offset",min=-32, max=32, default = 0,
     action=function(x) 
-      lorenz:reset()
+      -- lorenz:reset()
+      screen:clear()
     end
   }
 
@@ -111,32 +113,38 @@ function parameters.init()
     action=function(x) 
       params:set("x_offset",x)
       params:set("y_offset",x)
-      lorenz:reset()
+      -- lorenz:reset()
+      screen:clear()
     end
   }
 
   params:add{
     type="taper", id = "x_scale", name = "x scale",min=0.01, max=10, default = 1,
     action=function(x) 
-      lorenz:reset()
+      -- lorenz:reset()
+      screen:clear()
     end
   }
   
   params:add{
     type="taper", id = "y_scale", name = "y scale",min=0.01, max=10, default = 1,
     action=function(x) 
-      lorenz:reset()
+      -- lorenz:reset()
+      screen:clear()
     end
   }
 
-  params:add{
-    type="taper", id = "xy_scale", name = "xy scale",min=0.01, max=10, default = 1,
-    action=function(x) 
-      params:set("x_scale",x)
-      params:set("y_scale",x)
-      lorenz:reset()
-    end
-  }
+  -- params:add{
+  --   type="taper", id = "xy_scale", name = "xy scale",min=0.01, max=2, default = 1,
+  --   action=function(x) 
+  --     -- params:set("x_scale",x)
+  --     -- params:set("y_scale",x)
+  --     params:set("x_scale",params:get("x_scale") * x)
+  --     params:set("y_scale",params:get("y_scale") * x)
+  --     -- lorenz:reset()
+  --     screen:clear()
+  --   end
+  -- }
 
 
   params:add{

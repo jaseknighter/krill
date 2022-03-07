@@ -56,6 +56,7 @@ quant_grid = include("lib/quant_grid")
 midi_helper = include("lib/midi_helper")
 w_slash = include("lib/w_slash")
 externals = include("lib/externals")
+gui = include("lib/gui")
 
 
 -- engine.name="AcidTest"
@@ -73,9 +74,15 @@ chaos_y={}
 
 initializing = true
 function init()
+  -- set sensitivity of the encoders
+  norns.enc.sens(1,6)
+  norns.enc.sens(2,6)
+  norns.enc.sens(3,6)
+  
   screen.aa(1)
   lorenz.init()
   parameters.init()
+  -- params:set("x_offset",10)
   fn.build_scale()
 
   active_notes = {}
@@ -96,6 +103,15 @@ function init()
     action = function(t) 
       lorenz:process()
       lorenz:update()
+
+      if pixels[pixels.active] then
+        local lb = lorenz.get_boundary()
+        local lb_sample_min = lb[1]*lb[2]
+        local lb_sample_max = lb[3]*lb[4]
+        local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
+        sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
+        engine.kr_set_lorenz_sample(sample_val)
+      end
     end,
     division = 1/256, --1/16,
     enabled = true
@@ -109,7 +125,9 @@ function init()
   quant_pattern = krill_lattice:new_pattern{
     action = function(t) 
       
+      -- play note from quant grid
       quant_grid:update_note()
+
       if math.random()>0.8 then
         quant_pat_div = div[math.random(#div)]
       end
@@ -123,30 +141,48 @@ function init()
   clock.run( function()
     while true do
 
-      -- if norns.menu.status()  == false then
+      if norns.menu.status()  == false then
         screen.aa(0)
-        if params:get("grid_display") == 2 then quant_grid:display() end
+        if params:get("grid_display") == 2 and gui_level > 0 then quant_grid:display() end
+        gui:display()
+        screen.update()
         screen.aa(1)
         lorenz.display(true)
         screen.update()
-      -- else
-      --   lorenz.display(false)
-      -- end
+      else
+        lorenz.display(false)
+      end
       SCREEN_REFRESH_DENOMINATOR = 10
       clock.sleep(1/SCREEN_REFRESH_DENOMINATOR)
-      -- clock.sleep(0.005)
     end
   end)
 
   
   krill_lattice:start()
-  params:set("xy_scale",0.9)
+  -- params:set("xy_scale",0.9)
 
   -- clock.run(setup_polling)
+  init_polling()
+  engine.kr_start();
+  -- engine.kr_env_time(0.5);
+  -- clock.run(gui.set_gui_level)
   initializing = false
 end
 
-function setup_polling()
+function init_polling()
+  pitch_poll = poll.set("pitch_poll", function(value)
+    if note_start == true then
+      note_start = false
+      
+    end
+  end)
+
+  note_start_poll = poll.set("note_start_poll", function(value)
+    note_start = true
+    -- print("note_start_poll")
+    -- table.insert(chaos_x,value)
+  end)
+
   rise_poll = poll.set("rise_poll", function(value)
     -- print("rise done",value)
     -- table.insert(chaos_x,value)
@@ -158,57 +194,10 @@ function setup_polling()
     
   end)
 
-  rc1_sample_poll = poll.set("rc1_sample_poll", function(value)
-    -- print("rc1_sample_poll",value)
-    table.insert(chaos_x,value)
-    
-  end)
-
-  rc2_sample_poll = poll.set("rc2_sample_poll", function(value)
-    -- print("rc2_sample_poll",value)
-    table.insert(chaos_y,value)
-  end)
-
-  clock.sleep(1)
-  polling_start()
-  clock.sleep(0.25)
-  clock.run(function()
-      while true do
-        clock.sleep(1/10)
-        redraw()
-      end
-    end)
-  engine.kr_start();
-  -- engine.kr_env_time(0.5);
-end
-
-function polling_start()
+  pitch_poll:start()
+  note_start_poll:start()
   rise_poll:start()
   fall_poll:start()
-  rc1_sample_poll:start()
-  rc2_sample_poll:start()
 end
 
-function redraw()
-  local rand = math.random()*3+1
-  engine.kr_rc_c(rand)
-  -- print("redraw",#chaos_x)
-  screen.level(15)
-  -- if #chaos_x > 1000 then
-    -- chaos_x = {}
-    -- chaos_y = {}
-  -- end
-  
-  if #chaos_x >= 1 then
-    for i=1,#chaos_x,1 do
-      local x = math.floor(util.linlin(-1,1,1,128,chaos_x[i]))
-      local y = math.floor(util.linlin(-1,1,1,64,chaos_y[i]))
-      -- print(x,y)
-      screen.move(x,y)
-      -- screen.line(x,y)
-      screen.pixel(x,y)
-      screen.stroke()
-    end
-    screen.update()
-  end
-end
+

@@ -15,6 +15,7 @@ pixels = {}
 pixels.active = nil
 
 function pixels.update(display)
+  local lb = lorenz.get_boundary()
   -- print(#pixels)
   for i=1,#pixels,1 do
     pixels[i]:update(display)
@@ -22,7 +23,14 @@ function pixels.update(display)
   for i=1,#pixels,1 do
     if pixels[i] and pixels[i].remove == true then
       -- print("remove"..i)
-      table.remove(pixels,i)
+      if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
+        local x = math.floor(pixels[i].last_x)
+        local y = math.floor(pixels[i].last_y)
+        if (x and y) then
+          screen.poke(x-1,y-1,2,2,blank_pixel)
+        end
+        table.remove(pixels,i)
+      end
     elseif pixels[i] and pixels[i].remove == false then
       local lb = lorenz.get_boundary()
       if display == true then
@@ -69,35 +77,34 @@ function pixel:update(display)
     local lb = lorenz.get_boundary()
     if display == true then
       if (self.last_x>lb[1] and self.last_x<lb[1]+lb[3] and self.last_y>lb[2] and self.last_y<lb[2]+lb[4]) then
-        screen.level(0)
-        -- screen.blend_mode (5)
-        screen.pixel(self.last_x,self.last_y)
-        screen.stroke()
-        -- screen.blend_mode (0)
-      end 
-    end  
-      local x_offset = params:get("x_offset")
-      local y_offset = params:get("y_offset")
-      local x_scale = params:get("x_scale")
-      local y_scale = params:get("y_scale")
-  
-      
-      self.x_display = ((self.x*x_scale)+x_offset)+(64)
-      self.y_display = ((self.y*y_scale)+y_offset)+(32)
-      local x = self.x_display
-      local y = self.y_display
-      if (x>lb[1] and x<lb[1]+lb[3] and y>lb[2] and y<lb[2]+lb[4]) then
-        -- if (x>lb[1] and x<lb[1]+lb[3] and y>lb[2] and y<lb[2]+lb[4]) then
-        self.last_x = x
-        self.last_y = y
-        if display == true then
-          screen.level(self.level)
-          screen.pixel(x,y)
-          screen.stroke()
-        end
+        -- screen.level(0)
+        -- screen.pixel(self.last_x,self.last_y)
+        -- screen.stroke()
       end
-      self.redraw = false
     end
+
+    local x_offset = params:get("x_offset")
+    local y_offset = params:get("y_offset")
+    local x_scale = params:get("x_scale")
+    local y_scale = params:get("y_scale")
+
+    
+    self.x_display = ((self.x*x_scale)+x_offset)+(CENTER_X)
+    self.y_display = ((self.y*y_scale)+y_offset)+(CENTER_Y)
+    local x = self.x_display
+    local y = self.y_display
+    if (x>lb[1] and x<lb[1]+lb[3] and y>lb[2] and y<lb[2]+lb[4]) then
+      -- if (x>lb[1] and x<lb[1]+lb[3] and y>lb[2] and y<lb[2]+lb[4]) then
+      self.last_x = x
+      self.last_y = y
+      if display == true then
+        screen.level(self.level)
+        screen.pixel(x,y)
+        screen.stroke()
+      end
+    end
+    self.redraw = false
+  end
 end
 
 --------------------------------
@@ -122,7 +129,8 @@ lorenz = {
   third = 0,
   x_map = 0,
   y_map = 0,
-  boundary = {37,5,74,55}
+  boundary = {51,5,84,55}
+  -- boundary = {41,5,68,55}
 }
 
 function lorenz.init()
@@ -158,9 +166,9 @@ function lorenz.get_boundary()
   return boundary
 end
 function lorenz:reset()
+  for i=1,#pixels,1 do pixels[i] = nil end
   screen:clear()
-  for i=1,3 do self.state[i] = self.origin[i] end
-  -- for i=1,#pixels,1 do pixels[i] = nil end
+  -- for i=1,3 do self.state[i] = self.origin[i] end
 end
 
 lorenz.display = function(display)
@@ -169,65 +177,65 @@ lorenz.display = function(display)
 end
 
 lorenz.update = function()
+  local xyz = {}
   for i=1,4 do
     local sum = 0
-    local xyz = {}
     for j=1,3 do
       xyz[j] = lorenz.weigths[i][j]*lorenz.state[j]
       sum = sum+lorenz.weigths[i][j]*lorenz.state[j]  
     end
-
-    lorenz.first = math.floor(xyz[1])
-    lorenz.second = math.floor(xyz[2])
-    lorenz.third = math.floor(xyz[3])
-
-    -- lorenz.x_map = lorenz.first
-    -- lorenz.y_map = lorenz.second
-    -- lorenz.x_map = params:get("x_input")
-    -- lorenz.y_map = params:get("y_input")
-
-    local x_input = params:get("x_input")      
-    if x_input == 1 then lorenz.x_map = lorenz.first 
-    elseif x_input == 2 then lorenz.x_map = lorenz.second
-    elseif x_input == 3 then lorenz.x_map = lorenz.third 
-    end
-
-    local y_input = params:get("y_input")      
-    if y_input == 1 then lorenz.y_map = lorenz.first 
-    elseif y_input == 2 then lorenz.y_map = lorenz.second
-    elseif y_input == 3 then lorenz.y_map = lorenz.third 
-    end
-
-    local x = (lorenz.x_map) 
-    local y = (lorenz.y_map) 
-
-    -- screen.level(3)
-    -- screen.aa(0)
-    if lorenz.x_map~=0 and lorenz.y_map ~= 0 then
-    -- if x~=64 + x_offset and y~=32 +  y_offset then
-    -- if x~=64 and y~=32 then
-    --   screen.move(x,y)
-    --   screen.pixel(x,y)
-      -- local num_pixels = pixels and #pixels+1 or 1
-      -- print()
-      local xy_exists = false
-      for i=1,#pixels,1 do
-        local prev_x = pixels[i].x
-        local prev_y = pixels[i].y
-        if prev_x == x and prev_y == y then 
-          xy_exists = true
-        end
-      end
-      if xy_exists == false then
-        local px = pixel:new(x,y)
-        pixels[#pixels+1] = px
-      end
-    end
-
-
-    local outputs = 10*(sum+25)/80 - 5
-    -- output[i].volts = 10*(sum+25)/80 - 5
   end
+
+  lorenz.first = math.floor(xyz[1])
+  lorenz.second = math.floor(xyz[2])
+  lorenz.third = math.floor(xyz[3])
+
+  -- lorenz.x_map = lorenz.first
+  -- lorenz.y_map = lorenz.second
+  -- lorenz.x_map = params:get("x_input")
+  -- lorenz.y_map = params:get("y_input")
+  -- print("lorenz.first",lorenz.first)
+  local x_input = params:get("x_input")      
+  if x_input == 1 then lorenz.x_map = lorenz.first 
+  elseif x_input == 2 then lorenz.x_map = lorenz.second
+  elseif x_input == 3 then lorenz.x_map = lorenz.third 
+  end
+
+  local y_input = params:get("y_input")      
+  if y_input == 1 then lorenz.y_map = lorenz.first 
+  elseif y_input == 2 then lorenz.y_map = lorenz.second
+  elseif y_input == 3 then lorenz.y_map = lorenz.third 
+  end
+
+  local x = (lorenz.x_map) 
+  local y = (lorenz.y_map) 
+
+  -- screen.level(3)
+  -- screen.aa(0)
+  if lorenz.x_map~=0 and lorenz.y_map ~= 0 then
+  -- if x~=64 + x_offset and y~=32 +  y_offset then
+  -- if x~=64 and y~=32 then
+  --   screen.move(x,y)
+  --   screen.pixel(x,y)
+    -- local num_pixels = pixels and #pixels+1 or 1
+    -- print()
+    local xy_exists = false
+    for i=1,#pixels,1 do
+      local prev_x = pixels[i].x
+      local prev_y = pixels[i].y
+      if prev_x == x and prev_y == y then 
+        xy_exists = true
+      end
+    end
+    if xy_exists == false then
+      local px = pixel:new(x,y)
+      pixels[#pixels+1] = px
+    end
+  end
+
+
+    -- local outputs = 10*(sum+25)/80 - 5
+    -- output[i].volts = 10*(sum+25)/80 - 5
 end
 
 -- input[1].change = function(s)
