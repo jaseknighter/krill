@@ -33,10 +33,8 @@ function pixels.update(display)
       end
     elseif pixels[i] and pixels[i].remove == false then
       local lb = lorenz.get_boundary()
-      if display == true then
-        if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
-          pixels.active = i
-        end
+      if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
+        pixels.active = i
       end
     end
   end

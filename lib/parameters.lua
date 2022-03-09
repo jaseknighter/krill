@@ -83,13 +83,13 @@ function parameters.init()
   params:add{
     type="option", id = "x_input", name = "x input", options={"first","second","third"},default = 1,
     action=function(x) 
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
   params:add{
     type="option", id = "y_input", name = "y input", options={"first","second","third"},default = 2,
     action=function(x) 
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -151,7 +151,7 @@ function parameters.init()
     type="taper", id = "origin1", name = "origin1",min=0.000, max=20, default = 0.01,
     action=function(x) 
       lorenz.origin[1]=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
   
@@ -159,7 +159,7 @@ function parameters.init()
     type="taper", id = "origin2", name = "origin2",min=0.000, max=20, default = 0.5,
     action=function(x) 
       lorenz.origin[2]=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -167,7 +167,7 @@ function parameters.init()
     type="taper", id = "origin3", name = "origin3",min=0.000, max=20, default = 0.0,
     action=function(x) 
       lorenz.origin[3]=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -175,7 +175,7 @@ function parameters.init()
     type="taper", id = "sigma", name = "sigma",min=0.001, max=10, default = 2.333,
     action=function(x) 
       lorenz.dt=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -183,7 +183,7 @@ function parameters.init()
     type="number", id = "rho", name = "rho",min=1, max=50, default = 28,
     action=function(x) 
       lorenz.rho=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -191,7 +191,7 @@ function parameters.init()
     type="taper", id = "beta", name = "beta",min=0.01, max=2, default = 4/3,
     action=function(x) 
       lorenz.beta=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -199,7 +199,7 @@ function parameters.init()
     type="taper", id = "state1", name = "state1",min=0.000, max=2, default = 0.1,
     action=function(x) 
       lorenz.state[1]=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
   
@@ -207,7 +207,7 @@ function parameters.init()
     type="taper", id = "state2", name = "state2",min=0.000, max=2, default = 0.0,
     action=function(x) 
       lorenz.state[3]=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
   
@@ -215,7 +215,7 @@ function parameters.init()
     type="taper", id = "state3", name = "state3",min=0.000, max=2, default = 0.0,
     action=function(x) 
       lorenz.state[3]=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
   
@@ -224,14 +224,14 @@ function parameters.init()
     type="number", id = "steps", name = "steps",min=1, max=100, default = 1,
     action=function(x) 
       lorenz.steps=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
   params:add{
     type="taper", id = "dt", name = "dt",min=0.001, max=0.05, default = 0.015,
     action=function(x) 
       lorenz.dt=x
-      lorenz:reset()
+      --lorenz:reset()
     end
   }
 
@@ -257,14 +257,27 @@ function parameters.init()
   -- default = 2,
   -- }
 
+  -- engine_mode
+  params:add{
+    type = "option", id = "engine_mode", name = "eng mode", 
+    options = {"krell","other"},
+    default = 1,
+    action = function(value) 
+      engine_mode = value
+      if value == 1 then
+        engine.kr_looping(1)
+      else
+        engine.kr_looping(0)
+      end
+
+  end}
   -- midi
   params:add{
     type = "option", id = "quantize", name = "quantize", 
     options = {"on","off"},
     default = 1,
     action = function(value) 
-    end
-  }
+    end}
 
   params:add_group("midi",11)
 

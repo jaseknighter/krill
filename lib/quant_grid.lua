@@ -59,7 +59,6 @@ function quant_grid:get_active_sector(active)
   for i=1,#quant_grid.sectors,1 do
     for j=1,#quant_grid.sectors[i],1 do
       local s = quant_grid.sectors[i][j]
-      -- print(x,y.."    /    "..s.x,s.y,s.w,s.h)
       if x>s.x and x<s.x+s.w and y>s.y and y<s.y+s.h then
         -- active_sector={i,j}
         -- print(x,s.x,s.w,s.y,s.h)
@@ -73,9 +72,9 @@ end
 function quant_grid:update_note()
   local active = pixels[pixels.active]
   if active then 
-    
     local active_sector=quant_grid:get_active_sector(active)
     if active_sector then
+      -- print("update note")
       local octave =  active_sector.row
       local note =    active_sector.col
       -- local note_to_play = notes[note]
@@ -88,10 +87,16 @@ function quant_grid:update_note()
         mode = 1
       }
 
-      
+      if params:get("engine_mode") == 2 then
+        note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
+        if params:get("quantize") == 1 then          
+          note_tab.pitch = fn.quantize(note_tab.pitch)
+        end
+        play_engine(note_tab.pitch)
+      end
       ext.note_on(1,note_tab, "midi")
       -- ext.note_on(1,fn.deep_copy(value_tab),1,1,"sequencer", "jf")
-      -- ext.note_on(1,note_tab, "jf")
+      ext.note_on(1,note_tab, "jf")
       ext.note_on(1,note_tab, "crow")
       ext.note_on(1,note_tab, "wsyn")
       -- ext.note_on(1,note_tab, "wdel_ks")

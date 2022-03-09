@@ -48,7 +48,6 @@ tabutil = require "tabutil"
 Lattice = require "lattice"
 cs = require "controlspec"
 
-
 globals = include("lib/globals")
 lorenz = include("lib/lorenz")
 parameters = include("lib/parameters")
@@ -117,7 +116,7 @@ function init()
     enabled = true
   }
 
-  div = {3/16,1/8,3/8}
+  div = {1/8,1/16}
   -- div = {1/4,2/3,1/8,1/16,2/3,4/7}
 
   quant_pat_div = div[1]
@@ -128,7 +127,7 @@ function init()
       -- play note from quant grid
       quant_grid:update_note()
 
-      if math.random()>0.8 then
+      if math.random()>0.3 then
         quant_pat_div = div[math.random(#div)]
       end
       -- print("quant_pat_div",quant_pat_div)
@@ -163,10 +162,11 @@ function init()
 
   -- clock.run(setup_polling)
   init_polling()
-  engine.kr_start();
   -- engine.kr_env_time(0.5);
   -- clock.run(gui.set_gui_level)
+  params:set("engine_mode",2)
   initializing = false
+  params:set("engine_mode",1)
 end
 
 function init_polling()
@@ -184,15 +184,19 @@ function init_polling()
   end)
 
   rise_poll = poll.set("rise_poll", function(value)
-    -- print("rise done",value)
+    print("rise done",value)
     -- table.insert(chaos_x,value)
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
-    -- print("fall done",value)
+    print("fall done",value)
     -- table.insert(chaos_y,value)
     
   end)
+
+  function play_engine(note)
+    engine.kr_play_note(note)
+  end
 
   pitch_poll:start()
   note_start_poll:start()

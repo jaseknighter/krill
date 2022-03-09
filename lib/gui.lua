@@ -13,7 +13,7 @@ menu_map = {
   -- lp (lorenz params)
   {"origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
   -- krl (krell mode)
-  {"krell","rand"},
+  {"engine_mode"},
   -- rnd (random mode)
   {"krell","rand"},
 }
@@ -21,6 +21,8 @@ menu_map = {
 function update_menu_display()
   param_name = menu_map[active_menu][active_sub_menu]
   if param_name then
+    screen.clear()
+
     param = params:lookup_param(param_name)
     active_sub_menu_label = param.name
     if param.options then
@@ -41,13 +43,11 @@ function enc(n, d)
   update_menu_display()
   if initializing == false and gui_level == 1 then
     if n==1 then
-      active_menu =  util.clamp(active_menu+d,1,2)
-      screen.clear()
+      active_menu =  util.clamp(active_menu+d,1,3)
       update_menu_display()
     elseif n==2 then
       local new_active_sub_menu = util.clamp(active_sub_menu+d,1,#menu_map[active_menu])
       if new_active_sub_menu ~= active_sub_menu then
-        screen.clear()
         active_sub_menu = new_active_sub_menu
         update_menu_display()
       end
@@ -89,7 +89,7 @@ end
 
 function gui.clear()
   clock.sleep(0.01)
-  screen.clear()
+  -- screen.clear()
 end
 function gui.set_gui_level(amt)
   set_gui_level_initiated = true
@@ -129,9 +129,9 @@ function gui:display()
   screen.move(18,lb[2]+8)
   screen.text("lzp")
   
-  -- screen.level(math.floor(gui_level*(active_menu == 2 and 10 or 3)))
-  -- screen.move(32,lb[2]+8)
-  -- screen.text("mod")
+  screen.level(math.floor(gui_level*(active_menu == 3 and 10 or 3)))
+  screen.move(32,lb[2]+8)
+  screen.text("mod")
 
   -- display menu sub items
   screen.level(math.floor(gui_level*3))
