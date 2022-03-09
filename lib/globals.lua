@@ -183,3 +183,5 @@ CENTER_Y = 32
 blank_pixel = screen.peek(1,1,2,2)
 gui_level = 0
 set_gui_level_initiated = false
+rise = 1
+fall = 1

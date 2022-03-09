@@ -11,11 +11,11 @@ menu_map = {
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
   -- {"x_input","y_input","x_offset","y_offset","xy_scale","x_scale","y_scale"},
   -- lp (lorenz params)
-  {"origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
+  {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
   -- krl (krell mode)
-  {"engine_mode","rise","fall"},
+  {"engine_mode","rise_time","fall_time"},
   -- rnd (random mode)
-  {"krell","rand"},
+  {"krell","random"},
 }
 
 function update_menu_display()
@@ -89,7 +89,7 @@ end
 
 function gui.clear()
   clock.sleep(0.01)
-  -- screen.clear()
+  screen.clear()
 end
 function gui.set_gui_level(amt)
   set_gui_level_initiated = true

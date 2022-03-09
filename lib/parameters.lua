@@ -10,7 +10,7 @@ function parameters.init()
   -- note_offset: the note to use as "1" in the sequencer
   --------------------------------
 
-  function parameters.update_note_offset()
+  function parameters.play_random_note_offset()
     local offset = params:lookup_param("note_offset")
     local offset_options = {}
     for k,v in pairs(notes) do 
@@ -29,7 +29,7 @@ function parameters.init()
   params:add{type = "number", id = "num_octaves", name = "num octaves", min=1,max=7,default=2,
     action = function(val) 
       fn.build_scale() 
-      parameters.update_note_offset()
+      parameters.play_random_note_offset()
       -- local sl = params:lookup_param("scale_length")
       -- sl.maxval = fn.get_num_notes_per_octave() * val
   end}
@@ -42,7 +42,7 @@ function parameters.init()
   --   min = 1, max = max_notes, default = ROOT_NOTE_DEFAULT, 
   --   action = function(val) 
   --     fn.build_scale() 
-  --     parameters.update_note_offset()
+  --     parameters.play_random_note_offset()
   --     local sl = params:lookup_param("scale_length")
   --     sl.maxval = fn.get_num_notes_per_octave() * 5
   -- end}
@@ -54,7 +54,7 @@ function parameters.init()
     action = function() 
       fn.build_scale() 
       if initializing == false then 
-        parameters.update_note_offset()
+        parameters.play_random_note_offset()
       end
   end}
 
@@ -63,14 +63,14 @@ function parameters.init()
     min = 0, max = 127, default = ROOT_NOTE_DEFAULT, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
     action = function() 
       fn.build_scale() 
-      parameters.update_note_offset()
+      parameters.play_random_note_offset()
   end}
 
   params:add{type = "number", id = "note_offset", name = "note offset",
     min = -24, max = 24, default = 0, 
     action = function() 
       fn.build_scale() 
-      parameters.update_note_offset()
+      parameters.play_random_note_offset()
   end}
 
   params:hide("note_offset")
@@ -79,7 +79,7 @@ function parameters.init()
   -- lorenz params
   --------------------------------
   params:add_separator("LORENZ")
-  params:add_group("lorenz",19)
+  params:add_group("lorenz view",7)
   params:add{
     type="option", id = "x_input", name = "x input", options={"first","second","third"},default = 1,
     action=function(x) 
@@ -145,6 +145,23 @@ function parameters.init()
   --     screen:clear()
   --   end
   -- }
+
+
+  params:add_group("lorenz params",13)
+  
+  params:add{
+    type="number", id = "lz_speed", name = "lz_speed", min=0,max=100,default = 80,
+    action=function(x) 
+      if x==0 then -- set to clock
+        lorenz_pattern.division = 1/params:get("clock_tempo")
+      else
+        local denominator = util.linexp(1,100,1,1000,x)
+        print("denominator",denominator)
+        lorenz_pattern.division = 1/denominator
+      end
+      --lorenz:reset()
+    end
+  }
 
 
   params:add{
@@ -257,10 +274,22 @@ function parameters.init()
   -- default = 2,
   -- }
 
+  -- params:add{
+  --   type="taper", id = "env_length", name = "env length",min=0.01, max=0.5, default = 0.1,
+  --   action=function(x) 
+  --   end
+  -- }
+
+  params:add{
+    type="taper", id = "env_max_level", name = "env max level",min=0, max=10, default = 10,
+    action=function(x) 
+    end
+  }
+
   -- engine_mode
   params:add{
     type = "option", id = "engine_mode", name = "eng mode", 
-    options = {"krell","other"},
+    options = {"krell","random"},
     default = 1,
     action = function(value) 
       engine_mode = value
@@ -271,14 +300,14 @@ function parameters.init()
   end}
 
   params:add{
-    type="taper", id = "rise", name = "rise",min=0.01, max=5, default = 1,
+    type="taper", id = "rise_time", name = "rise time",min=0.01, max=5, default = 1,
     action=function(x) 
       engine.rise_fall(x,0)
     end
   }
 
   params:add{
-    type="taper", id = "fall", name = "fall",min=0.01, max=5, default = 1,
+    type="taper", id = "fall_time", name = "fall time",min=0.01, max=5, default = 1,
     action=function(x) 
       engine.rise_fall(0,x)
     end
@@ -287,12 +316,12 @@ function parameters.init()
   -- midi
   params:add{
     type = "option", id = "quantize", name = "quantize", 
-    options = {"on","off"},
-    default = 1,
+    options = {"off","on"},
+    default = 2,
     action = function(value) 
     end}
 
-  params:add_group("midi",11)
+  params:add_group("midi",7)
 
   -- params:add{type = "option", id = "midi_engine_control", name = "midi engine control",
   --   options = {"off","on"},
@@ -316,47 +345,30 @@ function parameters.init()
     end
   }
 
-  params:add{
-    type = "number", id = "midi_in_channel1", name = "midi_in channel1",
-    min = 1, max = 16, default = midi_in_channel1_default,
-    action = function(value)
-      -- all_notes_off()
-      midi_in_command1 = value + 143
-    end
-  }
-    
-  -- params:add{type = "number", id = "plant2_cc_channel", name = "plant 2:midi in channel",
-  --   min = 1, max = 16, default = plant2_cc_channel,
+  -- params:add{
+  --   type = "number", id = "midi_in_channel1", name = "midi_in channel1",
+  --   min = 1, max = 16, default = midi_in_channel1_default,
   --   action = function(value)
   --     -- all_notes_off()
-  --     midi_in_command2 = value + 143
+  --     midi_in_command1 = value + 143
+  --   end
+  -- }
+    
+  -- params:add{
+  --   type = "number", id = "envelope1_cc_channel", name = "env 1:midi cc channel",
+  --   min = 1, max = 16, default = envelope1_cc_channel,
+  --   action = function(value)
+  --     -- all_notes_off()
+  --     envelope1_cc_channel = value
   --   end
   -- }
 
-  params:add{
-    type = "number", id = "envelope1_cc_channel", name = "env 1:midi cc channel",
-    min = 1, max = 16, default = envelope1_cc_channel,
-    action = function(value)
-      -- all_notes_off()
-      envelope1_cc_channel = value
-    end
-  }
-
-  params:add{
-    type = "number", id = "envelope2_cc_channel", name = "env 2:midi cc channel",
-    min = 1, max = 16, default = envelope2_cc_channel,
-    action = function(value)
-      -- all_notes_off()
-      envelope2_cc_channel = value
-    end
-  }
-
   -- params:add{
-  --   type = "number", id = "water_cc_channel", name = "water:midi cc channel",
-  --   min = 1, max = 16, default = water_cc_channel,
+  --   type = "number", id = "envelope2_cc_channel", name = "env 2:midi cc channel",
+  --   min = 1, max = 16, default = envelope2_cc_channel,
   --   action = function(value)
   --     -- all_notes_off()
-  --     water_cc_channel = value
+  --     envelope2_cc_channel = value
   --   end
   -- }
 
@@ -428,21 +440,7 @@ function parameters.init()
   get_midi_devices()
 
   -- crow
-  params:add_group("crow",6)
-
-
-  params:add{
-    type="taper", id = "env_length", name = "env length",min=0.01, max=0.5, default = 0.1,
-    action=function(x) 
-    end
-  }
-
-  params:add{
-    type="taper", id = "env_max_level", name = "env max level",min=0, max=10, default = 10,
-    action=function(x) 
-    end
-  }
-
+  params:add_group("crow",4)
 
 
   params:add{type = "option", id = "output_crow1", name = "crow out1 mode",

@@ -51,7 +51,7 @@ cs = require "controlspec"
 globals = include("lib/globals")
 lorenz = include("lib/lorenz")
 parameters = include("lib/parameters")
-quant_grid = include("lib/quant_grid")
+sound_controller = include("lib/sound_controller")
 midi_helper = include("lib/midi_helper")
 w_slash = include("lib/w_slash")
 externals = include("lib/externals")
@@ -87,7 +87,7 @@ function init()
   active_notes = {}
   ext = externals:new(active_notes)
 
-  quant_grid:init(4,fn.get_num_notes_per_octave())
+  sound_controller:init(4,fn.get_num_notes_per_octave())
   lorenz:reset()
   -- input[1].mode('change', 1,0.1,'rising')
   -- input[2].mode('stream',0.001)
@@ -121,17 +121,12 @@ function init()
 
   quant_pat_div = div[1]
 
-  quant_pattern = krill_lattice:new_pattern{
+  sound_pattern = krill_lattice:new_pattern{
     action = function(t) 
       
       -- play note from quant grid
-      quant_grid:update_note()
-
-      if math.random()>0.3 then
-        quant_pat_div = div[math.random(#div)]
-      end
-      -- print("quant_pat_div",quant_pat_div)
-      quant_pattern.division = quant_pat_div
+      sound_controller:random_pattern_division()
+      sound_controller:play_random_note()
     end,
     division = div[1], --1/8, --1/16,
     enabled = true
@@ -142,7 +137,7 @@ function init()
 
       if norns.menu.status()  == false then
         screen.aa(0)
-        if params:get("grid_display") == 2 and gui_level > 0 then quant_grid:display() end
+        if params:get("grid_display") == 2 and gui_level > 0 then sound_controller:display() end
         gui:display()
         screen.update()
         screen.aa(1)
@@ -170,42 +165,37 @@ function init()
 end
 
 function init_polling()
-  pitch_poll = poll.set("pitch_poll", function(value)
-    if note_start == true then
-      note_start = false
+  -- pitch_poll = poll.set("pitch_poll", function(value)
+  --   if note_start == true then
+  --     note_start = false
       
-    end
-  end)
+  --   end
+  -- end)
 
-  note_start_poll = poll.set("note_start_poll", function(value)
-    note_start = true
+  next_note_poll = poll.set("next_note_poll", function(value)
+    sound_controller:play_krill_note(value)
+
+    -- note_start = true
     -- print("note_start_poll")
     -- table.insert(chaos_x,value)
   end)
 
   rise_poll = poll.set("rise_poll", function(value)
-    print("rise done",value)
-    -- table.insert(chaos_x,value)
+    -- print("rise done",value)
+    rise = value
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
-    fall_done = 1
-    print("fall done",value)
-    local note = math.floor(util.linlin(0,2,1,15,value))
-    engine.play_note(notes[note])
-    -- table.insert(chaos_y,value)
-    
+    -- print("fall done",value)
+    fall = value
   end)
 
   function play_engine(note)
-    -- if fall_done == nil or fall_done == 1 then
-      engine.play_note(note)
-      -- fall_done = 0
-    -- end
+    engine.play_note(note)
   end
 
-  pitch_poll:start()
-  note_start_poll:start()
+  -- pitch_poll:start()
+  next_note_poll:start()
   rise_poll:start()
   fall_poll:start()
 end

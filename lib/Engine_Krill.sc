@@ -10,8 +10,9 @@ Engine_Krill : CroneEngine {
 	var id=0;
 	var risePoll,risePollFunc;
 	var fallPoll,fallPollFunc;
-	var pitchPoll,pitchPollFunc;
-	var noteStartPoll;
+	var nextNotePoll,nextNotePollFunc;
+	// var pitchPoll,pitchPollFunc;
+	// var noteStartPoll;
 	var sh1=1, sh2=1;
 	var rise=1, fall=1, rise_time=1, fall_time=1, env_time=1;
 	var env_shape='exp';
@@ -70,18 +71,7 @@ Engine_Krill : CroneEngine {
 
 			logExpBuffer = Buffer.alloc(context.server, 1,1, {|b| b.setnMsg(0, logExp) });
 
-			/*
-			pitch = DegreeToKey.kr(
-                scale.as(LocalBuf),
-         				LinLin.kr((sh1+sh2),0,2,1,15).floor,
-                scale.stepsPerOctave,
-                1, // mul = 1
-                30 // offset by 30 notes (sample code is 72 note offset?!?!?!)
-            );
-			*/
-
 			pitch = ext_freq;
-			// pitch = (pitch*int_freq) + (ext_freq>0*ext_freq);
 			
 			filter_env = EnvGen.ar(Env.adsr(0.001, 0.8, 0, 0.8, 70, -4), gate);
 			out = LFSaw.ar(pitch.midicps, 2, -1);
@@ -107,22 +97,26 @@ Engine_Krill : CroneEngine {
     /////////////////////////////////
 
     // trigger Polls
-    pitchPollFunc = OSCFunc({
-      arg msg;
-			// ("pitchpoll"+msg[3]).postln;
-			pitchPoll.update(msg[3]);
-    }, path: '/triggerPitchPoll', srcID: context.server.addr);
+    // pitchPollFunc = OSCFunc({
+    //   arg msg;
+		// 	// ("pitchpoll"+msg[3]).postln;
+		// 	pitchPoll.update(msg[3]);
+    // }, path: '/triggerPitchPoll', srcID: context.server.addr);
 
+    nextNotePollFunc = OSCFunc({
+      arg msg;
+			nextNotePoll.update(msg[3]);
+    }, path: '/triggerNextNotePoll', srcID: context.server.addr);
 
 		risePollFunc = OSCFunc({
       arg msg;
-			// if (msg[3] == 1) {
 			sh1 = lorenz_sample;
 			if (sh1 < minRiseFall){
 				sh1 = minRiseFall
 			};
+			// ("rise time/sh1: "+rise_time+"/"+sh1).postln;
 			rise = rise_time * sh1;
-			risePoll.update(msg[3]);
+			risePoll.update(rise);
     }, path: '/triggerRiseDonePoll', srcID: context.server.addr);
 
     fallPollFunc = OSCFunc({ 
@@ -132,18 +126,17 @@ Engine_Krill : CroneEngine {
 				sh2 = minRiseFall
 			};
 			fall = fall_time * sh2;
-			("fall"+sh1+"/"+sh2).postln;
-			fallPoll.update(sh1+sh2);
+			// ("fall"+sh1+"/"+sh2).postln;
+			fallPoll.update(fall);
+			nextNotePoll.update(sh1+sh2);
+
 			// context.server.sendMsg("/n_free", msg[1]);	
-			noteStartPoll.update();
-			
-			// Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,1,\sh1,sh1,\sh2,sh2,\ext_freq,0]);
 			
     }, path: '/triggerFallDonePoll', srcID: context.server.addr);
 
     // add polls
-    pitchPoll = this.addPoll(name: "pitch_poll", periodic: false);
-    noteStartPoll = this.addPoll(name: "note_start_poll", periodic: false);
+    // pitchPoll = this.addPoll(name: "pitch_poll", periodic: false);
+    nextNotePoll = this.addPoll(name: "next_note_poll", periodic: false);
     risePoll = this.addPoll(name: "rise_poll", periodic: false);
     fallPoll = this.addPoll(name: "fall_poll", periodic: false);
     
@@ -204,17 +197,6 @@ Engine_Krill : CroneEngine {
 			lorenz_sample = msg[1];
 		});
 
-		// this.addCommand("looping","f",{ arg msg;
-		// 	var int_freq;
-		// 	looping = msg[1];
-		// 	if (msg[1] == 1.0){
-		// 		int_freq = sh1+sh2;
-					
-		// 		// Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,1,\sh1,sh1,\sh2,sh2,\ext_freq,0]);
-				 
-		// 	};
-			
-		// });
 		
 		////////////////////
 		//NOTE: rise + fall shouldn't be < 0.1

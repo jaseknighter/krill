@@ -47,7 +47,7 @@ externals.note_on = function(voice_id, note_tab, target)
   if initializing == false then
     if type(note_tab) == "table" and note_tab.pitch then
       note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
-      if params:get("quantize") == 1 then          
+      if params:get("quantize") == 2 then          
         note_tab.pitch = fn.quantize(note_tab.pitch)
       end
     end
@@ -79,13 +79,17 @@ externals.note_on = function(voice_id, note_tab, target)
     
 
 
-    local envelope_data = {
-      segments =	 3,
-      curves   =	 {0,10,0},
+    local function get_envelope_data() 
+      local data = {}
+      data.segments =	 3
+      data.curves   =	 {0,10,0}
       -- curves   =	 {0,-10,-10},
-      levels	 =   {0,params:get("env_max_level"),0},
-      times	   =   {0,0.001,params:get("env_length")},
-    }
+      data.levels	 =   {0,params:get("env_max_level"),0}
+      data.times	   =   {0,rise,fall}
+      
+      return data
+    end
+
     -- crow out
     local output_crow1 = params:get("output_crow1")
     local output_crow2 = params:get("output_crow2")
@@ -93,7 +97,7 @@ externals.note_on = function(voice_id, note_tab, target)
     local output_crow4 = params:get("output_crow4")
 
     local asl_generator = function(env_length)
-      -- local envelope_data = envelopes[env_id].get_envelope_arrays()
+      local envelope_data = get_envelope_data()
       local asl_envelope = ""
       for i=2, envelope_data.segments, 1
       do
@@ -113,7 +117,8 @@ externals.note_on = function(voice_id, note_tab, target)
         if i == envelope_data.segments then
           local to_string = "to(" .. 
                             (envelope_data.levels[i]) .. "," ..
-                            (env_length-envelope_data.times[i]) .. 
+                            (envelope_data.times[i]) .. 
+                            -- (env_length-envelope_data.times[i]) .. 
                             "," .. to_env .. 
                             "),"
                             asl_envelope = asl_envelope .. to_string
@@ -142,7 +147,8 @@ externals.note_on = function(voice_id, note_tab, target)
       local volts = (note_tab.pitch-60)/12
       crow.output[1].volts = volts 
       if output_crow2 == 2 then -- envelope
-        local asl_envelope = asl_generator(params:get("env_length"))
+        local asl_envelope = asl_generator()
+        -- local asl_envelope = asl_generator(params:get("env_length"))
         crow.output[2].action = tostring(asl_envelope)
       elseif output_crow2 == 3 then -- trigger
         local time = 0.01 --crow_trigger_2

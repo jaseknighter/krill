@@ -154,12 +154,12 @@ end
 
 function lorenz.get_boundary()
   
-  local rows = #quant_grid.sectors
-  local cols = #quant_grid.sectors[rows]
+  local rows = #sound_controller.sectors
+  local cols = #sound_controller.sectors[rows]
   local x = lorenz.boundary[1]
   local y = lorenz.boundary[2]
-  local w = quant_grid.sectors[1][1].w*cols
-  local h = quant_grid.sectors[1][1].h*rows
+  local w = sound_controller.sectors[1][1].w*cols
+  local h = sound_controller.sectors[1][1].h*rows
   local boundary = {x,y,w-2,h-2}
   return boundary
 end

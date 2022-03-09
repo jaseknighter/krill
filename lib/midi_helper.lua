@@ -91,7 +91,7 @@ local process_16n_data = function(data)
     for i=1,#sysexDataFrame,1
     do
       local val = sysexDataFrame[i]
-      if val.type == "other" then 
+      if val.type == "random" then 
         for j=1, #val.raw, 1
         do
           -- start collecting cc values
@@ -190,7 +190,7 @@ midi_event = function(data)
       --print("receiving of 16n configs. set receiving_configs_from_16n = true")
       receiving_configs_from_16n = true
     else
-      -- handle other message types
+      -- handle random message types
       -- local output_bandsaw = params:get("output_bandsaw")
       local output_midi = params:get("output_midi")
 
