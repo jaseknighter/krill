@@ -6,20 +6,20 @@
 -- _norns.screen_export_png("/home/we/dust/krill"..screenshot..".png")
 
 --[[
-engine.kr_start()
-engine.kr_env_time(1)
-engine.kr_env_shape('log')
-engine.kr_rise_fall(0.3,1.1)
-engine.kr_rc_fdbk(500)
-engine.kr_rc_freq(15000)
-engine.kr_env_time(12)
-engine.kr_rise_fall(0.01,0.01)
-engine.kr_rc_mul(0.3)
-engine.kr_rc_a(0.36)
-engine.kr_rc_b(0.35)
-engine.kr_rc_c(4.7)
-engine.kr_rc_h(0.01)
-engine.kr_rc_xi(0.5)
+engine.start()
+engine.env_time(1)
+engine.env_shape('log')
+engine.rise_fall(0.3,1.1)
+engine.rc_fdbk(500)
+engine.rc_freq(15000)
+engine.env_time(12)
+engine.rise_fall(0.01,0.01)
+engine.rc_mul(0.3)
+engine.rc_a(0.36)
+engine.rc_b(0.35)
+engine.rc_c(4.7)
+engine.rc_h(0.01)
+engine.rc_xi(0.5)
 
 ]]
 -- 
@@ -109,7 +109,7 @@ function init()
         local lb_sample_max = lb[3]*lb[4]
         local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
         sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
-        engine.kr_set_lorenz_sample(sample_val)
+        engine.set_lorenz_sample(sample_val)
       end
     end,
     division = 1/256, --1/16,
@@ -162,7 +162,7 @@ function init()
 
   -- clock.run(setup_polling)
   init_polling()
-  -- engine.kr_env_time(0.5);
+  -- engine.env_time(0.5);
   -- clock.run(gui.set_gui_level)
   params:set("engine_mode",2)
   initializing = false
@@ -189,13 +189,19 @@ function init_polling()
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
+    fall_done = 1
     print("fall done",value)
+    local note = math.floor(util.linlin(0,2,1,15,value))
+    engine.play_note(notes[note])
     -- table.insert(chaos_y,value)
     
   end)
 
   function play_engine(note)
-    engine.kr_play_note(note)
+    -- if fall_done == nil or fall_done == 1 then
+      engine.play_note(note)
+      -- fall_done = 0
+    -- end
   end
 
   pitch_poll:start()

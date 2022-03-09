@@ -13,7 +13,7 @@ menu_map = {
   -- lp (lorenz params)
   {"origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
   -- krl (krell mode)
-  {"engine_mode"},
+  {"engine_mode","rise","fall"},
   -- rnd (random mode)
   {"krell","rand"},
 }

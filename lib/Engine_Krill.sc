@@ -3,14 +3,17 @@
 
 Engine_Krill : CroneEngine {
 	// <Krill>
+	classvar maxNumVoices = 1;
+	var voiceGroup;
+  var voiceList;
+	var krillVoice;
+	var id=0;
 	var risePoll,risePollFunc;
 	var fallPoll,fallPollFunc;
 	var pitchPoll,pitchPollFunc;
 	var noteStartPoll;
-	var krillFn;
 	var sh1=1, sh2=1;
-	var rise=1, fall=1, rise_time=1, fall_time=1, looping=1,running=false, env_time=1;
-	var rise_triggered=0, fall_triggered=0;
+	var rise=1, fall=1, rise_time=1, fall_time=1, env_time=1;
 	var env_shape='exp';
 	var lorenz_sample = 1;
 	var minRiseFall = 0.1;
@@ -24,13 +27,15 @@ Engine_Krill : CroneEngine {
 	alloc {
 
 		var scale = Scale.choose.postln;
+    voiceGroup = Group.new(context.xg);
+    voiceList = List.new();
 
     // install the Maths quark
 		// Quarks.install("Maths");
     // context.server.sync;
 
 		// add synth defs
-		krillSynth = SynthDef("krill",{ 
+		SynthDef("KrillSynth",{ 
       arg outBus=0, logExp=0.5,loop=1,plugged=0,trig,
 			hz=220,amp=0.5, 
 			rise=1,fall=1, rise_time=1, fall_time=1, 
@@ -39,7 +44,7 @@ Engine_Krill : CroneEngine {
 			sh1=1,sh2=1,
 			mode=1,
 			logExpBuffer,
-			ext_freq, int_freq;
+			ext_freq;
 
 			
 			var out, osc, rise_phase, env_phase, rise_rate, fall_rate, 
@@ -47,8 +52,7 @@ Engine_Krill : CroneEngine {
 			filter_env,
 			pitch, freq,
 			mathsA=0,foc1=0,eor1=0,
-      fall_triggered=0,rise_triggered=0,
-			rise_done=0,
+      rise_done=0,
 			fall_done=0;
 
 
@@ -66,6 +70,7 @@ Engine_Krill : CroneEngine {
 
 			logExpBuffer = Buffer.alloc(context.server, 1,1, {|b| b.setnMsg(0, logExp) });
 
+			/*
 			pitch = DegreeToKey.kr(
                 scale.as(LocalBuf),
          				LinLin.kr((sh1+sh2),0,2,1,15).floor,
@@ -73,7 +78,10 @@ Engine_Krill : CroneEngine {
                 1, // mul = 1
                 30 // offset by 30 notes (sample code is 72 note offset?!?!?!)
             );
-			pitch = (pitch*int_freq) + (ext_freq>0*ext_freq);
+			*/
+
+			pitch = ext_freq;
+			// pitch = (pitch*int_freq) + (ext_freq>0*ext_freq);
 			
 			filter_env = EnvGen.ar(Env.adsr(0.001, 0.8, 0, 0.8, 70, -4), gate);
 			out = LFSaw.ar(pitch.midicps, 2, -1);
@@ -92,7 +100,8 @@ Engine_Krill : CroneEngine {
 		}).add;
 		
 		context.server.sync;
-    
+
+
     /////////////////////////////////
 		// add polling
     /////////////////////////////////
@@ -118,24 +127,18 @@ Engine_Krill : CroneEngine {
 
     fallPollFunc = OSCFunc({ 
 			arg msg;
-			var int_freq;
 			sh2 = lorenz_sample;
 			if (sh2 < minRiseFall){
 				sh2 = minRiseFall
 			};
 			fall = fall_time * sh2;
-			// ("fall"+fall_triggered).postln;
-			fallPoll.update(msg[3]);
-			context.server.sendMsg("/n_free", msg[1]);	
-			if (looping == 1){
-				noteStartPoll.update();
-				rise_triggered=0;
-				fall_triggered=0;
+			("fall"+sh1+"/"+sh2).postln;
+			fallPoll.update(sh1+sh2);
+			// context.server.sendMsg("/n_free", msg[1]);	
+			noteStartPoll.update();
 			
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,1,\sh1,sh1,\sh2,sh2,\ext_freq,0]);
-			}{
-				running = false;
-			};
+			// Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,1,\sh1,sh1,\sh2,sh2,\ext_freq,0]);
+			
     }, path: '/triggerFallDonePoll', srcID: context.server.addr);
 
     // add polls
@@ -148,80 +151,120 @@ Engine_Krill : CroneEngine {
 		// add norns commands
     ///////////////////////////////////
 
-		this.addCommand("kr_play_note","f",{ arg msg;
+		//////////////////////////////////////////
+		// create a synth voice
+		this.addCommand("play_note","f",{ arg msg;
 			var ext_freq=msg[1];
-			if (running == false){
-				rise_triggered=0;
-				fall_triggered=0;
+			var voicesToRemove, newVoice;
+      var env;
+      var envSig, envBuf;
+      var newEnv, envLength;
+
+      context.server.makeBundle(nil, {
+					
+				newVoice = (id: id, theSynth: Synth("KrillSynth",
+				[
+					\rise,rise,
+					\fall,fall,
+					\logExp,1,
+					\plugged,0,
+					\env_time,env_time,
+					\env_shape,env_shape,
+					\ext_freq,ext_freq,					
+				],
+					target: voiceGroup).onFree({ 
+						voiceList.remove(newVoice); 
+					})
+				);
+
+				voiceList.addFirst(newVoice);
+
+				// set krillVoice to the most recent voice instantiated
+				krillVoice = voiceList.detect({ arg item, i; item.id == id; });
+				id = id+1;
+
+				// effectsSynth.set(\envBuf, envBuf);
 				
-				krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,0,\ext_freq,ext_freq]);
-				// krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2]);
-				// running = true;
-			}
+			});
+
+      // Free the existing voice if it exists
+      if((voiceList.size > 0 && krillVoice.theSynth.isNil == false), {
+        voiceList.do{ arg v,i; 
+          v.theSynth.set(\t_trig, 1);
+          if (i >= maxNumVoices){
+            // v.theSynth.set(\gate, 0);
+            v.theSynth.free;
+          }
+        };
+      });
+
 		});
 
-		this.addCommand("kr_set_lorenz_sample","f",{ arg msg;
+		this.addCommand("set_lorenz_sample","f",{ arg msg;
 			lorenz_sample = msg[1];
 		});
 
-		this.addCommand("kr_looping","f",{ arg msg;
-			var int_freq;
-			looping = msg[1];
-			if (msg[1] == 1.0){
-				if (running == false){
-					int_freq = sh1+sh2;
-					rise_triggered=0;
-					fall_triggered=0;
-				
-					// krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\sh1,sh1,\sh2,sh2]);
-					krillFn = Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,1,\sh1,sh1,\sh2,sh2,\ext_freq,0]);
-					running = true;
-				} 
-			};
+		// this.addCommand("looping","f",{ arg msg;
+		// 	var int_freq;
+		// 	looping = msg[1];
+		// 	if (msg[1] == 1.0){
+		// 		int_freq = sh1+sh2;
+					
+		// 		// Synth.new("krill",[\rise,rise,\fall,fall,\logExp,1,\plugged,0,\env_time,env_time,\env_shape,env_shape,\int_freq,1,\sh1,sh1,\sh2,sh2,\ext_freq,0]);
+				 
+		// 	};
 			
-		});
+		// });
 		
 		////////////////////
 		//NOTE: rise + fall shouldn't be < 0.1
 		////////////////////
-		this.addCommand("kr_rise_fall","ff",{ arg msg;
+		this.addCommand("rise_fall","ff",{ arg msg;
 				// rise = msg[1];
 				// fall = msg[2];
-			if (msg[1] != nil){
+			if (msg[1] > 0){
 				rise_time = msg[1];
 			};			
 
-			if (msg[2] != nil){
+			if (msg[2] > 0){
 				fall_time = msg[2];
 			};
     });
 	  
-		this.addCommand("kr_env_time","f",{ arg msg;
+		this.addCommand("env_time","f",{ arg msg;
 			env_time = msg[1];
 		});
 		
-		this.addCommand("kr_switch_mode","",{ arg msg;
-			context.server.freeAll;
+		this.addCommand("switch_mode","f",{ arg msg;
+			("switch mode: " + msg[1]).postln;
+			("voiceList.size: " + voiceList.size).postln;
+			// if((voiceList.size > 0 && krillVoice.theSynth.isNil == false), {
+			if((voiceList.size > 0), {
+        voiceList.do{ arg v,i; 
+					v.theSynth.free;
+        };
+			});
+			mode = msg[1];
 		});
 
-		this.addCommand("kr_env_shape","s",{ arg msg;
+		this.addCommand("env_shape","s",{ arg msg;
 			env_shape = msg[1].asString;
 			env_shape.postln;
 		});
 	}
 
 	free {
+		voiceGroup.free;
+		voiceList.free;
+		krillVoice.free;
 		risePoll.free;
 		risePollFunc.free;
 		fallPoll.free;
 		fallPollFunc.free;
-		krillFn.free;
 		sh1.free;
 		sh2.free;
 		rise.free;
 		fall.free;
-		looping.free;
-		running.free;
 		env_time.free;
 	}
 }

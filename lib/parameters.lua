@@ -264,13 +264,26 @@ function parameters.init()
     default = 1,
     action = function(value) 
       engine_mode = value
-      if value == 1 then
-        engine.kr_looping(1)
-      else
-        engine.kr_looping(0)
+      engine.switch_mode(value)
+      if engine_mode == 1 then
+        engine.play_note(notes[math.random(15)])
       end
-
   end}
+
+  params:add{
+    type="taper", id = "rise", name = "rise",min=0.01, max=5, default = 1,
+    action=function(x) 
+      engine.rise_fall(x,0)
+    end
+  }
+
+  params:add{
+    type="taper", id = "fall", name = "fall",min=0.01, max=5, default = 1,
+    action=function(x) 
+      engine.rise_fall(0,x)
+    end
+  }
+
   -- midi
   params:add{
     type = "option", id = "quantize", name = "quantize", 

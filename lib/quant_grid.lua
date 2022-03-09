@@ -94,13 +94,23 @@ function quant_grid:update_note()
         end
         play_engine(note_tab.pitch)
       end
-      ext.note_on(1,note_tab, "midi")
+
+      if params:get("output_midi") == 2 then
+        ext.note_on(1,note_tab, "midi")
+      end
       -- ext.note_on(1,fn.deep_copy(value_tab),1,1,"sequencer", "jf")
-      ext.note_on(1,note_tab, "jf")
-      ext.note_on(1,note_tab, "crow")
-      ext.note_on(1,note_tab, "wsyn")
-      -- ext.note_on(1,note_tab, "wdel_ks")
-      
+      if params:get("output_jf") == 2 then
+        ext.note_on(1,note_tab, "jf")
+      end 
+      if params:get("output_crow1") == 2 then
+        ext.note_on(1,note_tab, "crow")
+      end
+      if params:get("output_wsyn") == 2 then
+        ext.note_on(1,note_tab, "wsyn")
+      end
+      if params:get("output_wdel_ks") == 2 then
+        ext.note_on(1,note_tab, "wdel_ks")
+      end
       -- ext.note_on(1,value_tab,1,1,"sequencer", "jf")
     
 
