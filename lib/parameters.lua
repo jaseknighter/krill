@@ -263,6 +263,39 @@ function parameters.init()
     if x == 1 then screen.clear() end 
   end}
 
+  --------------------------------
+  -- quant grid params
+  --------------------------------
+  params:add_separator("VUJA DE")
+  -- params:add_group("lorenz",19)
+
+  params:add{type = "number", id = "loop_length", name = "loop len",
+  min=1, max=16, default=8,
+  action = function(x)
+    print("loop length", x)
+  end}
+
+  params:add{type = "number", id = "vuja_de_prob", name = "vjd prob",
+  min=-10, max=10, default=10,
+  action = function(x)
+    print("vuja de prob", x)
+  end}
+
+  params:add{type = "number", id = "vuja_de_prob_numerator", name = "vjd prob num",
+  min=1, max=32, default=1,
+  action = function(x)
+    vuja_de_prob = x/params:get("vuja_de_prob_denominator")
+    vuja_de_pattern:set_division(vuja_de_prob)
+
+  end}
+
+  params:add{type = "number", id = "vuja_de_prob_denominator", name = "vjd prob den",
+  min=1, max=32, default=4,
+  action = function(x)
+    vuja_de_prob = params:get("vuja_de_prob_numerator")/x
+    vuja_de_pattern:set_division(vuja_de_prob)
+  end}
+
 
   --------------------------------
   -- inputs/outputs/midi params
@@ -286,32 +319,70 @@ function parameters.init()
     end
   }
 
+
   -- engine_mode
   params:add{
     type = "option", id = "engine_mode", name = "eng mode", 
-    options = {"krell","random"},
+    options = {"krell","vuja de"},
     default = 1,
     action = function(value) 
       engine_mode = value
       engine.switch_mode(value)
       if engine_mode == 1 then
-        engine.play_note(notes[math.random(15)])
+        engine.play_note(notes[math.random(15)],2)
+        if krell_rise then
+          engine.rise_fall(krell_rise,krell_fall)
+          krell_rise = nil
+          krell_fall = nil
+        end
+        sub_menu_map = sub_menu_map_krell
+      else
+        -- engine.play_note(notes[math.random(15)],2)
+        krell_rise = rise
+        krell_fall = fall
+        sub_menu_map = sub_menu_map_vuja_de
       end
   end}
 
   params:add{
-    type="taper", id = "rise_time", name = "rise time",min=0.01, max=5, default = 1,
+    type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 100,
     action=function(x) 
-      engine.rise_fall(x,0)
+      engine.env_scalar(x/100)
+    end
+  }
+
+  -- params:add_control("rise_time", "rise time", controlspec.new(10,200,'lin',1,10))
+  -- params:set_action("rise_time", function(x) 
+  --   engine.rise_fall(x/100,0) 
+  -- end )
+
+  -- params:add_control("fall_time", "fall time", controlspec.new(10,200,'lin',1,50))
+  -- params:set_action("fall_time", function(x) 
+  --   engine.rise_fall(0,x/100) 
+  -- end )
+
+
+  params:add{
+    type="number", id = "rise_time", name = "rise time",min=10, max=200, default = 50,
+    action=function(x) 
+      engine.rise_fall(x/100,0)
     end
   }
 
   params:add{
-    type="taper", id = "fall_time", name = "fall time",min=0.01, max=5, default = 1,
+    type="number", id = "fall_time", name = "fall time",min=10, max=200, default = 100,
     action=function(x) 
-      engine.rise_fall(0,x)
+      engine.rise_fall(0,x/100)
     end
   }
+
+  params:add{
+    type = "number", id = "env_shape", name = "env shape", 
+    min=-10,max=10,
+    default = 8,
+    action = function(value) 
+      engine.env_shape(value)
+  end}
 
   -- midi
   params:add{
@@ -453,7 +524,7 @@ function parameters.init()
 
   params:add{type = "option", id = "output_crow2", name = "crow out2 mode",
     options = {"off","envelope","trigger","gate","clock"},
-    default = 2,
+    default = 4,
     action = function(value)
       if value == 3 then 
         crow.output[2].action = "{to(5,0),to(0,0.25)}"
@@ -515,7 +586,7 @@ function parameters.init()
   }
 
 
-  params:add_group("w/syn",13)
+  params:add_group("w/syn",14)
   w_slash.wsyn_add_params()
   -- w_slash.wsyn_v2_add_params()
 

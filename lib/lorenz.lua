@@ -127,8 +127,8 @@ lorenz = {
   third = 0,
   x_map = 0,
   y_map = 0,
-  boundary = {51,5,84,55}
-  -- boundary = {41,5,68,55}
+  boundary = {51,5,64,55}
+  -- boundary = {51,5,84,55}
 }
 
 function lorenz.init()
@@ -163,6 +163,7 @@ function lorenz.get_boundary()
   local boundary = {x,y,w-2,h-2}
   return boundary
 end
+
 function lorenz:reset()
   for i=1,#pixels,1 do pixels[i] = nil end
   screen:clear()

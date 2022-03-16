@@ -47,6 +47,7 @@ MusicUtil = require "musicutil"
 tabutil = require "tabutil"
 Lattice = require "lattice"
 cs = require "controlspec"
+s = require "sequins"
 
 globals = include("lib/globals")
 lorenz = include("lib/lorenz")
@@ -56,6 +57,7 @@ midi_helper = include("lib/midi_helper")
 w_slash = include("lib/w_slash")
 externals = include("lib/externals")
 gui = include("lib/gui")
+vuja_de = include("lib/vuja_de")
 
 
 -- engine.name="AcidTest"
@@ -110,49 +112,97 @@ function init()
         local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
         sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
         engine.set_lorenz_sample(sample_val)
+        local x = pixels[pixels.active].x_display
+        local y = pixels[pixels.active].y_display
+        -- print(x,y)
       end
+      -- if lz_x then
+      --   externals.wiggle(lz_x,lz_y)
+      -- end
+
     end,
     division = 1/256, --1/16,
     enabled = true
   }
 
-  div = {1/8,1/16}
-  -- div = {1/4,2/3,1/8,1/16,2/3,4/7}
+  -- div = {1/8,1/16}
+  -- div = {1/4,2/3}
+  -- random_divisions = {1/4,2/3,1/8,1/16,2/3,4/7}
 
-  quant_pat_div = div[1]
+  -- random_pat_div = random_divisions[1]
 
-  sound_pattern = krill_lattice:new_pattern{
+  -- random_sound_pattern = krill_lattice:new_pattern{
+  --   action = function(t) 
+  --     -- play note from quant grid
+  --     if params:get("engine_mode")==2 then
+  --       sound_controller:random_pattern_division()
+  --       sound_controller:play_random_note()
+  --     end
+  --   end,
+  --   division = random_divisions[1], --1/8, --1/16,
+  --   enabled = true
+  -- }
+  
+  
+  vuja_de_pattern = krill_lattice:new_pattern{
     action = function(t) 
-      
       -- play note from quant grid
-      sound_controller:random_pattern_division()
-      sound_controller:play_random_note()
+      local active = pixels[pixels.active]
+      vuja_de:update_length()
+      if active and params:get("engine_mode") == 2 then -- vuja de mode
+        -- vuja_de:update()
+        sound_controller:play_vuja_de_note()
+      end
     end,
-    division = div[1], --1/8, --1/16,
-    enabled = true
+    division = vuja_de_prob, --3/1, --1/8, --1/16,
+    enabled = false
   }
 
+
+  -- print("asdf")
   clock.run( function()
     while true do
 
       if norns.menu.status()  == false then
         screen.aa(0)
-        if params:get("grid_display") == 2 and gui_level > 0 then sound_controller:display() end
+        if params:get("grid_display") == 2 and gui_level > 0 then 
+          sound_controller:display() 
+        end
         gui:display()
-        screen.update()
+        -- screen.update()
         screen.aa(1)
         lorenz.display(true)
-        screen.update()
       else
         lorenz.display(false)
       end
-      SCREEN_REFRESH_DENOMINATOR = 10
+
+
+      if lz_x then
+        local param_val = util.linlin(0,1,-40,40,lz_x)/10
+        local param_val1 = util.linlin(0,1,-50,40,lz_y)/10
+        -- if lz_x > 0.1 then params:set("wsyn_pluckylog", 1) end
+        
+        -- params:set("wsyn_fm_ratio_numerator", param_val)
+        -- local rand = math.random(4) == 1 and 1 or 0
+        -- if rand == 1 then params:set("wsyn_pluckylog", 1) end
+        -- params:set("wsyn_curve", param_val)
+        -- params:set("wsyn_ramp", param_val1)
+        -- params:set("wsyn_fm_env", param_val1)
+      end
+      if lz_x then
+        -- externals.wiggle(lz_x,lz_y)
+      end
+
+      screen.update()
       clock.sleep(1/SCREEN_REFRESH_DENOMINATOR)
     end
   end)
 
   
   krill_lattice:start()
+
+  vuja_de = vuja_de:new()
+  vuja_de_pattern:start()
   -- params:set("xy_scale",0.9)
 
   -- clock.run(setup_polling)
@@ -160,6 +210,8 @@ function init()
   -- engine.env_time(0.5);
   -- clock.run(gui.set_gui_level)
   params:set("engine_mode",2)
+  params:set("x_offset",-10)
+  params:set("y_scale",0.85)
   initializing = false
   params:set("engine_mode",1)
 end
@@ -173,25 +225,45 @@ function init_polling()
   -- end)
 
   next_note_poll = poll.set("next_note_poll", function(value)
-    sound_controller:play_krill_note(value)
+    -- sound_controller:play_krill_note(value)
+
+
+    -- if params:get("engine_mode") == 1 then
+    --   sound_controller:play_krill_note(value)
+    -- end
 
     -- note_start = true
-    -- print("note_start_poll")
-    -- table.insert(chaos_x,value)
+    -- print("note_start_poll",rise,fall)l
   end)
 
   rise_poll = poll.set("rise_poll", function(value)
     -- print("rise done",value)
+    prev_rise = rise
+
+    if params:get("engine_mode") == 1 then
+      -- sound_controller:play_krill_note(value)
+    else
+      -- sound_controller:play_vuja_de_note()
+    end
+
     rise = value
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
-    -- print("fall done",value)
+    prev_fall = fall
     fall = value
+    if params:get("engine_mode") == 1 then
+      sound_controller:play_krill_note(value)
+    else
+      -- sound_controller:play_vuja_de_note()
+    end
+
+    crow.output[2].volts = 0
+    crow.output[2].execute()
   end)
 
   function play_engine(note)
-    engine.play_note(note)
+    engine.play_note(note,1)
   end
 
   -- pitch_poll:start()
