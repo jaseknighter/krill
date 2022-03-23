@@ -10,33 +10,31 @@ function parameters.init()
   -- note_offset: the note to use as "1" in the sequencer
   --------------------------------
 
-  function parameters.play_random_note_offset()
-    local offset = params:lookup_param("note_offset")
-    local offset_options = {}
-    for k,v in pairs(notes) do 
-      if v then
-        table.insert(offset_options,MusicUtil.note_num_to_name(v,true))
-      end
-    end
-    offset.options = offset_options
-    offset.count = #offset_options
-  end
+  -- function parameters.play_random_note_offset()
+  --   local offset = params:lookup_param("note_offset")
+  --   local offset_options = {}
+  --   for k,v in pairs(notes) do 
+  --     if v then
+  --       table.insert(offset_options,MusicUtil.note_num_to_name(v,true))
+  --     end
+  --   end
+  --   offset.options = offset_options
+  --   offset.count = #offset_options
+  -- end
 
   params:add_separator("SCALES, NOTES, AND TEMPO")
   -- params:add_group("scales and notes",5)
 
   
-  params:add{type = "number", id = "num_octaves", name = "num octaves", min=1,max=7,default=2,
+  params:add{type = "number", id = "num_octaves", name = "num octs", min=1,max=NUM_OCTAVES_MAX,default=NUM_OCTAVES_DEFAULT,
     action = function(val) 
       fn.build_scale() 
-      parameters.play_random_note_offset()
+      sound_controller:init(val,fn.get_num_notes_per_octave())
+      screen.clear()
+      -- parameters.play_random_note_offset()
       -- local sl = params:lookup_param("scale_length")
       -- sl.maxval = fn.get_num_notes_per_octave() * val
   end}
-  
-  -- print(fn.get_num_notes_per_octave(),params:get("num_octaves"))
-  -- local max_notes = fn.get_num_notes_per_octave() * params:get("num_octaves")
-  -- -- local max_notes = fn.get_num_notes_per_octave() and fn.get_num_notes_per_octave() * 5 or SCALE_LENGTH_DEFAULT
 
   -- params:add{type = "number", id = "scale_length", name = "scale length",
   --   min = 1, max = max_notes, default = ROOT_NOTE_DEFAULT, 
@@ -54,7 +52,7 @@ function parameters.init()
     action = function() 
       fn.build_scale() 
       if initializing == false then 
-        parameters.play_random_note_offset()
+        -- parameters.play_random_note_offset()
       end
   end}
 
@@ -63,14 +61,14 @@ function parameters.init()
     min = 0, max = 127, default = ROOT_NOTE_DEFAULT, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
     action = function() 
       fn.build_scale() 
-      parameters.play_random_note_offset()
+      -- parameters.play_random_note_offset()
   end}
 
   params:add{type = "number", id = "note_offset", name = "note offset",
     min = -24, max = 24, default = 0, 
     action = function() 
       fn.build_scale() 
-      parameters.play_random_note_offset()
+      -- parameters.play_random_note_offset()
   end}
 
   params:hide("note_offset")
@@ -156,7 +154,6 @@ function parameters.init()
         lorenz_pattern.division = 1/params:get("clock_tempo")
       else
         local denominator = util.linexp(1,100,1,1000,x)
-        print("denominator",denominator)
         lorenz_pattern.division = 1/denominator
       end
       --lorenz:reset()
@@ -264,37 +261,139 @@ function parameters.init()
   end}
 
   --------------------------------
-  -- quant grid params
+  -- vuja de params
   --------------------------------
   params:add_separator("VUJA DE")
   -- params:add_group("lorenz",19)
 
   params:add{type = "number", id = "loop_length", name = "loop len",
-  min=1, max=16, default=8,
+  min=1, max=16, default=3,
   action = function(x)
-    print("loop length", x)
-  end}
-
-  params:add{type = "number", id = "vuja_de_prob", name = "vjd prob",
-  min=-10, max=10, default=10,
-  action = function(x)
-    print("vuja de prob", x)
-  end}
-
-  params:add{type = "number", id = "vuja_de_prob_numerator", name = "vjd prob num",
-  min=1, max=32, default=1,
-  action = function(x)
-    vuja_de_prob = x/params:get("vuja_de_prob_denominator")
-    vuja_de_pattern:set_division(vuja_de_prob)
 
   end}
 
-  params:add{type = "number", id = "vuja_de_prob_denominator", name = "vjd prob den",
-  min=1, max=32, default=4,
+  params:add{type = "number", id = "vuja_de_prob", name = "vjd pat",
+  min=-10, max=10, default=-5,
   action = function(x)
-    vuja_de_prob = params:get("vuja_de_prob_numerator")/x
-    vuja_de_pattern:set_division(vuja_de_prob)
   end}
+
+  parameters.setting_patterns = false
+  params:add{type = "number", id = "vuja_de_num_pats", name = "vjd num patterns",
+  min=1, max=VJD_MAX_PATTERNS, default=3,
+  action = function(x)
+    -- if parameters.setting_patterns == false then
+    --   parameters.setting_patterns = true
+      parameters.set_pats(x)
+      -- parameters.setting_patterns = false
+    -- end
+  end}
+
+
+  params:add_group("vjd pat asgn/div/jit",12+3+(VJD_MAX_PATTERNS*3))
+  params:add_separator("assignments")
+  params:add{type = "number", id = "vjd_pat_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_engine2", name = "engine asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_midi1", name = "midi asn 1", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_midi2", name = "midi asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_crow1", name = "crow asn 1", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_crow2", name = "crow asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_jf1", name = "jf asn 1", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_jf2", name = "jf asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_wsyn1", name = "wsyn asn 1", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_wdelkarp1", name = "wdelkarp asn 1", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=1}
+  
+  params:add_separator("")
+  params:add_separator("divisions")
+  for i=1,VJD_MAX_PATTERNS,1 do
+    params:add_separator("pattern "..i)
+    params:add{type = "number", id = "vuja_de_pat_numerator"..i, name = "vjd pat num"..i,
+      min=1, max=VJD_MAX_PATTERN_NUMERATOR, default=1,
+      action = function(x)
+        vuja_de_patterns[i]:set_division(x/params:get("vuja_de_pat_denominator"..i))
+    end}
+
+    params:add{type = "number", id = "vuja_de_pat_denominator"..i, name = "vjd pat den"..i,
+      min=1, max=VJD_MAX_PATTERN_DENOMINATOR, default=1,
+      action = function(x)
+        vuja_de_patterns[i]:set_division(params:get("vuja_de_pat_numerator"..i)/x)
+    end}
+
+    if i>3 then
+      params:hide("vuja_de_pat_numerator"..i)
+      params:hide("vuja_de_pat_denominator"..i)
+    end
+      
+  end
+
+  function parameters.set_pats(num_pats)    
+    for i=1,VJD_MAX_PATTERNS,1 do
+      if i>num_pats then
+        params:hide("vuja_de_pat_numerator"..i)
+        params:hide("vuja_de_pat_denominator"..i)
+      else
+        params:show("vuja_de_pat_numerator"..i)
+        params:show("vuja_de_pat_denominator"..i)    
+      end
+    end
+
+    if params:get("vjd_pat_asn_midi1") > num_pats then 
+      params:set("vjd_pat_asn_midi1",1)
+    end
+    if params:get("vjd_pat_asn_crow1") > num_pats then 
+      params:set("vjd_pat_asn_crow1",1)
+    end
+    if params:get("vjd_pat_asn_jf1") > num_pats then 
+      params:set("vjd_pat_asn_jf1",1)
+    end
+    if params:get("vjd_pat_asn_wsyn1") > num_pats then 
+      params:set("vjd_pat_asn_wsyn1",1)
+    end
+    if params:get("vjd_pat_asn_wdelkarp1") > num_pats then 
+      params:set("vjd_pat_asn_wdelkarp1",1)
+    end
+
+    if params:get("vjd_pat_asn_midi2") > num_pats then 
+      params:set("vjd_pat_asn_midi2",1)
+    end
+    if params:get("vjd_pat_asn_crow2") > num_pats then 
+      params:set("vjd_pat_asn_crow2",1)
+    end
+    if params:get("vjd_pat_asn_jf2") > num_pats then 
+      params:set("vjd_pat_asn_jf2",1)
+    end
+    if params:get("vjd_pat_asn_wsyn2") > num_pats then 
+      params:set("vjd_pat_asn_wsyn2",1)
+    end
+    if params:get("vjd_pat_asn_wdelkarp2") > num_pats then 
+      params:set("vjd_pat_asn_wdelkarp2",1)
+    end
+
+    local vjd_pat_asn_midi1 = params:lookup_param("vjd_pat_asn_midi1")
+    local vjd_pat_asn_crow1 = params:lookup_param("vjd_pat_asn_crow1")
+    local vjd_pat_asn_jf1 = params:lookup_param("vjd_pat_asn_jf1")
+    local vjd_pat_asn_wsyn1 = params:lookup_param("vjd_pat_asn_wsyn1")
+    local vjd_pat_asn_wdelkarp1 = params:lookup_param("vjd_pat_asn_wdelkarp1")
+    vjd_pat_asn_midi1.max = num_pats
+    vjd_pat_asn_crow1.max = num_pats
+    vjd_pat_asn_jf1.max = num_pats
+    vjd_pat_asn_wsyn1.max = num_pats
+    vjd_pat_asn_wdelkarp1.max = num_pats
+
+    local vjd_pat_asn_midi1 = params:lookup_param("vjd_pat_asn_midi1")
+    local vjd_pat_asn_crow1 = params:lookup_param("vjd_pat_asn_crow1")
+    local vjd_pat_asn_jf1 = params:lookup_param("vjd_pat_asn_jf1")
+    local vjd_pat_asn_wsyn1 = params:lookup_param("vjd_pat_asn_wsyn1")
+    local vjd_pat_asn_wdelkarp1 = params:lookup_param("vjd_pat_asn_wdelkarp1")
+    vjd_pat_asn_midi1.max = num_pats
+    vjd_pat_asn_crow1.max = num_pats
+    vjd_pat_asn_jf1.max = num_pats
+    vjd_pat_asn_wsyn1.max = num_pats
+    vjd_pat_asn_wdelkarp1.max = num_pats
+  end
+
+
 
 
   --------------------------------
@@ -363,7 +462,7 @@ function parameters.init()
 
 
   params:add{
-    type="number", id = "rise_time", name = "rise time",min=10, max=200, default = 50,
+    type="number", id = "rise_time", name = "rise time",min=10, max=200, default = 10,
     action=function(x) 
       engine.rise_fall(x/100,0)
     end
@@ -379,7 +478,7 @@ function parameters.init()
   params:add{
     type = "number", id = "env_shape", name = "env shape", 
     min=-10,max=10,
-    default = 8,
+    default = 3,
     action = function(value) 
       engine.env_shape(value)
   end}
@@ -392,7 +491,7 @@ function parameters.init()
     action = function(value) 
     end}
 
-  params:add_group("midi",7)
+  params:add_group("midi",8)
 
   -- params:add{type = "option", id = "midi_engine_control", name = "midi engine control",
   --   options = {"off","on"},
@@ -508,6 +607,14 @@ function parameters.init()
   --   end
   -- }
 
+  -- params:add{type = "number", id = "midi_pitch_offset", name = "note offset",
+  --   min = 0, max = 100, default = midi_pitch_offset,
+  --   action = function(value)
+  --     -- all_notes_off()
+  --     midi_pitch_offset = value
+  --   end
+  -- }
+
   get_midi_devices()
 
   -- crow
@@ -524,7 +631,7 @@ function parameters.init()
 
   params:add{type = "option", id = "output_crow2", name = "crow out2 mode",
     options = {"off","envelope","trigger","gate","clock"},
-    default = 4,
+    default = 2,
     action = function(value)
       if value == 3 then 
         crow.output[2].action = "{to(5,0),to(0,0.25)}"
@@ -554,7 +661,7 @@ function parameters.init()
   }
 
   -- just friends
-  params:add_group("just friends",2)
+  params:add_group("just friends",8)
   params:add{type = "option", id = "output_jf", name = "just friends",
     options = {"off","on"},
     default = 2,
@@ -562,7 +669,7 @@ function parameters.init()
       if value > 1 then 
         -- crow.output[2].action = "{to(5,0),to(0,0.25)}"
         crow.ii.pullup(true)
-        crow.ii.jf.mode(1)
+        crow.ii.jf.mode(value)
       else
         crow.ii.jf.mode(0)
         -- crow.ii.pullup(false)
@@ -572,7 +679,7 @@ function parameters.init()
 
   params:add{type = "option", id = "jf_mode", name = "just friends mode",
     options = {"mono","poly","port"},
-    default = 2,
+    default = 1,
     action = function(value)
       -- if value == 2 then 
       --   -- crow.output[2].action = "{to(5,0),to(0,0.25)}"
@@ -586,7 +693,39 @@ function parameters.init()
   }
 
 
-  params:add_group("w/syn",14)
+  params:add { type = "number", id = "jf_pitch_interval1", name = "pitch interval 1", min=-24, max=24, default = 0, 
+  -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
+    action = function(val) 
+    end
+  }
+  params:add { type = "number", id = "jf_pitch_interval2", name = "pitch interval 2", min=-24, max=24, default = 0, 
+  -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
+    action = function(val) 
+    end
+  }
+  params:add { type = "number", id = "jf_pitch_interval3", name = "pitch interval 3", min=-24, max=24, default = 0, 
+  -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
+    action = function(val) 
+    end
+  }
+  params:add { type = "number", id = "jf_pitch_interval4", name = "pitch interval 4", min=-24, max=24, default = 0, 
+  -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
+    action = function(val) 
+    end
+  }
+  params:add { type = "number", id = "jf_pitch_interval5", name = "pitch interval 5", min=-24, max=24, default = 0, 
+  -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
+    action = function(val) 
+    end
+  }
+  params:add { type = "number", id = "jf_pitch_interval6", name = "pitch interval 6", min=-24, max=24, default = 0, 
+  -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
+    action = function(val) 
+    end
+  }
+
+
+  params:add_group("w/syn",17)
   w_slash.wsyn_add_params()
   -- w_slash.wsyn_v2_add_params()
 

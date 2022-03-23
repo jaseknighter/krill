@@ -28,8 +28,8 @@ function vuja_de:get_note()
   self.prob = params:get("vuja_de_prob")
 
   local new_prob = math.random()
-  if self.prob <= 0 and new_prob > math.abs(tonumber(self.prob)/10) then
-    local active_sector=sound_controller:get_active_sector()
+  local active_sector=sound_controller:get_active_sector()
+  if active_sector and self.prob <= 0 and new_prob > math.abs(tonumber(self.prob)/10) then
     local octave =  active_sector.row
     local note =    active_sector.col
     local next_note = ((octave)*note)-14+midi_pitch_offset

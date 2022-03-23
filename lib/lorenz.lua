@@ -127,8 +127,8 @@ lorenz = {
   third = 0,
   x_map = 0,
   y_map = 0,
-  boundary = {51,5,64,55}
-  -- boundary = {51,5,84,55}
+  boundary = {51,5,104,55}
+  -- boundary = {51,5,74,55}
 }
 
 function lorenz.init()

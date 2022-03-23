@@ -33,8 +33,12 @@ sound_controller.random_pat_div = 1
 function sound_controller:init(rows,cols)
   sound_controller.sectors={}
   local lb = lorenz.boundary
-  local q_width =  math.floor(lb[3]-lb[1]/rows)
-  local q_height = math.floor(lb[4]-lb[2]/cols)
+  -- local q_width =  math.floor(lb[3]-lb[1]/rows)
+  local q_width =  math.floor(lb[3]-lb[1])
+  -- q_width = q_width and q_width < 20 and 20 or q_width
+  -- local q_height = math.floor(lb[4]-lb[2]/cols)
+  local q_height = math.floor(lb[4]-lb[2])
+  print("q_width, lb[3],lb[1]",q_width,lb[3],lb[1])
   for i=1,rows,1 do
     sound_controller.sectors[i]={}
     for j=1,cols,1 do
@@ -90,98 +94,32 @@ function sound_controller:get_active_sector()
 
 end
 
-
-
--- function sound_controller:random_pattern_division()
---   if math.random()>0.3 then
---     sound_controller.random_pat_div = random_divisions[math.random(#random_divisions)]
---   end
---   -- print("sound_controller.random_pat_div",sound_controller.random_pat_div)
---   random_sound_pattern.division = sound_controller.random_pat_div
--- end 
-
--- function sound_controller:play_random_note()
---   local active = pixels[pixels.active]
---   if active then 
---     local active_sector=sound_controller:get_active_sector()
---     if active_sector then
---       -- print("update note")
---       local octave =  active_sector.row
---       local note =    active_sector.col
---       -- local note_to_play = notes[note]
---       -- local note_to_play = notes[octave*note]
---       local note_to_play = ((octave)*note)+midi_pitch_offset
---       local note_tab = {
---         pitch = note_to_play,
---         level = 5,
---         mode = 1
---       }
-
---       if params:get("engine_mode") == 2 then
---         note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
---         if params:get("output_midi") == 2 then
---           ext.note_on(1,note_tab, "midi")
---         end
---         -- ext.note_on(1,fn.deep_copy(value_tab),1,1,"sequencer", "jf")
---         if params:get("output_jf") == 2 then
---           ext.note_on(1,note_tab, "jf")
---         end 
---         if params:get("output_crow1") == 2 then
---           ext.note_on(1,note_tab, "crow")
---         end
---         if params:get("output_wsyn") == 2 then
---           ext.note_on(1,note_tab, "wsyn")
---         end
---         if params:get("output_wdel_ks") == 2 then
---           ext.note_on(1,note_tab, "wdel_ks")
---         end
---         if params:get("quantize") == 2 then          
---           note_tab.pitch = fn.quantize(note_tab.pitch)
---         end
-
---         local env_time = rise+fall
---         local pat_div = tonumber(sound_controller.random_pat_div)
---         local new_rise = (rise/env_time) * pat_div * 2
---         local new_fall = (fall/env_time) * pat_div * 2
---         -- local new_rise = (rise/env_time) * pat_div / 2
---         -- local new_fall = (fall/env_time) * pat_div / 2
---         new_rise = util.clamp(new_rise*100,10,200)
---         new_fall = util.clamp(new_fall*100,10,200)
---         -- engine.rise_fall(new_rise,new_fall)    
---         params:set("rise_time",new_rise)
---         params:set("fall_time",new_fall)
---         play_engine(note_tab.pitch)
-
---       end
-
-
---     end
---   end
--- end
-
-function sound_controller.play_note(note_tab)
+function sound_controller.play_note(note_tab,mode)
   if initializing == false then
     note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
     if params:get("quantize") == 2 then          
       note_tab.pitch = fn.quantize(note_tab.pitch)
     end
-    play_engine(note_tab.pitch)
+
+    if mode==1 or (params:get("vjd_pat_asn_engine1") == note_tab.pat_id or params:get("vjd_pat_asn_engine2") == note_tab.pat_id) then
+      play_engine(note_tab.pitch)
+    end
 
     if params:get("output_midi") == 2 then
-      ext.note_on(1,note_tab, "midi")
+      ext.note_on(1,note_tab, "midi",mode)
     end
     -- ext.note_on(1,fn.deep_copy(value_tab),1,1,"sequencer", "jf")
     if params:get("output_jf") == 2 then
-      ext.note_on(1,note_tab, "jf")
+      ext.note_on(1,note_tab, "jf",mode)
     end 
     if params:get("output_crow1") == 2 then
-      ext.note_on(1,note_tab, "crow")
+      ext.note_on(1,note_tab, "crow",mode)
     end
     if params:get("output_wsyn") == 2 then
-      ext.note_on(1,note_tab, "wsyn")
+      ext.note_on(1,note_tab, "wsyn",mode)
     end
     if params:get("output_wdel_ks") == 2 then
-      ext.note_on(1,note_tab, "wdel_ks")
+      ext.note_on(1,note_tab, "wdel_ks",mode)
     end
   end
 end
@@ -199,39 +137,21 @@ function sound_controller:play_krill_note(value)
     mode = 1
   }
 
-  sound_controller.play_note(note_tab)
+  sound_controller.play_note(note_tab,1)
   -- sound_controller:play_note(note_tab)
 end
 
-function sound_controller:play_vuja_de_note()
+function sound_controller:play_vuja_de_note(pat_id)
   local note_to_play = vuja_de:get_note()
 
   local note_tab = {
     pitch = note_to_play,
-    level = 5,
-    mode = 1
+    level = 10,
+    mode = 1,
+    pat_id = pat_id
   }
 
-  local env_time = rise+fall
-
-  if math.random()>0.3 then
-    sound_controller.random_pat_div = 1/2
-    -- sound_controller.random_pat_div = random_divisions[math.random(#random_divisions)]
-  end
-  -- print("sound_controller.random_pat_div",sound_controller.random_pat_div)
-
-  local pat_div = tonumber(sound_controller.random_pat_div)
-  -- local new_rise = (rise/env_time) * pat_div
-  -- local new_fall = (fall/env_time) * pat_div
-
-  -- new_rise = util.linlin(0,1,10,200,new_rise)
-  -- new_fall = util.linlin(0,1,10,200,new_fall)
-  -- params:set("rise_time",new_rise)
-  -- params:set("fall_time",new_fall)
-  
-  -- sound_controller:play_note(note_tab)
-  sound_controller.play_note(note_tab)
-
+  sound_controller.play_note(note_tab,2)
 end
 
 return sound_controller

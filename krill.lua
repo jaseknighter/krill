@@ -85,11 +85,11 @@ function init()
   parameters.init()
   -- params:set("x_offset",10)
   fn.build_scale()
-
+  
   active_notes = {}
   ext = externals:new(active_notes)
-
-  sound_controller:init(4,fn.get_num_notes_per_octave())
+  
+  sound_controller:init(NUM_OCTAVES_DEFAULT,fn.get_num_notes_per_octave())
   lorenz:reset()
   -- input[1].mode('change', 1,0.1,'rising')
   -- input[2].mode('stream',0.001)
@@ -124,42 +124,65 @@ function init()
     division = 1/256, --1/16,
     enabled = true
   }
-
-  -- div = {1/8,1/16}
-  -- div = {1/4,2/3}
-  -- random_divisions = {1/4,2/3,1/8,1/16,2/3,4/7}
-
-  -- random_pat_div = random_divisions[1]
-
-  -- random_sound_pattern = krill_lattice:new_pattern{
+  
+  
+  for i=1,VJD_MAX_PATTERNS,1 do
+    
+    vuja_de_patterns[i]= krill_lattice:new_pattern{
+      action = function(t) 
+        -- play note from quant grid
+        local active = pixels[pixels.active]
+        vuja_de:update_length()
+        if active and params:get("engine_mode") == 2 then -- vuja de mode
+          -- vuja_de:update()
+          sound_controller:play_vuja_de_note(i)
+        end
+      end,
+      division = 1/5, --3/1, --1/8, --1/16,
+      enabled = false
+    }
+  end
+  -- vuja_de_pattern1 = krill_lattice:new_pattern{
   --   action = function(t) 
   --     -- play note from quant grid
-  --     if params:get("engine_mode")==2 then
-  --       sound_controller:random_pattern_division()
-  --       sound_controller:play_random_note()
+  --     local active = pixels[pixels.active]
+  --     vuja_de:update_length()
+  --     if active and params:get("engine_mode") == 2 then -- vuja de mode
+  --       -- vuja_de:update()
+  --       sound_controller:play_vuja_de_note(1)
   --     end
   --   end,
-  --   division = random_divisions[1], --1/8, --1/16,
-  --   enabled = true
+  --   division = vuja_de_pat1, --3/1, --1/8, --1/16,
+  --   enabled = false
   -- }
-  
-  
-  vuja_de_pattern = krill_lattice:new_pattern{
-    action = function(t) 
-      -- play note from quant grid
-      local active = pixels[pixels.active]
-      vuja_de:update_length()
-      if active and params:get("engine_mode") == 2 then -- vuja de mode
-        -- vuja_de:update()
-        sound_controller:play_vuja_de_note()
-      end
-    end,
-    division = vuja_de_prob, --3/1, --1/8, --1/16,
-    enabled = false
-  }
+  -- vuja_de_pattern2 = krill_lattice:new_pattern{
+  --   action = function(t) 
+  --     -- play note from quant grid
+  --     local active = pixels[pixels.active]
+  --     vuja_de:update_length()
+  --     if active and params:get("engine_mode") == 2 then -- vuja de mode
+  --       -- vuja_de:update()
+  --       sound_controller:play_vuja_de_note(2)
+  --     end
+  --   end,
+  --   division = vuja_de_pat2, --3/1, --1/8, --1/16,
+  --   enabled = false
+  -- }
 
+  -- vuja_de_pattern3 = krill_lattice:new_pattern{
+  --   action = function(t) 
+  --     -- play note from quant grid
+  --     local active = pixels[pixels.active]
+  --     vuja_de:update_length()
+  --     if active and params:get("engine_mode") == 2 then -- vuja de mode
+  --       -- vuja_de:update()
+  --       sound_controller:play_vuja_de_note(3)
+  --     end
+  --   end,
+  --   division = vuja_de_pat3, --3/1, --1/8, --1/16,
+  --   enabled = false
+  -- }
 
-  -- print("asdf")
   clock.run( function()
     while true do
 
@@ -200,20 +223,49 @@ function init()
 
   
   krill_lattice:start()
-
+  
   vuja_de = vuja_de:new()
-  vuja_de_pattern:start()
+  
+  
+  
+  
+  
+  
   -- params:set("xy_scale",0.9)
-
+  
   -- clock.run(setup_polling)
   init_polling()
   -- engine.env_time(0.5);
   -- clock.run(gui.set_gui_level)
-  params:set("engine_mode",2)
   params:set("x_offset",-10)
   params:set("y_scale",0.85)
+  print(">>>>>>>>")
+  -- params:set("vuja_de_pat_denominator1",8)
+  -- params:set("vuja_de_pat_denominator2",8)
+  -- params:set("vuja_de_pat_denominator3",8)
+  params:set("rise_time",10)
+  params:set("fall_time",50)
+  params:set("engine_mode",2)
+  clock.run(finish_init)
+end
+function finish_init()
   initializing = false
-  params:set("engine_mode",1)
+  clock.sleep(1)
+  vuja_de_patterns[1]:start()
+  vuja_de_patterns[2]:start()
+  vuja_de_patterns[3]:start()
+  -- vuja_de_patterns[1].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
+  -- vuja_de_patterns[2].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
+  -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
+  
+  params:set("vuja_de_pat_numerator1",VDJ_PAT_DEFAULT_NUMERATOR)
+  params:set("vuja_de_pat_denominator1",VDJ_PAT_DEFAULT_DENOMINATOR)
+  params:set("vuja_de_pat_numerator2",VDJ_PAT_DEFAULT_NUMERATOR)
+  params:set("vuja_de_pat_denominator2",VDJ_PAT_DEFAULT_DENOMINATOR)
+  params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
+  params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR+3)
+  -- params:set("engine_mode",1)
+
 end
 
 function init_polling()
@@ -246,20 +298,20 @@ function init_polling()
       -- sound_controller:play_vuja_de_note()
     end
 
-    rise = value
+    rise = value * params:get("env_scalar")/100
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
     prev_fall = fall
-    fall = value
+    fall = value * params:get("env_scalar")/100
     if params:get("engine_mode") == 1 then
       sound_controller:play_krill_note(value)
     else
       -- sound_controller:play_vuja_de_note()
     end
 
-    crow.output[2].volts = 0
-    crow.output[2].execute()
+    -- crow.output[2].volts = 0
+    -- crow.output[2].execute()
   end)
 
   function play_engine(note)

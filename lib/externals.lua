@@ -55,211 +55,320 @@ externals.wiggle = function(x,y)
 
 end
 
-externals.note_on = function(voice_id, note_tab, target)
-  
+externals.note_on = function(voice_id, note_tab, target,mode)
   -- local note_offset = params:get("note_offset") - params:get("root_note")
-  -- local note_tab = fn.deep_copy(note_tab)
-  -- tab.print(note_tab)
   local note_tab = fn.deep_copy(note_tab)
   if initializing == false then
     if type(note_tab) == "table" and note_tab.pitch then
       note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
       if params:get("quantize") == 2 then          
-        note_tab.pitch = fn.quantize(note_tab.pitch+14) 
+        note_tab.pitch = fn.quantize(note_tab.pitch+7) 
+        -- note_tab.pitch = fn.quantize(note_tab.pitch+14) 
       end
       -- print(note_tab.pitch)
     end
+    if mode == 1 or (params:get("vjd_pat_asn_midi1") == note_tab.pat_id or params:get("vjd_pat_asn_midi2") == note_tab.pat_id) then
+       externals.midi_note_on(voice_id, note_tab, target)
+    end
+    if mode == 1 or (params:get("vjd_pat_asn_crow1") == note_tab.pat_id or params:get("vjd_pat_asn_crow2") == note_tab.pat_id) then
+       externals.crow_note_on(voice_id, note_tab, target)
+    end
+    if mode == 1 or (params:get("vjd_pat_asn_jf1") == note_tab.pat_id or params:get("vjd_pat_asn_jf2") == note_tab.pat_id) then
+       externals.jf_note_on(voice_id, note_tab, target)
+    end
+    if mode == 1 or (params:get("vjd_pat_asn_wsyn1") == note_tab.pat_id or params:get("vjd_pat_asn_wsyn2") == note_tab.pat_id) then
+       externals.wsyn_note_on(voice_id, note_tab, target)
+    end
+    if mode == 1 or (params:get("vjd_pat_asn_wdelkarp1") == note_tab.pat_id or params:get("vjd_pat_asn_wdelkarp2") == note_tab.pat_id) then
+       externals.wdel_note_on(voice_id, note_tab, target)
+    end
+  end
+end
 
-    
-    -- local envelope_length = envelopes[voice_id].get_env_time()
-
-    -- MIDI out
-    local output_midi = params:get("output_midi")
-    if (target == "midi" and output_midi == 2) then
-      local mode = note_tab.mode and note_tab.mode or 1
-      if mode == 1 then -- play_voice
-        local channel = note_tab.channel and note_tab.channel or 1
-        local pitch = note_tab.pitch
-        local velocity = note_tab.velocity and note_tab.velocity or 80
-        local duration = note_tab.duration and note_tab.duration or 0.25
-        duration = tonumber(duration) and duration or fn.fraction_to_decimal(duration)    
-        midi_out_device:note_on(pitch, velocity, channel)
-        table.insert(active_notes, pitch)
-        clock.run(externals.midi_note_off_beats, duration, pitch, channel, 1, #active_notes)
-      elseif mode == 2 then -- stop/start
-        if note_tab.stop_start == 1 then -- stop
-          midi_out_device:stop()
-        else -- start
-          midi_out_device:start()
-        end
+-- local envelope_length = envelopes[voice_id].get_env_time()
+---------------------------------------
+-- MIDI out
+---------------------------------------
+externals.midi_note_on = function(voice_id, note_tab, target)
+  local output_midi = params:get("output_midi")
+  if (target == "midi" and output_midi == 2) then
+    local mode = note_tab.mode and note_tab.mode or 1
+    if mode == 1 then -- play_voice
+      local channel = note_tab.channel and note_tab.channel or 1
+      local pitch = note_tab.pitch
+      local velocity = note_tab.velocity and note_tab.velocity or 80
+      local duration = note_tab.duration and note_tab.duration or 0.25
+      duration = tonumber(duration) and duration or fn.fraction_to_decimal(duration)    
+      midi_out_device:note_on(pitch, velocity, channel)
+      table.insert(active_notes, pitch)
+      clock.run(externals.midi_note_off_beats, duration, pitch, channel, 1, #active_notes)
+    elseif mode == 2 then -- stop/start
+      if note_tab.stop_start == 1 then -- stop
+        midi_out_device:stop()
+      else -- start
+        midi_out_device:start()
       end
     end
-    
+  end
+end
+  
+---------------------------------------
+--crow
+---------------------------------------
+externals.crow_note_on = function(voice_id, note_tab, target)
+  local function get_envelope_data() 
+    local data = {}
+    data.segments =	 3
+    data.curves   =	 {0,params:get("env_shape"),params:get("env_shape")}
+    -- curves   =	 {0,-10,-10},
+    data.levels	 =   {0,params:get("env_max_level"),0}
 
+    -- local tempo = params:get("clock_tempo")
+    -- local div = vuja_de_pattern1.division
+    data.times	   =   {0,rise/10,fall/10}
+    return data
+  end
 
-    local function get_envelope_data() 
-      local data = {}
-      data.segments =	 3
-      data.curves   =	 {0,params:get("env_shape"),params:get("env_shape")}
-      -- curves   =	 {0,-10,-10},
-      data.levels	 =   {0,params:get("env_max_level"),0}
-      data.times	   =   {0,rise,fall}
-      return data
-    end
+  -- crow out
+  local output_crow1 = params:get("output_crow1")
+  local output_crow2 = params:get("output_crow2")
+  local output_crow3 = params:get("output_crow3")
+  local output_crow4 = params:get("output_crow4")
 
-    -- crow out
-    local output_crow1 = params:get("output_crow1")
-    local output_crow2 = params:get("output_crow2")
-    local output_crow3 = params:get("output_crow3")
-    local output_crow4 = params:get("output_crow4")
+  local asl_generator = function(env_length)
+    local envelope_data = get_envelope_data()
+    local asl_envelope = ""
+    for i=2, envelope_data.segments, 1
+    do
+      local to_env 
+      if envelope_data.curves[i] > 0 then to_env = '"exp"'
+      elseif envelope_data.curves[i] < 0 then to_env = '"log"'
+      else to_env = '"lin"'
+      end
+      local to_string
+      if i < envelope_data.segments then
+        to_string =  "to(" .. 
+                        (envelope_data.levels[i]) .. "," ..
+                        (envelope_data.times[i]-envelope_data.times[i-1]) .. 
+                        "," .. to_env .. 
+                        "),"
+                        asl_envelope = asl_envelope .. to_string
 
-    local asl_generator = function(env_length)
-      local envelope_data = get_envelope_data()
-      local asl_envelope = ""
-      for i=2, envelope_data.segments, 1
-      do
-        local to_env 
-        if envelope_data.curves[i] > 0 then to_env = '"exp"'
-        elseif envelope_data.curves[i] < 0 then to_env = '"log"'
-        else to_env = '"lin"'
-        end
-        local to_string
-        if i < envelope_data.segments then
-          to_string =  "to(" .. 
+      elseif i == envelope_data.segments then
+        local to_string = "to(" .. 
                           (envelope_data.levels[i]) .. "," ..
-                          (envelope_data.times[i]-envelope_data.times[i-1]) .. 
+                          (envelope_data.times[i]) .. 
+                          -- (env_length-envelope_data.times[i]) .. 
                           "," .. to_env .. 
                           "),"
                           asl_envelope = asl_envelope .. to_string
-
-        elseif i == envelope_data.segments then
-          local to_string = "to(" .. 
-                            (envelope_data.levels[i]) .. "," ..
-                            (envelope_data.times[i]) .. 
-                            -- (env_length-envelope_data.times[i]) .. 
-                            "," .. to_env .. 
-                            "),"
-                            asl_envelope = asl_envelope .. to_string
-        end
       end
-    
-      asl_envelope = "{" .. asl_envelope .. "}"
-      return asl_envelope 
     end
-
-    -- clock out check
-    if output_crow1 == 5 then 
-      crow.output[1]:execute() 
-    elseif output_crow2 == 5 then 
-      crow.output[2]:execute() 
-    elseif output_crow3 == 5 then 
-      crow.output[3]:execute() 
-    elseif output_crow4 == 5 then 
-      crow.output[4]:execute() 
-    end
-
-    -- note, trigger, envelope, gate check
-    if (voice_id == 1 and target == "crow" and output_crow1 == 2) then
-      local volts = (note_tab.pitch-midi_pitch_offset+14)/12
-      crow.output[1].volts = volts 
-      if output_crow2 == 2 then -- envelope
-        local asl_envelope = asl_generator()
-        -- local asl_envelope = asl_generator(params:get("env_length"))
-        crow.output[2].action = tostring(asl_envelope)
-      elseif output_crow2 == 3 then -- trigger
-        local time = 0.01 --crow_trigger_2
-        local level = params:get("env_max_level")
-        local polarity = 1
-        crow.output[2].action = "pulse(" .. time ..",".. level .. "," .. polarity .. ")"
-      elseif output_crow2 == 4 then -- gate
-        local time = rise+fall
-        local level = 5
-        -- local level = params:get("env_max_level")
-        local polarity = 1
-        
-        if (time and level and polarity) then 
-          -- local action = "pulse(" .. time ..",".. level .. "," .. polarity .. ")"
-          -- crow.output[2].action = action
-          crow.output[2].volts = 5
-          clock.run(externals.gate_off,time*0.75)
-          -- clock.run(externals.slide_gate_on,time/5)
-          -- crow.output[4].volts = 0
-          -- crow.output[4].execute()
-        end
-      end
-      if output_crow2 > 1 then 
-        crow.output[2]() 
-      end
-      crow.output[1].execute()
+  
+    asl_envelope = "{" .. asl_envelope .. "}"
+    return asl_envelope 
   end
 
-    -- just friends out 
-    local output_jf = params:get("output_jf")
-    local jf_mode = params:get("jf_mode")
+  -- clock out check
+  if output_crow1 == 5 then 
+    crow.output[1]:execute() 
+  elseif output_crow2 == 5 then 
+    crow.output[2]:execute() 
+  elseif output_crow3 == 5 then 
+    crow.output[3]:execute() 
+  elseif output_crow4 == 5 then 
+    crow.output[4]:execute() 
+  end
 
-    if (target == "jf" and output_jf == 2) then
-      local pitch = note_tab.pitch
-      local level = note_tab.level
-      local channel = note_tab.channel and note_tab.channel or 1
-      if jf_mode == 1 then -- play_note
-        crow.ii.jf.play_note((pitch-midi_pitch_offset)/12,level)
-      elseif jf_mode == 2 then -- play_voice
-        local channel = channel
-        crow.ii.jf.play_voice(channel,(pitch-midi_pitch_offset)/12,level)
-      else
-        crow.ii.jf.pitch(1,(note_tab-midi_pitch_offset)/12)
-      end
-    end
+  -- note, trigger, envelope, gate check
+  if (voice_id == 1 and target == "crow" and output_crow1 == 2) then
+    local volts = (note_tab.pitch-midi_pitch_offset)/12
+    -- local volts = (note_tab.pitch-midi_pitch_offset+24)/12
+    crow.output[1].volts = volts 
+    if output_crow2 == 2 then -- envelope
+      local asl_envelope = asl_generator()
+      -- print(asl_envelope)
+      -- local asl_envelope = asl_generator(params:get("env_length"))
+      crow.output[2].action = tostring(asl_envelope)
+    elseif output_crow2 == 3 then -- trigger
+      local time = 0.01 --crow_trigger_2
+      local level = params:get("env_max_level")
+      local polarity = 1
+      crow.output[2].action = "pulse(" .. time ..",".. level .. "," .. polarity .. ")"
+    elseif output_crow2 == 4 then -- gate
+      local tempo = params:get("clock_tempo")
+      -- local divs = {8,12,16,24,32}
+      -- params:set("vuja_de_prob_denominator",divs[math.random(1,3)])
 
-    -- wsyn out
-    local output_wsyn = params:get("output_wsyn")
-    local output_wdel_ks = params:get("output_wdel_ks")
-
-    -- wsyn out
-    if (target == "wsyn" and output_wsyn == 2) then
-
-      local env_time = params:get("rise_time")/100 + params:get("fall_time")/100 
-      local velocity = env_time
-      local lpg_time = util.linlin(0,3,1,-5,env_time)       
+      -- vuja_de_pattern1.division = vuja_de_prob + (math.random(0,5)/100)
+      local div = vuja_de_pattern1.division
+      -- local div = vuja_de_prob + (math.random(-200,50)/10000)
       
-      local pitch1 = (note_tab.pitch-midi_pitch_offset)/12
-      local pitch2 = (note_tab.pitch-midi_pitch_offset -8)/12
-      local pitch3 = (note_tab.pitch-midi_pitch_offset - 32)/12
-      -- params:set("wsyn_pluckylog",1)
-      -- params:set("wsyn_lpg_time",lpg_time)
-      crow.send("ii.wsyn.play_voice(" .. 1 .."," .. pitch1 .."," .. 5 .. ")")
-      -- params:set("wsyn_pluckylog",1)
-      -- params:set("wsyn_lpg_time",lpg_time)
-      -- crow.send("ii.wsyn.play_voice(" .. 2 .."," .. pitch2 .."," .. 5 .. ")")
-      -- params:set("wsyn_pluckylog",1)
-      -- params:set("wsyn_lpg_time",llpg_time)
-      -- crow.send("ii.wsyn.play_voice(" .. 1 .."," .. pitch3 .."," .. 5 .. ")")
+      -- local time = rise+fall
+      -- local level = 5
+      -- local level = params:get("env_max_level")
+      -- local polarity = 1
+        -- local action = "pulse(" .. time ..",".. level .. "," .. polarity .. ")"
+        -- crow.output[1].shape = 'exponential'
+        -- crow.output[2].execute()
+
+        crow.output[2].volts = 10
+        gate_off_clock = clock.run(externals.gate_off,60/((tempo/60)/div/40))
 
     end
+    if output_crow2 > 1 then 
+      crow.output[2]() 
+    end
+    crow.output[1].execute()
+  end
+end
 
-    -- wdel - karplus-strong out
-    if ( target == "wdel_ks" and output_wdel_ks == 2) then
-      local pitch = (note_tab.pitch-midi_pitch_offset)/12
-      -- local level = voice_id == 1 and params:get("env_max_level") or params:get("envelope2_max_level") 
-      local level = params:get("env_max_level") 
-      crow.send("ii.wdel.pluck(" .. level .. ")")
-      crow.send("ii.wdel.freq(" .. pitch .. ")")
-      params:set("wdel_rate",0)
+---------------------------------------
+-- just friends
+---------------------------------------
+externals.jf_note_on = function(voice_id, note_tab, target)
+  local output_jf = params:get("output_jf")
+  local jf_mode = params:get("jf_mode")
+
+  if (target == "jf" and output_jf == 2) then
+    local pitch = note_tab.pitch
+    local level = note_tab.level
+    local channel = note_tab.channel and note_tab.channel or 1
+
+    local jf_pitch1 = pitch + params:get("jf_pitch_interval1")
+    local jf_pitch2 = pitch + params:get("jf_pitch_interval2")
+    local jf_pitch3 = pitch + params:get("jf_pitch_interval3")
+    local jf_pitch4 = pitch + params:get("jf_pitch_interval4")
+    local jf_pitch5 = pitch + params:get("jf_pitch_interval5")
+    local jf_pitch6 = pitch + params:get("jf_pitch_interval6")
+
+    if params:get("quantize") == 2 then          
+      jf_pitch1 = jf_pitch1+midi_pitch_offset
+      jf_pitch2 = jf_pitch2+midi_pitch_offset
+      jf_pitch3 = jf_pitch3+midi_pitch_offset
+      jf_pitch4 = jf_pitch4+midi_pitch_offset
+      jf_pitch5 = jf_pitch5+midi_pitch_offset
+      jf_pitch6 = jf_pitch6+midi_pitch_offset
+      jf_pitch1 = fn.quantize(jf_pitch1-midi_pitch_offset)
+      jf_pitch2 = fn.quantize(jf_pitch2-midi_pitch_offset)
+      jf_pitch3 = fn.quantize(jf_pitch3-midi_pitch_offset)
+      jf_pitch4 = fn.quantize(jf_pitch4-midi_pitch_offset)
+      jf_pitch5 = fn.quantize(jf_pitch5-midi_pitch_offset)
+      jf_pitch6 = fn.quantize(jf_pitch6-midi_pitch_offset)
+    end
+    
+    if jf_mode == 1 then -- play_note poly mode
+      crow.ii.jf.play_note((pitch-midi_pitch_offset)/12,level)
+    elseif jf_mode == 2 then -- play_voice mono mode
+      local channel = channel
+      crow.ii.jf.play_voice(channel,(pitch-midi_pitch_offset)/12,level)
+    else -- portamento
+      crow.ii.jf.pitch(1,(jf_pitch1-midi_pitch_offset)/12)
+      crow.ii.jf.pitch(2,(jf_pitch2-midi_pitch_offset)/12)
+      crow.ii.jf.pitch(3,(jf_pitch3-midi_pitch_offset)/12)
+      crow.ii.jf.pitch(4,(jf_pitch4-midi_pitch_offset)/12)
+      crow.ii.jf.pitch(5,(jf_pitch5-midi_pitch_offset)/12)
+      crow.ii.jf.pitch(6,(jf_pitch6-midi_pitch_offset)/12)
+      -- crow.ii.jf.pitch(channel,(pitch-midi_pitch_offset)/12)
     end
   end
 end
 
+---------------------------------------
+-- wsyn 
+---------------------------------------
+externals.wsyn_note_on = function(voice_id, note_tab, target)
+  local output_wsyn = params:get("output_wsyn")
+  local output_wdel_ks = params:get("output_wdel_ks")
+
+  -- wsyn out
+  if (target == "wsyn" and output_wsyn == 2) then
+
+    local env_time = rise+fall
+    local lpg_time = util.linlin(0,2,10,0,env_time)-5       
+    local lpg_symmetry = util.linlin(0,1,10,0,rise)-5       
+    
+    params:set("wsyn_lpg_time",lpg_time)
+    params:set("wsyn_lpg_symmetry",lpg_symmetry)
+
+    local wsyn_pitch_interval1 = params:get("wsyn_pitch_interval1")
+    local wsyn_pitch_interval2 = params:get("wsyn_pitch_interval2")
+    local wsyn_pitch_interval3 = params:get("wsyn_pitch_interval3")
+
+    local pitch1 = (note_tab.pitch-midi_pitch_offset + wsyn_pitch_interval1)
+    local pitch2 = (note_tab.pitch-midi_pitch_offset + wsyn_pitch_interval2)
+    local pitch3 = (note_tab.pitch-midi_pitch_offset + wsyn_pitch_interval3)
+    
+    if params:get("quantize") == 2 then          
+      pitch1 = pitch1+midi_pitch_offset
+      pitch2 = pitch2+midi_pitch_offset
+      pitch3 = pitch3+midi_pitch_offset
+      pitch1 = (fn.quantize(pitch1)-midi_pitch_offset)/12
+      pitch2 = (fn.quantize(pitch2)-midi_pitch_offset)/12
+      pitch3 = (fn.quantize(pitch3)-midi_pitch_offset)/12
+      -- pitch2 = fn.quantize(pitch2) 
+      -- pitch3 = fn.quantize(pitch3) 
+    end
+
+    -- params:set("wsyn_pluckylog",1)
+    crow.send("ii.wsyn.play_voice(" .. 1 .."," .. pitch1 .."," .. 5 .. ")")
+    
+    -- params:set("wsyn_pluckylog",1)
+    crow.send("ii.wsyn.play_voice(" .. 2 .."," .. pitch2 .."," .. 5 .. ")")
+    
+    -- params:set("wsyn_pluckylog",1)
+    -- params:set("wsyn_lpg_time",llpg_time)
+    
+    crow.send("ii.wsyn.play_voice(" .. 3 .."," .. pitch3 .."," .. 5 .. ")")
+
+  end
+end
+
+------------------------------
+-- wdel - karplus-strong out
+------------------------------
+externals.wdel_note_on = function(voice_id, note_tab, target)
+  if ( target == "wdel_ks" and output_wdel_ks == 2) then
+    local pitch = (note_tab.pitch-midi_pitch_offset)/12
+    -- local level = voice_id == 1 and params:get("env_max_level") or params:get("envelope2_max_level") 
+    local level = params:get("env_max_level") 
+    crow.send("ii.wdel.pluck(" .. level .. ")")
+    crow.send("ii.wdel.freq(" .. pitch .. ")")
+    params:set("wdel_rate",0)
+  end
+end
+--[[
+  slide and gate notes:
+
+  if slide is on, do not bring the note gate to 0
+
+]]
+
+local gate_off_clock
 function externals.gate_off(time)
   clock.sleep(time)
-  crow.output[2].volts = 0
-  crow.output[2].execute()
+  -- if slide == "on" then
+    crow.output[2].volts = 0
+    crow.output[2].execute()
+      -- crow.output[4].volts = 0
+    -- crow.output[4].execute()                      
+    slide = "off"
+  -- end
 end
 
-function externals.slide_gate_on(time)
+function externals.slide_on(time)
   clock.sleep(time)
-  print("slide on")
-  crow.output[4].volts = 5.15
-  -- crow.output[4].execute()
+  slide = "on"
+  crow.output[4].volts = 5
+  crow.output[4].execute()
+  -- clock.run(externals.slide_off,60/(tempo/div)/2)
+end
+
+function externals.slide_off(time)
+  clock.sleep(time)
+  slide = "off"
+  crow.output[4].volts = 0
+  crow.output[4].execute()
 end
 
 return externals

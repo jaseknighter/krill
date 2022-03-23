@@ -480,6 +480,40 @@ function w_slash.wsyn_add_params()
       pset_wsyn_lpg_symmetry = val
     end
   }
+  
+  params:add {
+    type = "number",
+    id = "wsyn_pitch_interval1",
+    name = "pitch interval 1",
+    min=-24, max=24, default = 0,
+    -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"),
+    action = function(val) 
+    end
+  }
+
+  params:add {
+    type = "number",
+    id = "wsyn_pitch_interval2",
+    name = "pitch interval 2",
+    min=-24, max=24, default = 0,
+    -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"),
+    action = function(val) 
+    end
+  }
+
+  params:add {
+    type = "number",
+    id = "wsyn_pitch_interval3",
+    name = "pitch interval 3",
+    min=-24, max=24, default = 0,
+    -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"),
+    action = function(val) 
+    end
+  }
+
+
+
+
   params:add{
     type = "trigger",
     id = "wsyn_pluckylog",

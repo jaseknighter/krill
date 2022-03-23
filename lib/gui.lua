@@ -13,7 +13,7 @@ menu_map = {"eng","scr","lrz"}
 
 sub_menu_map_krell = {
   -- lv (lorenz view)
-  {"engine_mode","env_scalar","rise_time","fall_time"},
+  {"engine_mode","env_scalar","rise_time","fall_time","num_octaves"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
   {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
@@ -21,7 +21,7 @@ sub_menu_map_krell = {
 
 sub_menu_map_vuja_de = {
   -- lv (lorenz view)
-  {"engine_mode","env_scalar","rise_time","fall_time","loop_length","vuja_de_prob"},
+  {"engine_mode","env_scalar","rise_time","fall_time","num_octaves","loop_length","vuja_de_prob"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
   {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
