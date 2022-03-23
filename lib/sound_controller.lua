@@ -77,6 +77,7 @@ function sound_controller:get_dimensions()
   return {x=x,y=y,w=w,h=h}
 end
 
+sound_controller.active_pixels = {}
 function sound_controller:get_active_sector()
   local active = pixels[pixels.active]
   local x=active.x_display

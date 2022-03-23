@@ -284,6 +284,7 @@ function parameters.init()
     -- if parameters.setting_patterns == false then
     --   parameters.setting_patterns = true
       parameters.set_pats(x)
+      _menu.rebuild_params()
       -- parameters.setting_patterns = false
     -- end
   end}
@@ -307,7 +308,8 @@ function parameters.init()
   params:add_separator("")
   params:add_separator("divisions")
   for i=1,VJD_MAX_PATTERNS,1 do
-    params:add_separator("pattern "..i)
+    -- params:add_separator("pattern "..i)
+    params:add{ type = "option", id = "pat_lab"..i, name = "---------- pattern " .. i .. " ----------",  options = {" "}}
     params:add{type = "number", id = "vuja_de_pat_numerator"..i, name = "vjd pat num"..i,
       min=1, max=VJD_MAX_PATTERN_NUMERATOR, default=1,
       action = function(x)
@@ -323,6 +325,8 @@ function parameters.init()
     if i>3 then
       params:hide("vuja_de_pat_numerator"..i)
       params:hide("vuja_de_pat_denominator"..i)
+      params:hide("pat_lab"..i)
+      
     end
       
   end
@@ -332,9 +336,11 @@ function parameters.init()
       if i>num_pats then
         params:hide("vuja_de_pat_numerator"..i)
         params:hide("vuja_de_pat_denominator"..i)
+        params:hide("pat_lab"..i)
       else
         params:show("vuja_de_pat_numerator"..i)
         params:show("vuja_de_pat_denominator"..i)    
+        params:show("pat_lab"..i)    
       end
     end
 

@@ -22,7 +22,6 @@ function pixels.update(display)
   end
   for i=1,#pixels,1 do
     if pixels[i] and pixels[i].remove == true then
-      -- print("remove"..i)
       if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
         local x = math.floor(pixels[i].last_x)
         local y = math.floor(pixels[i].last_y)

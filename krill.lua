@@ -112,14 +112,9 @@ function init()
         local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
         sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
         engine.set_lorenz_sample(sample_val)
-        local x = pixels[pixels.active].x_display
-        local y = pixels[pixels.active].y_display
-        -- print(x,y)
+        -- local x = pixels[pixels.active].x_display
+        -- local y = pixels[pixels.active].y_display
       end
-      -- if lz_x then
-      --   externals.wiggle(lz_x,lz_y)
-      -- end
-
     end,
     division = 1/256, --1/16,
     enabled = true
@@ -142,46 +137,7 @@ function init()
       enabled = false
     }
   end
-  -- vuja_de_pattern1 = krill_lattice:new_pattern{
-  --   action = function(t) 
-  --     -- play note from quant grid
-  --     local active = pixels[pixels.active]
-  --     vuja_de:update_length()
-  --     if active and params:get("engine_mode") == 2 then -- vuja de mode
-  --       -- vuja_de:update()
-  --       sound_controller:play_vuja_de_note(1)
-  --     end
-  --   end,
-  --   division = vuja_de_pat1, --3/1, --1/8, --1/16,
-  --   enabled = false
-  -- }
-  -- vuja_de_pattern2 = krill_lattice:new_pattern{
-  --   action = function(t) 
-  --     -- play note from quant grid
-  --     local active = pixels[pixels.active]
-  --     vuja_de:update_length()
-  --     if active and params:get("engine_mode") == 2 then -- vuja de mode
-  --       -- vuja_de:update()
-  --       sound_controller:play_vuja_de_note(2)
-  --     end
-  --   end,
-  --   division = vuja_de_pat2, --3/1, --1/8, --1/16,
-  --   enabled = false
-  -- }
 
-  -- vuja_de_pattern3 = krill_lattice:new_pattern{
-  --   action = function(t) 
-  --     -- play note from quant grid
-  --     local active = pixels[pixels.active]
-  --     vuja_de:update_length()
-  --     if active and params:get("engine_mode") == 2 then -- vuja de mode
-  --       -- vuja_de:update()
-  --       sound_controller:play_vuja_de_note(3)
-  --     end
-  --   end,
-  --   division = vuja_de_pat3, --3/1, --1/8, --1/16,
-  --   enabled = false
-  -- }
 
   clock.run( function()
     while true do
