@@ -403,6 +403,39 @@ function parameters.init()
 
 
   --------------------------------
+  -- harmonic oscillator params
+  --------------------------------
+  params:add_group("harmonic osc",18)
+
+  params:add{
+    type="taper", id = "first_harmonic", name = "first harmonic",min=1, max=16, default = 3,
+    action=function(x) 
+      print("set first harm")
+      engine.set_first_harm(x)
+    end
+  }
+
+  params:add_separator("harmonics")
+  local setting_harmonics = false
+  for i=1,16,1 do
+    params:add{
+      type="taper", id = "harm_osc_amp"..i, name = "harm osc amp " .. i,min=0.1, max=1, default = 0.5,
+      action=function(x) 
+        if setting_harmonics == false then
+          setting_harmonics = true
+          local amp_array = {}
+          for j=1,16,1 do
+            table.insert(amp_array,params:get("harm_osc_amp"..i))
+          end
+          engine.set_harm_osc_amps(table.unpack(amp_array))
+          setting_harmonics = false
+        end
+      end
+    }
+  
+  end
+
+  --------------------------------
   -- inputs/outputs/midi params
   --------------------------------
   params:add_separator("inputs/outputs")

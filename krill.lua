@@ -6,6 +6,15 @@
 -- _norns.screen_export_png("/home/we/dust/krill"..screenshot..".png")
 
 --[[
+  notes about installing https://github.com/madskjeldgaard/portedplugins
+  
+  SOLUTION???
+  see: https://llllllll.co/t/tapedeck/51919
+
+    RUN:  `os.execute("cd /tmp && wget https://github.com/schollz/tapedeck/releases/download/PortedPlugins/PortedPlugins.tar.gz && tar -xvzf PortedPlugins.tar.gz && rm PortedPlugins.tar.gz && sudo rsync -avrP PortedPlugins /home/we/.local/share/SuperCollider/Extensions/")`
+
+]]
+--[[
 engine.start()
 engine.env_time(1)
 engine.env_shape('log')
@@ -195,13 +204,17 @@ function init()
   -- clock.run(gui.set_gui_level)
   params:set("x_offset",-10)
   params:set("y_scale",0.85)
-  print(">>>>>>>>")
   -- params:set("vuja_de_pat_denominator1",8)
   -- params:set("vuja_de_pat_denominator2",8)
   -- params:set("vuja_de_pat_denominator3",8)
-  params:set("rise_time",10)
+  params:set("rise_time",100)
   params:set("fall_time",50)
   params:set("engine_mode",2)
+
+  for i=1,16,1 do
+    params:set("harm_osc_amp"..i,0.5)
+  end
+
   clock.run(finish_init)
 end
 function finish_init()
