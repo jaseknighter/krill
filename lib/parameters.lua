@@ -410,7 +410,7 @@ function parameters.init()
   params:add{
     type="taper", id = "first_harmonic", name = "first harmonic",min=1, max=16, default = 3,
     action=function(x) 
-      print("set first harm")
+      -- print("set first harm")
       engine.set_first_harm(x)
     end
   }
