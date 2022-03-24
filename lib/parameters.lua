@@ -405,27 +405,30 @@ function parameters.init()
   --------------------------------
   -- resonator params
   --------------------------------
+
+  -- exciter_decay_min
+  -- exciter_decay_max
+  -- resonator_pos
+  -- resonator_resolution
+  -- resonator_structure
+  -- resonator_brightness_min
+  -- resonator_brightness_max
+  -- resonator_damping_min
+  -- resonator_damping_max
   local resonator_param_data = {
     {"taper","exciter_decay_min","decay_min",0,1,0.1},
     {"taper","exciter_decay_max","decay_max",0,1,0.5},
-    {"taper","resonator_structure_min","structure_min",0,1,0.01},
-    {"taper","resonator_structure_max","structure_max",0,1,0.99},
+    {"taper","resonator_pos","pos",0,1,0.0},
+    -- {"taper","resonator_resolution","resolution",0,1,2},
+    {"taper","resonator_structure","structure",0,1,0.01},
     {"taper","resonator_brightness_min","brightness_min",0,1,0.6},
     {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
     {"taper","resonator_damping_min","damping_min",0,1,0.5},
     {"taper","resonator_damping_max","damping_max",0,1,0.5},
-    {"taper","resonator_accent_min","accent_min",0,1,0.99},
-    {"taper","resonator_accent_max","accent_max",0,1,0.99},
-    {"taper","resonator_stretch_min","stretch_min",0,1,0.1},
-    {"taper","resonator_stretch_max","stretch_max",0,1,0.99},
-    {"taper","resonator_pos","pos",0,1,0.0},
-    -- {"taper","resonator_resolution","resolution",0,1,2},
-    {"taper","resonator_loss_min","loss_min",0,1,0.1},
-    {"taper","resonator_loss_max","loss_max",0,1,0.1},
   }
 
   params:add_separator("resonators")
-  params:add_group("resonator",16)
+  params:add_group("resonator",8)
 
   for i=1, #resonator_param_data,1 do
     local p_data = resonator_param_data[i]
