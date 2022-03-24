@@ -211,9 +211,6 @@ function init()
   params:set("fall_time",50)
   params:set("engine_mode",2)
 
-  for i=1,16,1 do
-    params:set("harm_osc_amp"..i,0.5)
-  end
 
   clock.run(finish_init)
 end
@@ -228,7 +225,7 @@ function finish_init()
   -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   
   params:set("vuja_de_pat_numerator1",VDJ_PAT_DEFAULT_NUMERATOR)
-  params:set("vuja_de_pat_denominator1",VDJ_PAT_DEFAULT_DENOMINATOR)
+  params:set("vuja_de_pat_denominator1",VDJ_PAT_DEFAULT_DENOMINATOR*6)
   params:set("vuja_de_pat_numerator2",VDJ_PAT_DEFAULT_NUMERATOR)
   params:set("vuja_de_pat_denominator2",VDJ_PAT_DEFAULT_DENOMINATOR)
   params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)

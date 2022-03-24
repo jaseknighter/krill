@@ -401,39 +401,58 @@ function parameters.init()
 
 
 
-
+  
   --------------------------------
-  -- harmonic oscillator params
+  -- resonator params
   --------------------------------
-  params:add_group("harmonic osc",18)
-
-  params:add{
-    type="taper", id = "first_harmonic", name = "first harmonic",min=1, max=16, default = 3,
-    action=function(x) 
-      -- print("set first harm")
-      engine.set_first_harm(x)
-    end
+  local resonator_param_data = {
+    {"taper","exciter_decay_min","decay_min",0,1,0.1},
+    {"taper","exciter_decay_max","decay_max",0,1,0.5},
+    {"taper","resonator_structure_min","structure_min",0,1,0.01},
+    {"taper","resonator_structure_max","structure_max",0,1,0.99},
+    {"taper","resonator_brightness_min","brightness_min",0,1,0.6},
+    {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
+    {"taper","resonator_damping_min","damping_min",0,1,0.5},
+    {"taper","resonator_damping_max","damping_max",0,1,0.5},
+    {"taper","resonator_accent_min","accent_min",0,1,0.99},
+    {"taper","resonator_accent_max","accent_max",0,1,0.99},
+    {"taper","resonator_stretch_min","stretch_min",0,1,0.1},
+    {"taper","resonator_stretch_max","stretch_max",0,1,0.99},
+    {"taper","resonator_pos","pos",0,1,0.0},
+    -- {"taper","resonator_resolution","resolution",0,1,2},
+    {"taper","resonator_loss_min","loss_min",0,1,0.1},
+    {"taper","resonator_loss_max","loss_max",0,1,0.1},
   }
 
-  params:add_separator("harmonics")
-  local setting_harmonics = false
-  for i=1,16,1 do
+  params:add_separator("resonators")
+  params:add_group("resonator",16)
+
+  for i=1, #resonator_param_data,1 do
+    local p_data = resonator_param_data[i]
     params:add{
-      type="taper", id = "harm_osc_amp"..i, name = "harm osc amp " .. i,min=0.1, max=1, default = 0.5,
+      type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
       action=function(x) 
-        if setting_harmonics == false then
-          setting_harmonics = true
-          local amp_array = {}
-          for j=1,16,1 do
-            table.insert(amp_array,params:get("harm_osc_amp"..i))
+        local val = x
+        if string.find(p_data[2],"_min")~=nil then
+          local current_max_value = params:get(resonator_param_data[i+1][2])
+          if val > current_max_value then 
+            val = current_max_value
+            params:set(p_data[2],val)
           end
-          engine.set_harm_osc_amps(table.unpack(amp_array))
-          setting_harmonics = false
+        elseif string.find(p_data[2],"_max")~=nil then
+          local current_min_value = params:get(resonator_param_data[i-1][2])
+          val = util.clamp(val, current_min_value,val)
+          if val < current_min_value then 
+            val = current_min_value
+            params:set(p_data[2],val)
+          end
         end
+        local engine_command = engine[p_data[2]]
+        engine_command(val)
       end
-    }
-  
+    }          
   end
+
 
   --------------------------------
   -- inputs/outputs/midi params
