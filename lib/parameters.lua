@@ -416,15 +416,32 @@ function parameters.init()
   -- resonator_damping_min
   -- resonator_damping_max
   local resonator_param_data = {
-    {"taper","exciter_decay_min","decay_min",0,1,0.1},
-    {"taper","exciter_decay_max","decay_max",0,1,0.5},
-    {"taper","resonator_pos","pos",0,1,0.0},
-    -- {"taper","resonator_resolution","resolution",0,1,2},
-    {"taper","resonator_structure","structure",0,1,0.01},
-    {"taper","resonator_brightness_min","brightness_min",0,1,0.6},
-    {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
-    {"taper","resonator_damping_min","damping_min",0,1,0.5},
-    {"taper","resonator_damping_max","damping_max",0,1,0.5},
+    --Rings params
+    -- {"taper","exciter_decay_min","decay_min",0,1,0.1},
+    -- {"taper","exciter_decay_max","decay_max",0,1,0.5},
+    -- {"taper","resonator_pos","pos",0,1,0.0},
+    -- {"taper","resonator_structure","structure",0,1,0.01},
+    -- {"taper","resonator_brightness_min","brightness_min",0,1,0.6},
+    -- {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
+    -- {"taper","resonator_damping_min","damping_min",0,1,0.5},
+    -- {"taper","resonator_damping_max","damping_max",0,1,0.5},
+
+    -- rongs params
+    {"taper","exciter_decay_min","decay",0,1,0.315},
+    -- {"taper","exciter_decay_max","decay_max",0,1,0.5},
+    {"taper","resonator_structure_min","structure",0,1,0.315},
+    -- {"taper","resonator_structure_max","structure_max",0,1,0.99},
+    {"taper","resonator_brightness_min","brightness",0,1,0.0},
+    -- {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
+    {"taper","resonator_damping_min","damping",0,1,0.0},
+    -- {"taper","resonator_damping_max","damping_max",0,1,0.5},
+    {"taper","resonator_accent_min","accent",0,1,0.756},
+    -- {"taper","resonator_accent_max","accent_max",0,1,0.99},
+    {"taper","resonator_stretch_min","stretch",0,1,0.339},
+    -- {"taper","resonator_stretch_max","stretch_max",0,1,0.99},
+    {"taper","resonator_loss_min","loss",0,1,0.307},
+    -- {"taper","resonator_loss_max","loss_max",0,1,0.1},
+    {"taper","resonator_pos","pos",0,1,0.134},
   }
 
   params:add_separator("resonators")
@@ -436,20 +453,20 @@ function parameters.init()
       type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
       action=function(x) 
         local val = x
-        if string.find(p_data[2],"_min")~=nil then
-          local current_max_value = params:get(resonator_param_data[i+1][2])
-          if val > current_max_value then 
-            val = current_max_value
-            params:set(p_data[2],val)
-          end
-        elseif string.find(p_data[2],"_max")~=nil then
-          local current_min_value = params:get(resonator_param_data[i-1][2])
-          val = util.clamp(val, current_min_value,val)
-          if val < current_min_value then 
-            val = current_min_value
-            params:set(p_data[2],val)
-          end
-        end
+        -- if string.find(p_data[2],"_min")~=nil then
+        --   local current_max_value = params:get(resonator_param_data[i+1][2])
+        --   if val > current_max_value then 
+        --     val = current_max_value
+        --     params:set(p_data[2],val)
+        --   end
+        -- elseif string.find(p_data[2],"_max")~=nil then
+        --   local current_min_value = params:get(resonator_param_data[i-1][2])
+        --   val = util.clamp(val, current_min_value,val)
+        --   if val < current_min_value then 
+        --     val = current_min_value
+        --     params:set(p_data[2],val)
+        --   end
+        -- end
         local engine_command = engine[p_data[2]]
         engine_command(val)
       end
