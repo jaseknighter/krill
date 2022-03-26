@@ -3,7 +3,7 @@
 
 Engine_Krill : CroneEngine {
 	// <Krill>
-	classvar maxNumVoices = 1;
+	classvar maxNumVoices = 10;
 	var voiceGroup;
   var voiceList;
 	var krillVoice;
@@ -87,7 +87,7 @@ Engine_Krill : CroneEngine {
 			fall_done=0;
 			var trig;
 			var exciter;
-			var modeNum=3,cosFreq=0.5;
+			var modeNum=1,cosFreq=0.75;
 
 			// var trig = Impulse.kr(1);		
 			// var exciter = AnalogSnareDrum.ar(
@@ -162,12 +162,13 @@ Engine_Krill : CroneEngine {
 			//////////////////
 	    // trig = Trig.kr(1, dur: 0.5);
 	    // trig = Trig.kr(1, dur: (rise+fall)*env_scalar);
-	    trig = Trig.kr(1, dur: rise );
-	    // trig = Trig.kr(1, dur: rise * env_scalar);
+	    trig = Dust2.kr(rise*env_scalar);
+	    // trig = Trig.kr(1, dur: rise f* env_scalar);
 
 			out = Rongs.ar(
 				trig,
-        sustain: trig,
+        sustain: rise,
+        // sustain: trig,
 				// Amplitude.kr(SoundIn.ar(0,1)),
         // sustain: Amplitude.kr(SoundIn.ar(0,1)),
         f0: pitch.midicps,
@@ -381,6 +382,7 @@ Engine_Krill : CroneEngine {
 						if (i >= maxNumVoices){
 							// v.theSynth.set(\gate, 0);
 							v.theSynth.free;
+							("free"+i).postln;
 						}
 					};
 				});

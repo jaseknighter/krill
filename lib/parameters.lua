@@ -428,19 +428,12 @@ function parameters.init()
 
     -- rongs params
     {"taper","exciter_decay_min","decay",0,1,0.315},
-    -- {"taper","exciter_decay_max","decay_max",0,1,0.5},
     {"taper","resonator_structure_min","structure",0,1,0.315},
-    -- {"taper","resonator_structure_max","structure_max",0,1,0.99},
     {"taper","resonator_brightness_min","brightness",0,1,0.0},
-    -- {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
     {"taper","resonator_damping_min","damping",0,1,0.0},
-    -- {"taper","resonator_damping_max","damping_max",0,1,0.5},
     {"taper","resonator_accent_min","accent",0,1,0.756},
-    -- {"taper","resonator_accent_max","accent_max",0,1,0.99},
     {"taper","resonator_stretch_min","stretch",0,1,0.339},
-    -- {"taper","resonator_stretch_max","stretch_max",0,1,0.99},
     {"taper","resonator_loss_min","loss",0,1,0.307},
-    -- {"taper","resonator_loss_max","loss_max",0,1,0.1},
     {"taper","resonator_pos","pos",0,1,0.134},
   }
 

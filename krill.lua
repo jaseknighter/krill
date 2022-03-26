@@ -207,8 +207,10 @@ function init()
   -- params:set("vuja_de_pat_denominator1",8)
   -- params:set("vuja_de_pat_denominator2",8)
   -- params:set("vuja_de_pat_denominator3",8)
-  params:set("rise_time",25)
-  params:set("fall_time",20)
+  
+  params:set("env_scalar",100)
+  params:set("rise_time",10)
+  params:set("fall_time",200)
   params:set("engine_mode",2)
   params:set("engine_mode",1)
 
