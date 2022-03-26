@@ -418,7 +418,9 @@ function parameters.init()
   local resonator_param_data = {
     --Rings params
     {"taper","resonator_pos","pos",0,1,0.394},
-    {"taper","resonator_structure","structure",0,1,0.283},
+    -- {"taper","resonator_structure","structure",0,1,0.283},
+    {"taper","resonator_structure_min","structure_min",0,1,0.253},
+    {"taper","resonator_structure_max","structure_max",0,1,0.315},
     {"taper","resonator_brightness_min","brightness_min",0,1,0.094},
     {"taper","resonator_brightness_max","brightness_max",0,1,0.307},
     {"taper","resonator_damping_min","damping_min",0,1,0.0},
@@ -444,20 +446,20 @@ function parameters.init()
       type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
       action=function(x) 
         local val = x
-        -- if string.find(p_data[2],"_min")~=nil then
-        --   local current_max_value = params:get(resonator_param_data[i+1][2])
-        --   if val > current_max_value then 
-        --     val = current_max_value
-        --     params:set(p_data[2],val)
-        --   end
-        -- elseif string.find(p_data[2],"_max")~=nil then
-        --   local current_min_value = params:get(resonator_param_data[i-1][2])
-        --   val = util.clamp(val, current_min_value,val)
-        --   if val < current_min_value then 
-        --     val = current_min_value
-        --     params:set(p_data[2],val)
-        --   end
-        -- end
+        if string.find(p_data[2],"_min")~=nil then
+          local current_max_value = params:get(resonator_param_data[i+1][2])
+          if val > current_max_value then 
+            val = current_max_value
+            params:set(p_data[2],val)
+          end
+        elseif string.find(p_data[2],"_max")~=nil then
+          local current_min_value = params:get(resonator_param_data[i-1][2])
+          val = util.clamp(val, current_min_value,val)
+          if val < current_min_value then 
+            val = current_min_value
+            params:set(p_data[2],val)
+          end
+        end
         local engine_command = engine[p_data[2]]
         engine_command(val)
       end

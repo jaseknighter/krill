@@ -3,7 +3,7 @@
 
 Engine_Krill : CroneEngine {
 	// <Krill>
-	classvar maxNumVoices = 1;
+	classvar maxNumVoices = 2;
 	var voiceGroup;
   var voiceList;
 	var krillVoice;
@@ -23,7 +23,9 @@ Engine_Krill : CroneEngine {
 
 	//rings vars
 	var exciter_decay_min=0.1,exciter_decay_max=0.5, 
-			resonator_pos=0.05, resonator_resolution=24, resonator_structure=0.01,
+			resonator_pos=0.05, resonator_resolution=24, 
+			// resonator_structure=0.01,
+			resonator_structure_min=0.253,resonator_structure_max=0.315,
 			resonator_brightness_min=0.01,resonator_brightness_max=0.5, resonator_damping_min=0.2,resonator_damping_max=0.8;
 	
 	//rongs vars
@@ -57,7 +59,9 @@ Engine_Krill : CroneEngine {
 			ext_freq,
 			//rings args
 			exciter_decay_min=0.1,exciter_decay_max=0.5, 
-			resonator_pos=0.05, resonator_resolution=24, resonator_structure=0.01,
+			resonator_pos=0.05, resonator_resolution=24, 
+			// resonator_structure=0.01,
+			resonator_structure_min=0.253,resonator_structure_max=0.315,
 			resonator_brightness_min=0.01,resonator_brightness_max=0.5, resonator_damping_min=0.2,resonator_damping_max=0.8;
 			//rongs args
 			// exciter_decay_min=0.315,exciter_decay_max=0.5, 
@@ -136,12 +140,12 @@ Engine_Krill : CroneEngine {
 				// input: SoundIn.ar([0,1]),
         freq: pitch.midicps,
         position: resonator_pos,
-        resolution: 24,
-        // resolution: resonator_resolution,
+        resolution: resonator_resolution,
         // structure: SinOsc.kr(resonator_structure).unipolar,
-        // brightness: SinOsc.kr(resonator_brightness_min, resonator_brightness_max*pi).unipolar * resonator_brightness_max,
-        structure: resonator_structure,
-        brightness: resonator_brightness_min,
+        structure: SinOsc.kr(resonator_structure_min, resonator_structure_max*pi).unipolar * resonator_structure_max,
+        brightness: SinOsc.kr(resonator_brightness_min, resonator_brightness_max*pi).unipolar * resonator_brightness_max,
+        // structure: resonator_structure,
+        // brightness: resonator_brightness_min,
         damping: TRand.kr(resonator_damping_min,resonator_damping_max, trig)
   	  );
 
@@ -282,7 +286,9 @@ Engine_Krill : CroneEngine {
 					//set rings args
 					\resonator_pos,resonator_pos,
 					\resonator_resolution,resonator_resolution,
-					\resonator_structure,resonator_structure,
+					// \resonator_structure,resonator_structure,
+					\resonator_structure_min,resonator_structure_min,
+					\resonator_structure_max,resonator_structure_max,
 					\resonator_brightness_min,resonator_brightness_min,
 					\resonator_brightness_max,resonator_brightness_max,
 					\resonator_damping_min,resonator_damping_min,
@@ -324,7 +330,6 @@ Engine_Krill : CroneEngine {
 						if (i >= maxNumVoices){
 							// v.theSynth.set(\gate, 0);
 							v.theSynth.free;
-							("free"+i).postln;
 						}
 					};
 				});
@@ -385,9 +390,19 @@ Engine_Krill : CroneEngine {
 			krillVoice.theSynth.set(\resonator_resolution,resonator_resolution)
 		});
 
-		this.addCommand("resonator_structure","f",{ arg msg;
-			resonator_structure = msg[1];
-			krillVoice.theSynth.set(\resonator_structure,resonator_structure)
+		// this.addCommand("resonator_structure","f",{ arg msg;
+		// 	resonator_structure = msg[1];
+		// 	krillVoice.theSynth.set(\resonator_structure,resonator_structure)
+		// });
+
+		this.addCommand("resonator_structure_min","f",{ arg msg;
+			resonator_structure_min = msg[1];
+			krillVoice.theSynth.set(\resonator_structure_min,resonator_structure_min);
+		});
+
+		this.addCommand("resonator_structure_max","f",{ arg msg;
+			resonator_structure_max = msg[1];
+			krillVoice.theSynth.set(\resonator_structure_max,resonator_structure_max);
 		});
 
 		this.addCommand("resonator_brightness_min","f",{ arg msg;
