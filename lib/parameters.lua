@@ -293,17 +293,17 @@ function parameters.init()
   params:add_group("vjd pat asgn/div/jit",12+3+(VJD_MAX_PATTERNS*3))
   params:add_separator("assignments")
   params:add{type = "number", id = "vjd_pat_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_pat_asn_engine2", name = "engine asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_engine2", name = "engine asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_pat_asn_midi1", name = "midi asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_pat_asn_midi2", name = "midi asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_midi2", name = "midi asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_pat_asn_crow1", name = "crow asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_pat_asn_crow2", name = "crow asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_crow2", name = "crow asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_pat_asn_jf1", name = "jf asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_pat_asn_jf2", name = "jf asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_jf2", name = "jf asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_pat_asn_wsyn1", name = "wsyn asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_pat_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_pat_asn_wdelkarp1", name = "wdelkarp asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_pat_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_pat_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=2}
   
   params:add_separator("")
   params:add_separator("divisions")
@@ -417,24 +417,22 @@ function parameters.init()
   -- resonator_damping_max
   local resonator_param_data = {
     --Rings params
-    -- {"taper","exciter_decay_min","decay_min",0,1,0.1},
-    -- {"taper","exciter_decay_max","decay_max",0,1,0.5},
-    -- {"taper","resonator_pos","pos",0,1,0.0},
-    -- {"taper","resonator_structure","structure",0,1,0.01},
-    -- {"taper","resonator_brightness_min","brightness_min",0,1,0.6},
-    -- {"taper","resonator_brightness_max","brightness_max",0,1,0.99},
-    -- {"taper","resonator_damping_min","damping_min",0,1,0.5},
-    -- {"taper","resonator_damping_max","damping_max",0,1,0.5},
+    {"taper","resonator_pos","pos",0,1,0.394},
+    {"taper","resonator_structure","structure",0,1,0.283},
+    {"taper","resonator_brightness_min","brightness_min",0,1,0.094},
+    {"taper","resonator_brightness_max","brightness_max",0,1,0.307},
+    {"taper","resonator_damping_min","damping_min",0,1,0.0},
+    {"taper","resonator_damping_max","damping_max",0,1,0.677},
 
     -- rongs params
-    {"taper","exciter_decay_min","decay",0,1,0.315},
-    {"taper","resonator_structure_min","structure",0,1,0.315},
-    {"taper","resonator_brightness_min","brightness",0,1,0.0},
-    {"taper","resonator_damping_min","damping",0,1,0.0},
-    {"taper","resonator_accent_min","accent",0,1,0.756},
-    {"taper","resonator_stretch_min","stretch",0,1,0.339},
-    {"taper","resonator_loss_min","loss",0,1,0.307},
-    {"taper","resonator_pos","pos",0,1,0.134},
+  --   {"taper","exciter_decay_min","decay",0,1,0.315},
+  --   {"taper","resonator_structure_min","structure",0,1,0.315},
+  --   {"taper","resonator_brightness_min","brightness",0,1,0.0},
+  --   {"taper","resonator_damping_min","damping",0,1,0.0},
+  --   {"taper","resonator_accent_min","accent",0,1,0.756},
+  --   {"taper","resonator_stretch_min","stretch",0,1,0.339},
+  --   {"taper","resonator_loss_min","loss",0,1,0.307},
+  --   {"taper","resonator_pos","pos",0,1,0.134},
   }
 
   params:add_separator("resonators")

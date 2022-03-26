@@ -208,14 +208,15 @@ function init()
   -- params:set("vuja_de_pat_denominator2",8)
   -- params:set("vuja_de_pat_denominator3",8)
   
-  params:set("env_scalar",100)
-  params:set("rise_time",10)
-  params:set("fall_time",200)
-  params:set("engine_mode",2)
-  params:set("engine_mode",1)
-
-
+  params:set("env_scalar",50)
+  params:set("rise_time",23)
+  params:set("fall_time",100)
+  -- params:set("engine_mode",2)
+  
+  
   clock.run(finish_init)
+  params:set("engine_mode",1)
+  params:set("engine_mode",2)
 end
 function finish_init()
   initializing = false
@@ -227,12 +228,12 @@ function finish_init()
   -- vuja_de_patterns[2].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   
-  params:set("vuja_de_pat_numerator1",VDJ_PAT_DEFAULT_NUMERATOR)
-  params:set("vuja_de_pat_denominator1",VDJ_PAT_DEFAULT_DENOMINATOR*6)
-  params:set("vuja_de_pat_numerator2",VDJ_PAT_DEFAULT_NUMERATOR)
-  params:set("vuja_de_pat_denominator2",VDJ_PAT_DEFAULT_DENOMINATOR)
+  params:set("vuja_de_pat_numerator1",3)
+  params:set("vuja_de_pat_denominator1",32)
+  params:set("vuja_de_pat_numerator2",2)
+  params:set("vuja_de_pat_denominator2",7)
   params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
-  params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR+3)
+  params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
   -- params:set("engine_mode",1)
 
 end
