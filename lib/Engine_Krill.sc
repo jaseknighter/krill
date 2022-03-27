@@ -3,7 +3,7 @@
 
 Engine_Krill : CroneEngine {
 	// <Krill>
-	classvar maxNumVoices = 2;
+	classvar maxNumVoices = 1;
 	var voiceGroup;
   var voiceList;
 	var krillVoice;
@@ -18,7 +18,7 @@ Engine_Krill : CroneEngine {
 	var env_shape=8;
 	var lorenz_sample = 1;
 	var minRiseFall = 0.005;
-	var mode;
+	var sequencing_mode, trigger_mode;
 	var krillSynth;
 
 	//rings vars
@@ -54,7 +54,7 @@ Engine_Krill : CroneEngine {
 			gate=1,
 			env_scalar=1, env_shape=8,
 			sh1=1,sh2=1,
-			mode=1,
+			sequencing_mode=1, trigger_mode=1,
 			logExpBuffer,
 			ext_freq,
 			//rings args
@@ -125,19 +125,23 @@ Engine_Krill : CroneEngine {
 
 			// trig = Dust2.kr(rise*env_scalar);
 
+			//0
 			trig = Impulse.kr(1);
 			exciter = AnalogSnareDrum.ar(
 					trig, decay: rise*env_scalar
 			);
-			// exciter = AnalogSnareDrum.ar(
+
+			//1
+			exciter = ((1-trigger_mode) * exciter) + SoundIn.ar([0,1],mul:trigger_mode);
+
+			// exciter = trigger_mode==1 * AnalogSnareDrum.ar(
 			// 		trig, decay: TRand.kr(0.1,0.5,trig) 
 			// );
 			
   	  out = Resonator.ar(
         // input: trig,
-        input: exciter,
         // input: exciter,
-				// input: SoundIn.ar([0,1]),
+				input: exciter,
         freq: pitch.midicps,
         position: resonator_pos,
         resolution: resonator_resolution,
@@ -184,15 +188,13 @@ Engine_Krill : CroneEngine {
 
 			// out = MoogLadder.ar(out, (env_gen ).midicps+(LFNoise1.kr(0.2,1100,1500)),LFN///oise1.kr(0.4,0.9).abs+0.3,3);
 			// out = MoogLadder.ar(out, (pitch + filter_env).midicps+(LFNoise1.kr(0.2,1100,1500)),env_gen.abs,4);
-			/*
-			out = MoogLadder.ar(
-				out, 																													//in
-				(pitch + filter_env).midicps+(LFNoise1.kr(0.2,1100,1500)),		//cutoff freq
-				LFNoise1.kr(0.4,0.9).abs+0.3,																	//res
-				3
-			);
-			*/
-
+			// out = MoogLadder.ar(
+			// 	out, 																													//in
+			// 	(pitch + filter_env).midicps+(LFNoise1.kr(0.2,1100,1500)),		//cutoff freq
+			// 	LFNoise1.kr(0.4,0.9).abs+0.3,																	//res
+			// 	3
+			// );
+			
 
 			// out = LeakDC.ar((out * amp).tanh/2.7);
 			out = LeakDC.ar((out * env_gen * amp).tanh/2.7);
@@ -228,7 +230,7 @@ Engine_Krill : CroneEngine {
 
 		risePollFunc = OSCFunc({
       arg msg;
-			if (mode == 1){
+			if (sequencing_mode == 1){
 				sh1 = lorenz_sample;
 			}{
 				sh1 = 1;
@@ -240,7 +242,7 @@ Engine_Krill : CroneEngine {
 
     fallPollFunc = OSCFunc({ 
 			arg msg;
-			if (mode == 1){
+			if (sequencing_mode == 1){
 				sh2 = lorenz_sample;
 			}{
 				sh2 = 1;
@@ -284,6 +286,7 @@ Engine_Krill : CroneEngine {
 					\exciter_decay_min,exciter_decay_min,
 					\exciter_decay_max,exciter_decay_max,
 					//set rings args
+					\trigger_mode,trigger_mode,
 					\resonator_pos,resonator_pos,
 					\resonator_resolution,resonator_resolution,
 					// \resonator_structure,resonator_structure,
@@ -357,8 +360,8 @@ Engine_Krill : CroneEngine {
 			env_scalar = msg[1];
 		});
 		
-		this.addCommand("switch_mode","f",{ arg msg;
-			mode = msg[1];
+		this.addCommand("switch_sequencing_mode","f",{ arg msg;
+			sequencing_mode = msg[1];
 		});
 
 		this.addCommand("env_shape","f",{ arg msg;
@@ -370,6 +373,11 @@ Engine_Krill : CroneEngine {
 		/////////////////////////////////
 		//set rings commands
 		/////////////////////////////////
+		this.addCommand("trigger_mode","f",{ arg msg;
+			trigger_mode = msg[1];
+			// krillVoice.theSynth.set(\trigger_mode,trigger_mode)
+		});
+
 		this.addCommand("exciter_decay_min","f",{ arg msg;
 			exciter_decay_min = msg[1];
 			krillVoice.theSynth.set(\exciter_decay_min,exciter_decay_min)

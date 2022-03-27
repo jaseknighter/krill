@@ -137,7 +137,7 @@ function init()
         -- play note from quant grid
         local active = pixels[pixels.active]
         vuja_de:update_length()
-        if active and params:get("engine_mode") == 2 then -- vuja de mode
+        if active and params:get("sequencing_mode") == 2 then -- vuja de mode
           -- vuja_de:update()
           sound_controller:play_vuja_de_note(i)
         end
@@ -211,12 +211,12 @@ function init()
   params:set("env_scalar",50)
   params:set("rise_time",23)
   params:set("fall_time",100)
-  -- params:set("engine_mode",2)
+  -- params:set("sequencing_mode",2)
   
   
   clock.run(finish_init)
-  params:set("engine_mode",1)
-  params:set("engine_mode",2)
+  params:set("sequencing_mode",1)
+  params:set("sequencing_mode",2)
 end
 function finish_init()
   initializing = false
@@ -234,7 +234,7 @@ function finish_init()
   params:set("vuja_de_pat_denominator2",7)
   params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
   params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
-  -- params:set("engine_mode",1)
+  -- params:set("sequencing_mode",1)
 
 end
 
@@ -250,7 +250,7 @@ function init_polling()
     -- sound_controller:play_krill_note(value)
 
 
-    -- if params:get("engine_mode") == 1 then
+    -- if params:get("sequencing_mode") == 1 then
     --   sound_controller:play_krill_note(value)
     -- end
 
@@ -262,7 +262,7 @@ function init_polling()
     -- print("rise done",value)
     prev_rise = rise
 
-    if params:get("engine_mode") == 1 then
+    if params:get("sequencing_mode") == 1 then
       -- sound_controller:play_krill_note(value)
     else
       -- sound_controller:play_vuja_de_note()
@@ -274,7 +274,7 @@ function init_polling()
   fall_poll = poll.set("fall_poll", function(value)
     prev_fall = fall
     fall = value * params:get("env_scalar")/100
-    if params:get("engine_mode") == 1 then
+    if params:get("sequencing_mode") == 1 then
       sound_controller:play_krill_note(value)
     else
       -- sound_controller:play_vuja_de_note()

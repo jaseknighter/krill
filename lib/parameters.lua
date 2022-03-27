@@ -73,6 +73,34 @@ function parameters.init()
 
   params:hide("note_offset")
 
+  params:add_separator("")
+  params:add_separator("SEQUENCING")
+
+    -- sequencing_mode
+    params:add{
+      type = "option", id = "sequencing_mode", name = "sequencing mode", 
+      options = {"krell","vuja de"},
+      default = 1,
+      action = function(value) 
+        sequencing_mode = value
+        engine.switch_sequencing_mode(value)
+        if sequencing_mode == 1 then
+          engine.play_note(notes[math.random(15)],2)
+          if krell_rise then
+            engine.rise_fall(krell_rise,krell_fall)
+            krell_rise = nil
+            krell_fall = nil
+          end
+          sub_menu_map = sub_menu_map_krell
+        else
+          -- engine.play_note(notes[math.random(15)],2)
+          krell_rise = rise
+          krell_fall = fall
+          sub_menu_map = sub_menu_map_vuja_de
+        end
+    end}
+  
+  
   --------------------------------
   -- lorenz params
   --------------------------------
@@ -437,51 +465,12 @@ function parameters.init()
   --   {"taper","resonator_pos","pos",0,1,0.134},
   }
 
-  params:add_separator("resonators")
-  params:add_group("resonator",8)
-
-  for i=1, #resonator_param_data,1 do
-    local p_data = resonator_param_data[i]
-    params:add{
-      type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
-      action=function(x) 
-        local val = x
-        if string.find(p_data[2],"_min")~=nil then
-          local current_max_value = params:get(resonator_param_data[i+1][2])
-          if val > current_max_value then 
-            val = current_max_value
-            params:set(p_data[2],val)
-          end
-        elseif string.find(p_data[2],"_max")~=nil then
-          local current_min_value = params:get(resonator_param_data[i-1][2])
-          val = util.clamp(val, current_min_value,val)
-          if val < current_min_value then 
-            val = current_min_value
-            params:set(p_data[2],val)
-          end
-        end
-        local engine_command = engine[p_data[2]]
-        engine_command(val)
-      end
-    }          
-  end
-
-
   --------------------------------
   -- inputs/outputs/midi params
   --------------------------------
-  params:add_separator("inputs/outputs")
+  params:add_separator("")
+  params:add_separator("INPUTS/OUTPUTS")
   -- params:add_group("inputs/outputs",17+14)
-  -- params:add{type = "option", id = "output_bandsaw", name = "bandsaw (eng)",
-  -- options = {"off","engine", "midi", "engine + midi"},
-  -- default = 2,
-  -- }
-
-  -- params:add{
-  --   type="taper", id = "env_length", name = "env length",min=0.01, max=0.5, default = 0.1,
-  --   action=function(x) 
-  --   end
-  -- }
 
   params:add{
     type="taper", id = "env_max_level", name = "env max level",min=0, max=10, default = 10,
@@ -489,30 +478,7 @@ function parameters.init()
     end
   }
 
-
-  -- engine_mode
-  params:add{
-    type = "option", id = "engine_mode", name = "eng mode", 
-    options = {"krell","vuja de"},
-    default = 1,
-    action = function(value) 
-      engine_mode = value
-      engine.switch_mode(value)
-      if engine_mode == 1 then
-        engine.play_note(notes[math.random(15)],2)
-        if krell_rise then
-          engine.rise_fall(krell_rise,krell_fall)
-          krell_rise = nil
-          krell_fall = nil
-        end
-        sub_menu_map = sub_menu_map_krell
-      else
-        -- engine.play_note(notes[math.random(15)],2)
-        krell_rise = rise
-        krell_fall = fall
-        sub_menu_map = sub_menu_map_vuja_de
-      end
-  end}
+  params:add_group("envelope params",5)
 
   params:add{
     type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 100,
@@ -520,17 +486,6 @@ function parameters.init()
       engine.env_scalar(x/100)
     end
   }
-
-  -- params:add_control("rise_time", "rise time", controlspec.new(10,200,'lin',1,10))
-  -- params:set_action("rise_time", function(x) 
-  --   engine.rise_fall(x/100,0) 
-  -- end )
-
-  -- params:add_control("fall_time", "fall time", controlspec.new(10,200,'lin',1,50))
-  -- params:set_action("fall_time", function(x) 
-  --   engine.rise_fall(0,x/100) 
-  -- end )
-
 
   params:add{
     type="number", id = "rise_time", name = "rise time",min=10, max=200, default = 10,
@@ -561,6 +516,44 @@ function parameters.init()
     default = 2,
     action = function(value) 
     end}
+
+
+  params:add_group("resonator",8)
+
+  params:add{
+    type = "option", id = "triger_mode", name = "trigger mode", 
+    options = {"internal","external"},
+    default = 1,
+    action = function(value) 
+      engine.trigger_mode(value-1)
+    end}
+
+
+  for i=1, #resonator_param_data,1 do
+    local p_data = resonator_param_data[i]
+    params:add{
+      type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
+      action=function(x) 
+        local val = x
+        if string.find(p_data[2],"_min")~=nil then
+          local current_max_value = params:get(resonator_param_data[i+1][2])
+          if val > current_max_value then 
+            val = current_max_value
+            params:set(p_data[2],val)
+          end
+        elseif string.find(p_data[2],"_max")~=nil then
+          local current_min_value = params:get(resonator_param_data[i-1][2])
+          val = util.clamp(val, current_min_value,val)
+          if val < current_min_value then 
+            val = current_min_value
+            params:set(p_data[2],val)
+          end
+        end
+        local engine_command = engine[p_data[2]]
+        engine_command(val)
+      end
+    }          
+  end
 
   params:add_group("midi",8)
 
