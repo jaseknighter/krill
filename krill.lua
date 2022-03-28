@@ -121,14 +121,42 @@ function init()
         local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
         sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
         engine.set_lorenz_sample(sample_val)
-        -- local x = pixels[pixels.active].x_display
-        -- local y = pixels[pixels.active].y_display
       end
     end,
     division = 1/256, --1/16,
     enabled = true
   }
   
+  lorenz_output_pattern_x = krill_lattice:new_pattern{
+    action = function(t) 
+      if pixels[pixels.active] then
+        local lb = lorenz.get_boundary()
+
+        local lz_x_min = params:get("lz_x_min")
+        local lz_x_max = params:get("lz_x_max")
+        local x_val = pixels[pixels.active].x_display
+        lz_x_val = util.linlin(lb[1],lb[1]+lb[3],lz_x_min,lz_x_max,x_val)
+        ext.play_crow_lz_xy("x",lz_x_val)
+      end
+    end,
+    division = 1/64,-- 1/256, --1/16,
+    enabled = true
+  }
+  
+  lorenz_output_pattern_y = krill_lattice:new_pattern{
+    action = function(t) 
+      if pixels[pixels.active] then
+        local lb = lorenz.get_boundary()
+        local lz_y_min = params:get("lz_y_min")
+        local lz_y_max = params:get("lz_y_max")
+        local y_val = pixels[pixels.active].y_display
+        lz_y_val = util.linlin(lb[2],lb[2]+lb[4],lz_y_min,lz_y_max,y_val)
+        ext.play_crow_lz_xy("y",lz_y_val)
+      end
+    end,
+    division = 1/64,-- 1/256, --1/16,
+    enabled = true
+  }
   
   for i=1,VJD_MAX_PATTERNS,1 do
     
@@ -208,8 +236,8 @@ function init()
   -- params:set("vuja_de_pat_denominator2",8)
   -- params:set("vuja_de_pat_denominator3",8)
   
-  params:set("env_scalar",50)
-  params:set("rise_time",23)
+  params:set("env_scalar",100)
+  params:set("rise_time",1)
   params:set("fall_time",100)
   -- params:set("sequencing_mode",2)
   
@@ -229,11 +257,13 @@ function finish_init()
   -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   
   params:set("vuja_de_pat_numerator1",3)
-  params:set("vuja_de_pat_denominator1",32)
-  params:set("vuja_de_pat_numerator2",2)
-  params:set("vuja_de_pat_denominator2",7)
-  params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
-  params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
+  params:set("vuja_de_pat_denominator1",16)
+  params:set("vuja_de_pat_numerator2",1)
+  params:set("vuja_de_pat_denominator2",2)
+  params:set("vuja_de_pat_numerator3",1)
+  params:set("vuja_de_pat_denominator3",2)
+  -- params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
+  -- params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
   -- params:set("sequencing_mode",1)
 
 end

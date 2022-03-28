@@ -134,7 +134,7 @@ function sound_controller:play_krill_note(value)
   note = (note)+midi_pitch_offset - (notes_per_octave*3)
   local note_tab = {
     pitch = note,
-    level = 5,
+    level = params:get("env_max_level"),
     mode = 1
   }
 
@@ -147,7 +147,7 @@ function sound_controller:play_vuja_de_note(pat_id)
 
   local note_tab = {
     pitch = note_to_play,
-    level = 10,
+    level = params:get("env_max_level"),
     mode = 1,
     pat_id = pat_id
   }

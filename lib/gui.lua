@@ -9,7 +9,7 @@ active_sub_menu_value = ""
 
 -- menu_map = {"lzv","lzp","mod","xy","vd"}
 -- menu_map = {"mod","lzv","lzp","xy","vd"}
-menu_map = {"eng","scr","lrz"}
+menu_map = {"seq","scr","lrz"}
 
 sub_menu_map_krell = {
   -- lv (lorenz view)
@@ -51,6 +51,9 @@ function update_menu_display()
         active_sub_menu_value = param.options[param.selected]
       elseif p_type == 1 then -- number param
         active_sub_menu_value = param.value
+      elseif p_type == 3  then -- control param
+        local val = params:get(param_name)
+        active_sub_menu_value = val
       elseif p_type == 5  then -- taper param
         local val = params:get(param_name)
         active_sub_menu_value = util.linlin(0,1,param.min,param.max,val)
@@ -80,6 +83,7 @@ end
 --------------------------
 function enc(n, d)
   clock.run(update_menu_display)
+  param_name = sub_menu_map[active_menu][active_sub_menu]
   if initializing == false and gui_level == 1 then
     if n==1 then
       active_menu =  util.clamp(active_menu+d,1,#menu_map)
@@ -91,11 +95,18 @@ function enc(n, d)
         clock.run(update_menu_display)
       end
     elseif n== 3 then
-      if param.options then --option param
+      local p_type = params:t(param_name)
+      
+      if p_type == 2 then --option param
         params:set(param_name,params:get(param_name)+d)
-      elseif param.range then -- number param
+      elseif p_type == 1 then -- number param
         params:set(param_name,params:get(param_name)+d)
-      else -- taper param
+      elseif p_type == 3 then -- control param
+        local new_d = params:get(param_name)+(d*param.controlspec.step)
+        -- local new_d = params:get(param_name)+(d*param.controlspec.step)
+        params:set(param_name,new_d)
+        clock.run(update_menu_display)
+      elseif p_type == 5 then -- taper param
         local new_d
         local max = param.max and param.max or param.controlspec.maxval
         if max < 1 then 

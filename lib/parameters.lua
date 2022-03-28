@@ -73,33 +73,6 @@ function parameters.init()
 
   params:hide("note_offset")
 
-  params:add_separator("")
-  params:add_separator("SEQUENCING")
-
-    -- sequencing_mode
-    params:add{
-      type = "option", id = "sequencing_mode", name = "sequencing mode", 
-      options = {"krell","vuja de"},
-      default = 1,
-      action = function(value) 
-        sequencing_mode = value
-        engine.switch_sequencing_mode(value)
-        if sequencing_mode == 1 then
-          engine.play_note(notes[math.random(15)],2)
-          if krell_rise then
-            engine.rise_fall(krell_rise,krell_fall)
-            krell_rise = nil
-            krell_fall = nil
-          end
-          sub_menu_map = sub_menu_map_krell
-        else
-          -- engine.play_note(notes[math.random(15)],2)
-          krell_rise = rise
-          krell_fall = fall
-          sub_menu_map = sub_menu_map_vuja_de
-        end
-    end}
-  
   
   --------------------------------
   -- lorenz params
@@ -430,19 +403,192 @@ function parameters.init()
 
 
   
+
+  --------------------------------
+  -- inputs/outputs/midi params
+  --------------------------------
+  params:add_separator("")
+  params:add_separator("INPUTS/OUTPUTS")
+
+  -- sequencing_mode
+  params:add{
+    type = "option", id = "sequencing_mode", name = "seq mode", 
+    options = {"krell","vuja de"},
+    default = 1,
+    action = function(value) 
+      sequencing_mode = value
+      engine.switch_sequencing_mode(value)
+      if sequencing_mode == 1 then
+        engine.play_note(notes[math.random(15)],2)
+        if krell_rise then
+          engine.rise_fall(krell_rise,krell_fall)
+          krell_rise = nil
+          krell_fall = nil
+        end
+        sub_menu_map = sub_menu_map_krell
+      else
+        -- engine.play_note(notes[math.random(15)],2)
+        krell_rise = rise
+        krell_fall = fall
+        sub_menu_map = sub_menu_map_vuja_de
+      end
+  end}
+
+  --------------------------------
+  -- lorenz x/y output params
+  --------------------------------
+
+
+  local lz_xy_min_action_x = function(x) 
+    local val = x
+    local current_max_value = params:get("lz_x_max")
+    if val > current_max_value then 
+      val = current_max_value
+      params:set("lz_x_min",val)
+    end
+  end
+  
+  local lz_min_cs = cs.new(-5, 10, 'lin', 0, 0, "")
+  local lz_max_cs = cs.new(-5, 10, 'lin', 0, 5, "")
+  local lz_xy_min_action_y = function(x) 
+    local val = x
+    local current_min_value = params:get("lz_x_min")
+    val = util.clamp(val, current_min_value,val)
+    if val < current_min_value then 
+      val = current_min_value
+      params:set("lz_x_max",val)
+    end
+  end
+  
+  local lz_xy_max_action_x = function(x) 
+    local val = x
+    local current_max_value = params:get("lz_y_max")
+    if val > current_max_value then 
+      val = current_max_value
+      params:set("lz_y_min",val)
+    end
+  end
+  
+  local lz_xy_max_action_y = function(x) 
+    local val = x
+    local current_min_value = params:get("lz_y_min")
+    val = util.clamp(val, current_min_value,val)
+    if val < current_min_value then 
+      val = current_min_value
+      params:set("lz_y_max",val)
+    end
+  end
+
+  local lz_division_cs = cs.new(10, 2000, 'exp', 0, 31.25, "",0.001)
+  local lz_division_action_x = function(x)
+    lorenz_output_pattern_x:set_division(x/1000)
+  end
+  
+  local lz_division_action_y = function(x)
+    lorenz_output_pattern_y:set_division(x/1000)
+  end
+
+  local lz_slew_cs = cs.new(0, 2000, 'lin', 0, 31.25, "",0.001)
+  local lz_slew_action_x = function(x)
+    -- lorenz_output_pattern_x:set_division(x)
+  end
+
+  local lz_slew_action_y = function(x)
+    -- lorenz_output_pattern_y:set_division(x)
+  end
+
+  local lorenz_xy_output_param_data = {
+    -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
+    -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
+    {"control","lz_x_division","lz x division",lz_division_cs,lz_division_action_x},
+    {"control","lz_y_division","lz y division",lz_division_cs,lz_division_action_y},
+    {"control","lz_x_slew","lz x slew",lz_slew_cs,lz_slew_action_x},
+    {"control","lz_y_slew","lz y slew",lz_slew_cs,lz_slew_action_y},
+    {"control","lz_x_min","lz x min",lz_min_cs,lz_xy_min_action_x},
+    {"control","lz_x_max","lz x max",lz_max_cs,lz_xy_min_action_y},
+    {"control","lz_y_min","lz y min",lz_min_cs,lz_xy_max_action_x},
+    {"control","lz_y_max","lz y max",lz_max_cs,lz_xy_max_action_y},
+  }
+
+  params:add_group("lz x/y outputs",#lorenz_xy_output_param_data)
+
+  for i=1, #lorenz_xy_output_param_data,1 do
+    local p_data = lorenz_xy_output_param_data[i]
+    if p_data[1] == "number" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
+        action=p_data[7]
+      }          
+    elseif p_data[1] == "control" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3], controlspec=p_data[4], 
+        action=p_data[5]
+      }          
+    elseif p_data[1] == "option" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,options=p_data[4], default=p_data[5], 
+        action=p_data[6]
+      }          
+
+    end
+  end
+
+
+  -- quantize notes
+  params:add{
+    type = "option", id = "quantize", name = "quantize notes", 
+    options = {"off","on"},
+    default = 2,
+    action = function(value) 
+  end}
+    
+    
+  -- quantize notes
+  params:add_group("envelope params",5)
+
+
+  params:add{
+    type="taper", id = "env_max_level", name = "env max level",min=0, max=10, default = ENV_MAX_LEVEL_DEFAULT,
+    action=function(x) 
+    end
+  }
+
+  params:add{
+    type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 100,
+    action=function(x) 
+      engine.env_scalar(x/100)
+    end
+  }
+  params:add{
+    -- type="number", id = "rise_time", name = "rise (ms)",min=100, step="10", max=2000, default = 100,
+    type="control", id = "rise_time", name = "rise (ms)",
+    controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
+    action=function(x) 
+      -- engine.rise_fall(x/1000,0)
+    end
+  }
+
+  params:add{
+    -- type="number", id = "fall_time", name = "fall (ms)",min=100, step="10", max=2000, default = 1000,
+    type="control", id = "fall_time", name = "fall (ms)",
+    controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
+    action=function(x) 
+      -- engine.rise_fall(0,x/1000)
+    end
+  }
+
+  params:add{
+    type = "number", id = "env_shape", name = "env shape", 
+    min=-10,max=10,
+    default = 3,
+    action = function(value) 
+      engine.env_shape(value)
+  end}
+
   --------------------------------
   -- resonator params
   --------------------------------
 
-  -- exciter_decay_min
-  -- exciter_decay_max
-  -- resonator_pos
-  -- resonator_resolution
-  -- resonator_structure
-  -- resonator_brightness_min
-  -- resonator_brightness_max
-  -- resonator_damping_min
-  -- resonator_damping_max
   local resonator_param_data = {
     --Rings params
     {"taper","resonator_pos","pos",0,1,0.394},
@@ -465,60 +611,7 @@ function parameters.init()
   --   {"taper","resonator_pos","pos",0,1,0.134},
   }
 
-  --------------------------------
-  -- inputs/outputs/midi params
-  --------------------------------
-  params:add_separator("")
-  params:add_separator("INPUTS/OUTPUTS")
-  -- params:add_group("inputs/outputs",17+14)
-
-  params:add{
-    type="taper", id = "env_max_level", name = "env max level",min=0, max=10, default = 10,
-    action=function(x) 
-    end
-  }
-
-  params:add_group("envelope params",5)
-
-  params:add{
-    type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 100,
-    action=function(x) 
-      engine.env_scalar(x/100)
-    end
-  }
-
-  params:add{
-    type="number", id = "rise_time", name = "rise time",min=10, max=200, default = 10,
-    action=function(x) 
-      engine.rise_fall(x/100,0)
-    end
-  }
-
-  params:add{
-    type="number", id = "fall_time", name = "fall time",min=10, max=200, default = 100,
-    action=function(x) 
-      engine.rise_fall(0,x/100)
-    end
-  }
-
-  params:add{
-    type = "number", id = "env_shape", name = "env shape", 
-    min=-10,max=10,
-    default = 3,
-    action = function(value) 
-      engine.env_shape(value)
-  end}
-
-  -- midi
-  params:add{
-    type = "option", id = "quantize", name = "quantize", 
-    options = {"off","on"},
-    default = 2,
-    action = function(value) 
-    end}
-
-
-  params:add_group("resonator",8)
+  params:add_group("resonator",#resonator_param_data+1)
 
   params:add{
     type = "option", id = "triger_mode", name = "trigger mode", 
@@ -685,45 +778,41 @@ function parameters.init()
   params:add_group("crow",4)
 
 
-  params:add{type = "option", id = "output_crow1", name = "crow out1 mode",
-    -- options = {"off","on"},
-    options = {"off","on"},
-    default = 2,
-    action = function(value)
-    end
-  }
-
-  params:add{type = "option", id = "output_crow2", name = "crow out2 mode",
-    options = {"off","envelope","trigger","gate","clock"},
-    default = 2,
-    action = function(value)
-      if value == 3 then 
-        crow.output[2].action = "{to(5,0),to(0,0.25)}"
-      elseif value == 5 then
-        crow.output[2].action = "{to(5,0),to(5,0.05),to(0,0)}"
+  --override the built in crow clock action
+  params:set_action("clock_crow_out", function(x)
+    --if x>1 then crow.output[x-1].action = "pulse(0.01,8)" end
+    norns.state.clock.crow_out = x
+    for i=1,4,1 do 
+      if i ~= x-1 then
+      params:show("output_crow".. i)
       end
     end
-  }
-
-  params:add{type = "option", id = "output_crow3", name = "crow out3 mode",
-    options = {"off","on"},
-    default = 2,
-    action = function(value)
+    if x>1 then 
+      params:hide("output_crow".. x-1)
     end
-  }
+    _menu.rebuild_params()
+  end)
+  for i=1,4,1 do
+    local c_default
+    if i==1 then
+      c_default = 2
+    elseif i==2 then
+      c_default = 3
+    elseif i==3 then
+      c_default = 6
+    elseif i==4 then
+      c_default = 7
+    end
+    params:add{type = "option", id = "output_crow"..i, name = "crow out ".. i .." mode",
+      -- options = {"off","on"},
+      -- options = {"off","on"},
+      options = {"off","lz note","envelope","trigger","gate","lz x voltage", "lz y voltage"},
 
-  params:add{type = "option", id = "output_crow4", name = "crow out4 mode",
-    options = {"off","envelope","trigger","gate", "clock"},
-    default = 2,
-    action = function(value)
-      if value == 3 then 
-        crow.output[4].action = "{to(5,0),to(0,0.25)}"
-      elseif value == 5 then 
-        crow.output[4].action = "{to(5,0),to(5,0.05),to(0,0)}"
+      default = c_default,
+      action = function(value)
       end
-    end
-  }
-
+    }
+  end
   -- just friends
   params:add_group("just friends",8)
   params:add{type = "option", id = "output_jf", name = "just friends",
