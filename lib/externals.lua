@@ -74,7 +74,6 @@ externals.note_on = function(voice_id, note_tab, target,mode)
     -- if mode == 1 or (params:get("vjd_pat_asn_crow1") == note_tab.pat_id or params:get("vjd_pat_asn_crow2") == note_tab.pat_id) then
     if target == "crow" and (mode == 1 or (params:get("vjd_pat_asn_crow1") == note_tab.pat_id or params:get("vjd_pat_asn_crow2") == note_tab.pat_id)) then
       externals.crow_note_on(voice_id, note_tab, target)
-      print("crow note on")
     end
     -- if mode == 1 or (params:get("vjd_pat_asn_jf1") == note_tab.pat_id or params:get("vjd_pat_asn_jf2") == note_tab.pat_id) then
     if target == "jf" and (mode == 1 or (params:get("vjd_pat_asn_jf1") == note_tab.pat_id or params:get("vjd_pat_asn_jf2") == note_tab.pat_id)) then
@@ -137,7 +136,6 @@ function externals.get_envelope_data()
 end
 externals.crow_note_on = function(voice_id, note_tab, target)
   
-  print("crow note on")
   local asl_generator = function()
     local envelope_data = externals.get_envelope_data()
     local asl_envelope = ""
@@ -183,6 +181,7 @@ externals.crow_note_on = function(voice_id, note_tab, target)
         crow.output[i]() 
       elseif output_crow == 3 then -- envelope
         local asl_envelope = asl_generator()
+        -- print(asl_envelope)
         crow.output[i].action = tostring(asl_envelope)
         crow.output[i]() 
       elseif output_crow == 4 then -- trigger

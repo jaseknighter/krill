@@ -548,7 +548,9 @@ function parameters.init()
 
 
   params:add{
-    type="taper", id = "env_max_level", name = "env max level",min=0, max=10, default = ENV_MAX_LEVEL_DEFAULT,
+    type="control", id = "env_max_level", name = "env lvl",
+    
+    controlspec = controlspec.new(0, 10, "lin", 0.1, ENV_MAX_LEVEL_DEFAULT, ""), 
     action=function(x) 
     end
   }
@@ -578,9 +580,9 @@ function parameters.init()
   }
 
   params:add{
-    type = "number", id = "env_shape", name = "env shape", 
-    min=-10,max=10,
-    default = 3,
+    type = "control", id = "env_shape", name = "env shp", 
+    -- min=-10,max=10, default = ENV_SHAPE_DEFAULT,
+    controlspec = controlspec.new(-10, 10, "lin", 1, ENV_SHAPE_DEFAULT, ""), 
     action = function(value) 
       engine.env_shape(value)
   end}

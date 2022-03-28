@@ -199,3 +199,4 @@ slide="off"
 lz_x_val = 0 
 lz_y_val = 0 
 ENV_MAX_LEVEL_DEFAULT = 10
+ENV_SHAPE_DEFAULT = -10

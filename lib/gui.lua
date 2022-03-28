@@ -2,7 +2,7 @@ local gui = {}
 
 local lb = lorenz.boundary
 active_menu = 1
-active_sub_menu = 1
+active_sub_menu = {1,1,1}
 active_sub_menu_label = ""
 active_sub_menu_value = ""
 
@@ -13,15 +13,16 @@ menu_map = {"seq","scr","lrz"}
 
 sub_menu_map_krell = {
   -- lv (lorenz view)
-  {"sequencing_mode","env_scalar","rise_time","fall_time","num_octaves"},
+  {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
+  -- {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
   {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
 
 
 sub_menu_map_vuja_de = {
   -- lv (lorenz view)
-  {"sequencing_mode","env_scalar","rise_time","fall_time","num_octaves","loop_length","vuja_de_prob"},
+  {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
   {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
@@ -43,7 +44,7 @@ function update_menu_display()
 
     
     if active_menu < 4 then
-      param_name = sub_menu_map[active_menu][active_sub_menu]
+      param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
       param = params:lookup_param(param_name)
       local p_type = params:t(param_name)
       active_sub_menu_label = param.name
@@ -89,9 +90,9 @@ function enc(n, d)
       active_menu =  util.clamp(active_menu+d,1,#menu_map)
       clock.run(update_menu_display)
     elseif n==2 then
-      local new_active_sub_menu = util.clamp(active_sub_menu+d,1,#sub_menu_map[active_menu])
-      if new_active_sub_menu ~= active_sub_menu then
-        active_sub_menu = new_active_sub_menu
+      local new_active_sub_menu = util.clamp(active_sub_menu[active_menu]+d,1,#sub_menu_map[active_menu])
+      if new_active_sub_menu ~= active_sub_menu[active_menu] then
+        active_sub_menu[active_menu] = new_active_sub_menu
         clock.run(update_menu_display)
       end
     elseif n== 3 then
