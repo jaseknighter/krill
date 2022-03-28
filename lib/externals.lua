@@ -101,8 +101,8 @@ externals.midi_note_on = function(voice_id, note_tab, target)
     if mode == 1 then -- play_voice
       local channel = note_tab.channel and note_tab.channel or 1
       local pitch = note_tab.pitch
-      local velocity = note_tab.level and note_tab.level or 80
-      local duration = note_tab.duration and note_tab.duration or 0.25
+      local velocity = note_tab.level and math.floor(util.linlin(0,10,0,127,note_tab.level)) or 80
+      local duration = note_tab.duration and note_tab.duration or (params:get("rise_time")/1000)*(params:get("env_scalar")/100)+(params:get("fall_time")/1000)*(params:get("env_scalar")/100)
       duration = tonumber(duration) and duration or fn.fraction_to_decimal(duration)    
       midi_out_device:note_on(pitch, velocity, channel)
       table.insert(active_notes, pitch)
@@ -117,6 +117,26 @@ externals.midi_note_on = function(voice_id, note_tab, target)
   end
 end
   
+externals.play_midi_lz_xy = function(source,volts)
+  local output_midi_x = params:get("output_midi_lz_x")
+  local output_midi_y = params:get("output_midi_lz_y")
+  local cc_val = math.floor(util.linlin(-5,10,1,127,volts))
+  if source == "x" and output_midi_x == 2 then -- lz x output
+    local slew = params:get("lz_x_slew")/1000
+    local cc = params:get("output_midi_lz_x_cc")
+    local ch = params:get("output_midi_lz_x_chan")
+    ch = ch > 0 and ch or nil
+    midi_out_device:cc (cc, cc_val, ch)
+    -- print("x",cc_val)
+  elseif source == "y" and output_midi_y == 2 then -- lz y output
+    local slew = params:get("lz_y_slew")/1000
+    local cc = params:get("output_midi_lz_y_cc")
+    local ch = params:get("output_midi_lz_y_chan")
+    ch = ch > 0 and ch or nil
+    midi_out_device:cc (cc, cc_val, ch)
+  end
+end
+
 ---------------------------------------
 --crow
 ---------------------------------------

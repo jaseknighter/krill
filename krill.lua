@@ -137,6 +137,8 @@ function init()
         local x_val = pixels[pixels.active].x_display
         lz_x_val = util.linlin(lb[1],lb[1]+lb[3],lz_x_min,lz_x_max,x_val)
         ext.play_crow_lz_xy("x",lz_x_val)
+        ext.play_midi_lz_xy("x",lz_x_val)
+        
       end
     end,
     division = 1/64,-- 1/256, --1/16,
@@ -152,6 +154,7 @@ function init()
         local y_val = pixels[pixels.active].y_display
         lz_y_val = util.linlin(lb[2],lb[2]+lb[4],lz_y_min,lz_y_max,y_val)
         ext.play_crow_lz_xy("y",lz_y_val)
+        ext.play_midi_lz_xy("y",lz_y_val)
       end
     end,
     division = 1/64,-- 1/256, --1/16,

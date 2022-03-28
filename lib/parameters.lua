@@ -500,14 +500,14 @@ function parameters.init()
   local lorenz_xy_output_param_data = {
     -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
     -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
-    {"control","lz_x_division","lz x division",lz_division_cs,lz_division_action_x},
-    {"control","lz_y_division","lz y division",lz_division_cs,lz_division_action_y},
-    {"control","lz_x_slew","lz x slew",lz_slew_cs,lz_slew_action_x},
-    {"control","lz_y_slew","lz y slew",lz_slew_cs,lz_slew_action_y},
-    {"control","lz_x_min","lz x min",lz_min_cs,lz_xy_min_action_x},
-    {"control","lz_x_max","lz x max",lz_max_cs,lz_xy_min_action_y},
-    {"control","lz_y_min","lz y min",lz_min_cs,lz_xy_max_action_x},
-    {"control","lz_y_max","lz y max",lz_max_cs,lz_xy_max_action_y},
+    {"control","lz_x_division","lz x division (ms)",lz_division_cs,lz_division_action_x},
+    {"control","lz_y_division","lz y division (ms)",lz_division_cs,lz_division_action_y},
+    {"control","lz_x_slew","lz x slew (ms)",lz_slew_cs,lz_slew_action_x},
+    {"control","lz_y_slew","lz y slew (ms)",lz_slew_cs,lz_slew_action_y},
+    {"control","lz_x_min","lz x min (volts)",lz_min_cs,lz_xy_min_action_x},
+    {"control","lz_x_max","lz x max (volts)",lz_max_cs,lz_xy_min_action_y},
+    {"control","lz_y_min","lz y min (volts)",lz_min_cs,lz_xy_max_action_x},
+    {"control","lz_y_max","lz y max (volts)",lz_max_cs,lz_xy_max_action_y},
   }
 
   params:add_group("lz x/y outputs",#lorenz_xy_output_param_data)
@@ -650,7 +650,7 @@ function parameters.init()
     }          
   end
 
-  params:add_group("midi",8)
+  params:add_group("midi",11)
 
   -- params:add{type = "option", id = "midi_engine_control", name = "midi engine control",
   --   options = {"off","on"},
@@ -703,11 +703,11 @@ function parameters.init()
 
   params:add_separator("midi out")
 
-  params:add{type = "option", id = "output_midi", name = "midi out",
+  params:add{type = "option", id = "output_midi", name = "midi notes out",
     options = {"off","on"},
     default = 2,
   }
-
+  
   params:add{
     type = "option", id = "midi_out_device", name = "out device", options = midi_devices,
     default = 1,
@@ -716,38 +716,68 @@ function parameters.init()
     end
   }
 
-  params:add{
-    type = "option", id = "midi_note1_mode", name = "midi note 1 mode", 
-    options = {"quant","unquant"},
-    default = 1,
-    action = function(value) 
-      if initializing == false then
-        -- sequencer_controller.refresh_output_control_specs_map()
-      end
-    end
+  params:add{type = "option", id = "output_midi_lz_x", name = "midi lz x out",
+    options = {"off","on"},
+    default = 2,
+  }
+  params:add{type = "option", id = "output_midi_lz_y", name = "midi lz y out",
+    options = {"off","on"},
+    default = 2,
   }
 
-  params:add{
-    type = "option", id = "midi_note2_mode", name = "midi note 2 mode", 
-    options = {"quant","unquant"},
-    default = 1,
-    action = function(value) 
-      if initializing == false then
-        -- sequencer_controller.refresh_output_control_specs_map()
-      end
-    end
+  params:add{type = "number", id = "output_midi_lz_x_cc", name = "midi lz x cc",
+  min=1,max=127,default=100,
+  action=function() end
+}
+
+params:add{type = "number", id = "output_midi_lz_y_cc", name = "midi lz y c",
+  min=1,max=127,default=101,
+  action=function() end
+}
+
+
+  params:add{type = "number", id = "output_midi_lz_x_chan", name = "midi lz x chan",
+    min=0,max=16,default=1,
+    action=function() end
   }
 
-  params:add{
-    type = "option", id = "midi_note3_mode", name = "midi note 3 mode", 
-    options = {"quant","unquant"},
-    default = 1,
-    action = function(value) 
-      if initializing == false then
-        -- sequencer_controller.refresh_output_control_specs_map()
-      end
-    end
+  params:add{type = "number", id = "output_midi_lz_y_chan", name = "midi lz y chan",
+    min=0,max=16,default=2,
+    action=function() end
   }
+
+  -- params:add{
+  --   type = "option", id = "midi_note1_mode", name = "midi note 1 mode", 
+  --   options = {"quant","unquant"},
+  --   default = 1,
+  --   action = function(value) 
+  --     if initializing == false then
+  --       -- sequencer_controller.refresh_output_control_specs_map()
+  --     end
+  --   end
+  -- }
+
+  -- params:add{
+  --   type = "option", id = "midi_note2_mode", name = "midi note 2 mode", 
+  --   options = {"quant","unquant"},
+  --   default = 1,
+  --   action = function(value) 
+  --     if initializing == false then
+  --       -- sequencer_controller.refresh_output_control_specs_map()
+  --     end
+  --   end
+  -- }
+
+  -- params:add{
+  --   type = "option", id = "midi_note3_mode", name = "midi note 3 mode", 
+  --   options = {"quant","unquant"},
+  --   default = 1,
+  --   action = function(value) 
+  --     if initializing == false then
+  --       -- sequencer_controller.refresh_output_control_specs_map()
+  --     end
+  --   end
+  -- }
 
   -- params:add{
   --   type = "number", id = "midi_out_channel1", name = "plant 1:midi out channel",
