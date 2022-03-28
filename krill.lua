@@ -240,6 +240,7 @@ function init()
   params:set("rise_time",1)
   params:set("fall_time",100)
   -- params:set("sequencing_mode",2)
+  params:set("midi_out_device",2)
   
   
   clock.run(finish_init)

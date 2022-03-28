@@ -84,7 +84,7 @@ end
 --------------------------
 function enc(n, d)
   clock.run(update_menu_display)
-  param_name = sub_menu_map[active_menu][active_sub_menu]
+  param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
   if initializing == false and gui_level == 1 then
     if n==1 then
       active_menu =  util.clamp(active_menu+d,1,#menu_map)

@@ -101,7 +101,7 @@ externals.midi_note_on = function(voice_id, note_tab, target)
     if mode == 1 then -- play_voice
       local channel = note_tab.channel and note_tab.channel or 1
       local pitch = note_tab.pitch
-      local velocity = note_tab.velocity and note_tab.velocity or 80
+      local velocity = note_tab.level and note_tab.level or 80
       local duration = note_tab.duration and note_tab.duration or 0.25
       duration = tonumber(duration) and duration or fn.fraction_to_decimal(duration)    
       midi_out_device:note_on(pitch, velocity, channel)
