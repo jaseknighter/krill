@@ -226,6 +226,18 @@ lorenz.update = function()
       end
     end
     if xy_exists == false then
+      lb = lorenz.get_boundary()
+      -- local central_x = lb[1]
+      -- local central_y = lb[2]
+      -- local central_x = lb[1]+(lb[1]+lb[3])/2
+      -- local central_y = lb[2]+(lb[2]+lb[4])/2
+      -- local central_vector = vector:new(central_x,central_y)
+      -- local central_vector = vector:new(central_x-params:get("x_offset"),central_y-params:get("y_offset"))
+      -- local xy_vector = vector:new(x,y)
+      -- xy_vector:rotate_around(central_vector, math.rad(params:get("rotation")))
+      -- print(x,y,xy_vector.x,xy_vector.y)
+      -- x=math.floor(xy_vector.x)
+      -- y=math.floor(xy_vector.y)
       local px = pixel:new(x,y)
       pixels[#pixels+1] = px
     end

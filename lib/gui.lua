@@ -16,7 +16,8 @@ sub_menu_map_krell = {
   {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
   -- {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
-  {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
+  {"lz_speed","rho","beta"},
+  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
 
 
@@ -24,7 +25,8 @@ sub_menu_map_vuja_de = {
   -- lv (lorenz view)
   {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
-  {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
+  {"lz_speed","rho","beta"},
+  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
 
 sub_menu_map = sub_menu_map_krell

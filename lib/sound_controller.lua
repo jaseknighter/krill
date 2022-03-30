@@ -33,12 +33,8 @@ sound_controller.random_pat_div = 1
 function sound_controller:init(rows,cols)
   sound_controller.sectors={}
   local lb = lorenz.boundary
-  -- local q_width =  math.floor(lb[3]-lb[1]/rows)
   local q_width =  math.floor(lb[3]-lb[1])
-  -- q_width = q_width and q_width < 20 and 20 or q_width
-  -- local q_height = math.floor(lb[4]-lb[2]/cols)
   local q_height = math.floor(lb[4]-lb[2])
-  print("q_width, lb[3],lb[1]",q_width,lb[3],lb[1])
   for i=1,rows,1 do
     sound_controller.sectors[i]={}
     for j=1,cols,1 do

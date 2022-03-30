@@ -79,6 +79,14 @@ function parameters.init()
   --------------------------------
   params:add_separator("LORENZ")
   params:add_group("lorenz view",7)
+  -- params:add{
+  --   type="control", id = "rotation", name = "rotation",
+  --   controlspec=cs.new(-360, 360, 'lin', 1, 0, "",1/720,true),
+  --   action=function(x) 
+  --     --lorenz:reset()
+  --   end
+  -- }
+
   params:add{
     type="option", id = "x_input", name = "x input", options={"first","second","third"},default = 1,
     action=function(x) 
@@ -93,14 +101,14 @@ function parameters.init()
   }
 
   params:add{
-    type="number", id = "x_offset", name = "x offset",min=-64, max=64, default = 0,
+    type="number", id = "x_offset", name = "x offset",min=-128, max=128, default = 0,
     action=function(x) 
       -- lorenz:reset()
       screen:clear()
     end
   }
   params:add{
-    type="number", id = "y_offset", name = "y offset",min=-32, max=32, default = 0,
+    type="number", id = "y_offset", name = "y offset",min=-64, max=64, default = 0,
     action=function(x) 
       -- lorenz:reset()
       screen:clear()
@@ -595,12 +603,12 @@ function parameters.init()
     --Rings params
     {"taper","resonator_pos","pos",0,1,0.394},
     -- {"taper","resonator_structure","structure",0,1,0.283},
-    {"taper","resonator_structure_min","structure_min",0,1,0.253},
-    {"taper","resonator_structure_max","structure_max",0,1,0.315},
-    {"taper","resonator_brightness_min","brightness_min",0,1,0.094},
-    {"taper","resonator_brightness_max","brightness_max",0,1,0.307},
-    {"taper","resonator_damping_min","damping_min",0,1,0.0},
-    {"taper","resonator_damping_max","damping_max",0,1,0.677},
+    {"taper","resonator_structure_base","struct",0,1,0.253,"resonator_structure"},
+    {"taper","resonator_structure_range","struct rng",0,1,0,"resonator_structure"},
+    {"taper","resonator_brightnes_base","bright",0,1,0.094,"resonator_brightness"},
+    {"taper","resonator_brightness_range","bright rng",0,1,0,"resonator_brightness"},
+    {"taper","resonator_damping_base","damping",0,1,0.0,"resonator_damping"},
+    {"taper","resonator_damping_range","damp rng",0,1,0,"resonator_damping"},
 
     -- rongs params
   --   {"taper","exciter_decay_min","decay",0,1,0.315},
@@ -629,23 +637,29 @@ function parameters.init()
     params:add{
       type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
       action=function(x) 
-        local val = x
-        if string.find(p_data[2],"_min")~=nil then
-          local current_max_value = params:get(resonator_param_data[i+1][2])
-          if val > current_max_value then 
-            val = current_max_value
-            params:set(p_data[2],val)
-          end
-        elseif string.find(p_data[2],"_max")~=nil then
-          local current_min_value = params:get(resonator_param_data[i-1][2])
-          val = util.clamp(val, current_min_value,val)
-          if val < current_min_value then 
-            val = current_min_value
-            params:set(p_data[2],val)
-          end
+        local base, range, min, max
+        if string.find(p_data[2],"_range")~=nil then
+          range = x
+          base = params:get(resonator_param_data[i-1][2])
+          min = util.clamp(base-range,0,1)
+          max = util.clamp(base+range,0,1)
+          local engine_min = engine[p_data[7].."_min"]
+          local engine_max = engine[p_data[7].."_max"]
+          engine_min(min)
+          engine_max(max)
+        elseif string.find(p_data[2],"_base")~=nil then
+          base = x
+          range = params:get(resonator_param_data[i+1][2])
+          min = util.clamp(base-range,0,1)
+          max = util.clamp(base+range,0,1)
+          local engine_min = engine[p_data[7].."_min"]
+          local engine_max = engine[p_data[7].."_max"]
+          engine_min(min)
+          engine_max(max)
+        else
+          local engine_command = engine[p_data[2]]
+          engine_command(x)
         end
-        local engine_command = engine[p_data[2]]
-        engine_command(val)
       end
     }          
   end

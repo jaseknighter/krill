@@ -67,6 +67,7 @@ w_slash = include("lib/w_slash")
 externals = include("lib/externals")
 gui = include("lib/gui")
 vuja_de = include("lib/vuja_de")
+vector = include("lib/vector")
 
 
 -- engine.name="AcidTest"
