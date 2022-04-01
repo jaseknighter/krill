@@ -22,7 +22,7 @@ function parameters.init()
   --   offset.count = #offset_options
   -- end
 
-  params:add_separator("SCALES, NOTES, AND TEMPO")
+  params:add_separator("SCALES")
   -- params:add_group("scales and notes",5)
 
   
@@ -264,9 +264,11 @@ function parameters.init()
   params:add_separator("QUANT GRID")
   -- params:add_group("lorenz",19)
   params:add{type = "option", id = "grid_display", name = "grid display",
-  options = {"hide","show"}, default = 2,
-  action = function(x)
-    if x == 1 then screen.clear() end 
+    options = {"hide","show","always show"}, default = 2,
+    action = function(x)
+      if x == 1 then screen.clear() 
+      elseif x == 3 then gui_level = 1
+      end 
   end}
 
   --------------------------------
@@ -287,7 +289,7 @@ function parameters.init()
   end}
 
   parameters.setting_patterns = false
-  params:add{type = "number", id = "vuja_de_num_pats", name = "vjd num patterns",
+  params:add{type = "number", id = "vuja_de_num_pats", name = "vjd num pats",
   min=1, max=VJD_MAX_PATTERNS, default=3,
   action = function(x)
     -- if parameters.setting_patterns == false then
@@ -299,7 +301,7 @@ function parameters.init()
   end}
 
 
-  params:add_group("vjd pat asgn/div/jit",12+3+(VJD_MAX_PATTERNS*3))
+  params:add_group("pat assn",12+3+(VJD_MAX_PATTERNS*3))
   params:add_separator("assignments")
   params:add{type = "number", id = "vjd_pat_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_pat_asn_engine2", name = "engine asn 2", min=1, max=3, default=2}
@@ -505,6 +507,8 @@ function parameters.init()
     -- lorenz_output_pattern_y:set_division(x)
   end
 
+  local lz_xy_cs = cs.new(-5, 10, 'lin', 0, 0.01, "",0.001)
+
   local lorenz_xy_output_param_data = {
     -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
     -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
@@ -516,6 +520,8 @@ function parameters.init()
     {"control","lz_x_max","lz x max (volts)",lz_max_cs,lz_xy_min_action_y},
     {"control","lz_y_min","lz y min (volts)",lz_min_cs,lz_xy_max_action_x},
     {"control","lz_y_max","lz y max (volts)",lz_max_cs,lz_xy_max_action_y},
+    {"control","lz_x","lorenz x",lz_xy_cs,nil},
+    {"control","lz_y","lorenz y",lz_xy_cs,nil},
   }
 
   params:add_group("lz x/y outputs",#lorenz_xy_output_param_data)
@@ -601,24 +607,13 @@ function parameters.init()
 
   local resonator_param_data = {
     --Rings params
-    {"taper","resonator_pos","pos",0,1,0.394},
-    -- {"taper","resonator_structure","structure",0,1,0.283},
-    {"taper","resonator_structure_base","struct",0,1,0.253,"resonator_structure"},
+    {"taper","resonator_pos","pos",0,1,0.05},
+    {"taper","resonator_structure_base","struct",0,1,0.2,"resonator_structure"},
     {"taper","resonator_structure_range","struct rng",0,1,0,"resonator_structure"},
-    {"taper","resonator_brightnes_base","bright",0,1,0.094,"resonator_brightness"},
+    {"taper","resonator_brightnes_base","bright",0,1,0.3,"resonator_brightness"},
     {"taper","resonator_brightness_range","bright rng",0,1,0,"resonator_brightness"},
-    {"taper","resonator_damping_base","damping",0,1,0.0,"resonator_damping"},
+    {"taper","resonator_damping_base","damping",0,1,0.675,"resonator_damping"},
     {"taper","resonator_damping_range","damp rng",0,1,0,"resonator_damping"},
-
-    -- rongs params
-  --   {"taper","exciter_decay_min","decay",0,1,0.315},
-  --   {"taper","resonator_structure_min","structure",0,1,0.315},
-  --   {"taper","resonator_brightness_min","brightness",0,1,0.0},
-  --   {"taper","resonator_damping_min","damping",0,1,0.0},
-  --   {"taper","resonator_accent_min","accent",0,1,0.756},
-  --   {"taper","resonator_stretch_min","stretch",0,1,0.339},
-  --   {"taper","resonator_loss_min","loss",0,1,0.307},
-  --   {"taper","resonator_pos","pos",0,1,0.134},
   }
 
   params:add_group("resonator",#resonator_param_data+1)
@@ -634,8 +629,9 @@ function parameters.init()
 
   for i=1, #resonator_param_data,1 do
     local p_data = resonator_param_data[i]
+    print(p_data[1], p_data[2], p_data[3] ,p_data[4], p_data[5], p_data[6])
     params:add{
-      type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
+      type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],  
       action=function(x) 
         local base, range, min, max
         if string.find(p_data[2],"_range")~=nil then

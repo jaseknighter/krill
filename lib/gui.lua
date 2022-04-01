@@ -34,7 +34,6 @@ sub_menu_map = sub_menu_map_krell
 function update_menu_display()
   clock.sleep(0.01)
   if active_menu < 4 then
-    -- screen.clear()
     --clear sub-menu value text areas
     screen.level(0)
     screen.rect(1,18,41,10)
@@ -81,69 +80,6 @@ function update_menu_display()
   -- end
 end
 
---------------------------
--- encoders and keys
---------------------------
-function enc(n, d)
-  clock.run(update_menu_display)
-  param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
-  if initializing == false and gui_level == 1 then
-    if n==1 then
-      active_menu =  util.clamp(active_menu+d,1,#menu_map)
-      clock.run(update_menu_display)
-    elseif n==2 then
-      local new_active_sub_menu = util.clamp(active_sub_menu[active_menu]+d,1,#sub_menu_map[active_menu])
-      if new_active_sub_menu ~= active_sub_menu[active_menu] then
-        active_sub_menu[active_menu] = new_active_sub_menu
-        clock.run(update_menu_display)
-      end
-    elseif n== 3 then
-      local p_type = params:t(param_name)
-      
-      if p_type == 2 then --option param
-        params:set(param_name,params:get(param_name)+d)
-      elseif p_type == 1 then -- number param
-        params:set(param_name,params:get(param_name)+d)
-      elseif p_type == 3 then -- control param
-        local new_d = params:get(param_name)+(d*param.controlspec.step)
-        -- local new_d = params:get(param_name)+(d*param.controlspec.step)
-        params:set(param_name,new_d)
-        clock.run(update_menu_display)
-      elseif p_type == 5 then -- taper param
-        local new_d
-        local max = param.max and param.max or param.controlspec.maxval
-        if max < 1 then 
-          new_d = params:get(param_name)+(d*0.0001)
-        else
-          new_d = params:get(param_name)+(d*0.1)
-        end
-
-        -- local new_d = params:get(param_name)+(d*param.min)
-        params:set(param_name,new_d)
-        clock.run(update_menu_display)
-
-      end
-      -- clock.run(update_menu_display)
-      -- if d<0 then d=-0.01 else d=0.01 end
-      -- params:set("xy_scale",params:get("xy_scale")+d)
-    end
-  end
-
-  if set_gui_level_clock then
-    clock.cancel(set_gui_level_clock)
-    set_gui_level_clock = clock.run(gui.set_gui_level)
-  elseif set_gui_level_initiated == false then
-    set_gui_level_clock = clock.run(gui.set_gui_level)
-  end
-  
-
-end
-
-function key(n,z)
-  if initializing == false then
-  end
-end
-
 function gui.clear()
   clock.sleep(0.01)
   sound_controller:display(true) 
@@ -161,7 +97,7 @@ function gui.set_gui_level(amt)
     clock.sleep(0.15)
   end
   if amt > 0.2 then
-    gui_level = amt
+    if params:get("grid_display") ~= 3 then gui_level = amt end 
     clock.run(gui.set_gui_level,amt)
   else
     gui_level = 0
@@ -172,10 +108,24 @@ function gui.set_gui_level(amt)
   end
 end
 
+function gui:display()
+  if page == 1 then
+    gui:display_lorenz()
+  else 
+    screen.clear()
+    screen.font_size(8)
+    lorenz.display(false)
+    mod_matrix:display_mod_matrix()
+  end
+end
 
 local lz_ix = 1
-function gui:display()
-  -- screen.aa(0)
+function gui:display_lorenz()
+  screen.aa(0)
+  if params:get("grid_display") > 1 and gui_level > 0 then 
+    sound_controller:display() 
+  end
+
 
   -- display left menu items
   screen.level(math.floor(gui_level*3))
@@ -252,6 +202,8 @@ function gui:display()
     -- screen.rect(106,18,22,60)
     screen.fill()
     screen.stroke()
+
+    
   end
 
   lz_ix = lz_ix+1
@@ -262,6 +214,13 @@ function gui:display()
     -- screen.clear()
   end 
 
+  screen.aa(0)
+  if params:get("grid_display") > 1 and gui_level > 0 then 
+    sound_controller:display() 
+  end
+
+  screen.aa(1)
+  lorenz.display(true)
 end
 
 function gui.draw_lorenz_coords(lx,ly,lw,lh,y,dim)
@@ -292,5 +251,7 @@ function gui.draw_lorenz_coords(lx,ly,lw,lh,y,dim)
   screen.level(10)
   screen.pixel(lx+lz_ix,y_loc)    
 end
+
+
 
 return gui

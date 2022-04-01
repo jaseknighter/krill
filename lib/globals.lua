@@ -4,6 +4,23 @@
 
 fn = {}
 
+-- utility to clone function
+function fn.clone_function(fn)
+  local dumped=string.dump(fn)
+  local cloned=load(dumped)
+  local i=1
+  while true do
+    local name=debug.getupvalue(fn,i)
+    if not name then
+      break
+    end
+    debug.upvaluejoin(cloned,i,fn,i)
+    i=i+1
+  end
+  return cloned
+end
+
+
 function fn.deep_copy(orig, copies)
   copies = copies or {}
   local orig_type = type(orig)
@@ -177,7 +194,10 @@ end
 -------------------------------------------
 -- global variables
 -------------------------------------------
-
+folder_path = norns.state.data .. "krill_data/" 
+AUTOSAVE_DEFAULT=2
+alt_key_active = false
+page = 1
 CENTER_X = 84
 CENTER_Y = 32
 blank_pixel = screen.peek(1,1,2,2)

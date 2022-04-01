@@ -25,8 +25,8 @@ Engine_Krill : CroneEngine {
 	var exciter_decay_min=0.1,exciter_decay_max=0.5, 
 			resonator_pos=0.05, resonator_resolution=24, 
 			// resonator_structure=0.01,
-			resonator_structure_min=0.253,resonator_structure_max=0.315,
-			resonator_brightness_min=0.01,resonator_brightness_max=0.5, resonator_damping_min=0.2,resonator_damping_max=0.8;
+			resonator_structure_min=0.2,resonator_structure_max=0.2,
+			resonator_brightness_min=0.01,resonator_brightness_max=0.01, resonator_damping_min=0.5,resonator_damping_max=0.5;
 	
 	//rongs vars
 // var exciter_decay_min=0.315,exciter_decay_max=0.5, 
@@ -61,8 +61,8 @@ Engine_Krill : CroneEngine {
 			exciter_decay_min=0.1,exciter_decay_max=0.5, 
 			resonator_pos=0.05, resonator_resolution=24, 
 			// resonator_structure=0.01,
-			resonator_structure_min=0.253,resonator_structure_max=0.315,
-			resonator_brightness_min=0.01,resonator_brightness_max=0.5, resonator_damping_min=0.2,resonator_damping_max=0.8;
+			resonator_structure_min=0.2,resonator_structure_max=0.2,
+			resonator_brightness_min=0.01,resonator_brightness_max=0.01, resonator_damping_min=0.5,resonator_damping_max=0.5;
 			//rongs args
 			// exciter_decay_min=0.315,exciter_decay_max=0.5, 
 			// resonator_structure_min=0.315, resonator_structure_max=0.99,
@@ -289,36 +289,18 @@ Engine_Krill : CroneEngine {
 					\trigger_mode,trigger_mode,
 					\resonator_pos,resonator_pos,
 					\resonator_resolution,resonator_resolution,
-					// \resonator_structure,resonator_structure,
 					\resonator_structure_min,resonator_structure_min,
 					\resonator_structure_max,resonator_structure_max,
 					\resonator_brightness_min,resonator_brightness_min,
 					\resonator_brightness_max,resonator_brightness_max,
 					\resonator_damping_min,resonator_damping_min,
 					\resonator_damping_max,resonator_damping_max,
-					
-					//set rongs args
-					// \exciter_decay_min,exciter_decay_min,
-					// \exciter_decay_max,exciter_decay_max,
-					// \resonator_pos,resonator_pos,
-					// \resonator_structure_min,resonator_structure_min,
-					// \resonator_structure_max,resonator_structure_max,
-					// \resonator_brightness_min,resonator_brightness_min,
-					// \resonator_brightness_max,resonator_brightness_max,
-					// \resonator_damping_min,resonator_damping_min,
-					// \resonator_damping_max,resonator_damping_max,
-					// \resonator_accent_min,resonator_accent_min,
-					// \resonator_accent_max,resonator_accent_max,
-					// \resonator_stretch_min,resonator_stretch_min,
-					// \resonator_stretch_max,resonator_stretch_max,
-					// \resonator_loss_min,resonator_loss_min,
-					// \resonator_loss_max,resonator_loss_max,
 				],
 					target: voiceGroup).onFree({ 
 						voiceList.remove(newVoice); 
 					})
 				);
-
+				("play").postln;
 				voiceList.addFirst(newVoice);
 
 				// set krillVoice to the most recent voice instantiated
@@ -366,7 +348,6 @@ Engine_Krill : CroneEngine {
 
 		this.addCommand("env_shape","f",{ arg msg;
 			env_shape = msg[1];
-			env_shape.postln;
 		});
 
 
@@ -380,137 +361,80 @@ Engine_Krill : CroneEngine {
 
 		this.addCommand("exciter_decay_min","f",{ arg msg;
 			exciter_decay_min = msg[1];
-			krillVoice.theSynth.set(\exciter_decay_min,exciter_decay_min)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\exciter_decay_min,exciter_decay_min)
+			};
 		});
 
 		this.addCommand("exciter_decay_max","f",{ arg msg;
 			exciter_decay_max = msg[1];
-			krillVoice.theSynth.set(\exciter_decay_max,exciter_decay_max)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\exciter_decay_max,exciter_decay_max)
+			};
 		});
 
 		this.addCommand("resonator_pos","f",{ arg msg;
 			resonator_pos = msg[1];
-			krillVoice.theSynth.set(\resonator_pos,resonator_pos)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_pos,resonator_pos)
+			};
 		});
 
 		this.addCommand("resonator_resolution","f",{ arg msg;
 			resonator_resolution = msg[1];
-			krillVoice.theSynth.set(\resonator_resolution,resonator_resolution)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_resolution,resonator_resolution)
+			};
 		});
 
 		// this.addCommand("resonator_structure","f",{ arg msg;
 		// 	resonator_structure = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_structure,resonator_structure)
+		// 	if (voiceList.size > 0){ 
+				// krillVoice.theSynth.set(\resonator_structure,resonator_structure)
 		// });
 
 		this.addCommand("resonator_structure_min","f",{ arg msg;
 			resonator_structure_min = msg[1];
-			krillVoice.theSynth.set(\resonator_structure_min,resonator_structure_min);
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_structure_min,resonator_structure_min);
+			};
 		});
 
 		this.addCommand("resonator_structure_max","f",{ arg msg;
 			resonator_structure_max = msg[1];
-			krillVoice.theSynth.set(\resonator_structure_max,resonator_structure_max);
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_structure_max,resonator_structure_max);
+			};
 		});
 
 		this.addCommand("resonator_brightness_min","f",{ arg msg;
 			resonator_brightness_min = msg[1];
-			krillVoice.theSynth.set(\resonator_brightness_min,resonator_brightness_min)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_brightness_min,resonator_brightness_min)
+			};
 		});
 
 		this.addCommand("resonator_brightness_max","f",{ arg msg;
 			resonator_brightness_max = msg[1];
-			krillVoice.theSynth.set(\resonator_brightness_max,resonator_brightness_max)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_brightness_max,resonator_brightness_max)
+			};
 		});
 
 		this.addCommand("resonator_damping_min","f",{ arg msg;
 			resonator_damping_min = msg[1];
-			krillVoice.theSynth.set(\resonator_damping_min,resonator_damping_min)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_damping_min,resonator_damping_min)
+			};
 		});
 
 		this.addCommand("resonator_damping_max","f",{ arg msg;
 			resonator_damping_max = msg[1];
-			krillVoice.theSynth.set(\resonator_damping_max,resonator_damping_max)
+			if (voiceList.size > 0){ 
+				krillVoice.theSynth.set(\resonator_damping_max,resonator_damping_max)
+			};
 		});
 
-		/////////////////////////////////
-		//set rongs commands
-		/////////////////////////////////
-		// this.addCommand("exciter_decay_min","f",{ arg msg;
-		// 	exciter_decay_min = msg[1];
-		// 	krillVoice.theSynth.set(\exciter_decay_min,exciter_decay_min);
-		// });
-
-		// this.addCommand("exciter_decay_max","f",{ arg msg;
-		// 	exciter_decay_max = msg[1];
-		// 	krillVoice.theSynth.set(\exciter_decay_max,exciter_decay_max);
-		// });
-
-		// this.addCommand("resonator_pos","f",{ arg msg;
-		// 	resonator_pos = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_pos,resonator_pos);
-		// });
-
-		// this.addCommand("resonator_structure_min","f",{ arg msg;
-		// 	resonator_structure_min = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_structure_min,resonator_structure_min);
-		// });
-
-		// this.addCommand("resonator_structure_max","f",{ arg msg;
-		// 	resonator_structure_max = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_structure_max,resonator_structure_max);
-		// });
-
-		// this.addCommand("resonator_brightness_min","f",{ arg msg;
-		// 	resonator_brightness_min = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_brightness_min,resonator_brightness_min);
-		// });
-
-		// this.addCommand("resonator_brightness_max","f",{ arg msg;
-		// 	resonator_brightness_max = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_brightness_max,resonator_brightness_max);
-		// });
-
-		// this.addCommand("resonator_damping_min","f",{ arg msg;
-		// 	resonator_damping_min = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_damping_min,resonator_damping_min);
-		// });
-
-		// this.addCommand("resonator_damping_max","f",{ arg msg;
-		// 	resonator_damping_max = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_damping_max,resonator_damping_max);
-		// });
-
-		// this.addCommand("resonator_accent_min","f",{ arg msg;
-		// 	resonator_accent_min = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_accent_min,resonator_accent_min);
-		// });
-
-		// this.addCommand("resonator_accent_max","f",{ arg msg;
-		// 	resonator_accent_max = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_accent_max,resonator_accent_max);
-		// });
-
-		// this.addCommand("resonator_stretch_min","f",{ arg msg;
-		// 	resonator_stretch_min = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_stretch_min,resonator_stretch_min);
-		// });
-
-		// this.addCommand("resonator_stretch_max","f",{ arg msg;
-		// 	resonator_stretch_max = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_stretch_max,resonator_stretch_max);
-		// });
-
-		// this.addCommand("resonator_loss_min","f",{ arg msg;
-		// 	resonator_loss_min = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_loss_min,resonator_loss_min);
-		// });
-
-		// this.addCommand("resonator_loss_max","f",{ arg msg;
-		// 	resonator_loss_max = msg[1];
-		// 	krillVoice.theSynth.set(\resonator_loss_max,resonator_loss_max);
-		// });
-		
 	}
 
 

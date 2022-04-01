@@ -57,7 +57,10 @@ tabutil = require "tabutil"
 Lattice = require "lattice"
 cs = require "controlspec"
 s = require "sequins"
+textentry = require "textentry"
+fileselect = require "fileselect"
 
+encoders_and_keys = include("lib/encoders_and_keys")
 globals = include("lib/globals")
 lorenz = include("lib/lorenz")
 parameters = include("lib/parameters")
@@ -68,6 +71,8 @@ externals = include("lib/externals")
 gui = include("lib/gui")
 vuja_de = include("lib/vuja_de")
 vector = include("lib/vector")
+mod_matrix = include("lib/mod_matrix")
+save_load = include("lib/save_load")
 
 
 -- engine.name="AcidTest"
@@ -110,6 +115,16 @@ function init()
     ppqn = 96
   }
   
+  -- mod_matrix_pattern = krill_lattice:new_pattern{
+  --   action = function(t) 
+  --     if initializing == false then
+  --       mod_matrix:process_matrix()
+  --     end
+  --   end,
+  --   division = 1/1, --1/256, 
+  --   enabled = true
+  -- }
+  
   lorenz_pattern = krill_lattice:new_pattern{
     action = function(t) 
       lorenz:process()
@@ -139,7 +154,7 @@ function init()
         lz_x_val = util.linlin(lb[1],lb[1]+lb[3],lz_x_min,lz_x_max,x_val)
         ext.play_crow_lz_xy("x",lz_x_val)
         ext.play_midi_lz_xy("x",lz_x_val)
-        
+        params:set("lz_x",lz_x_val)
       end
     end,
     division = 1/64,-- 1/256, --1/16,
@@ -156,6 +171,7 @@ function init()
         lz_y_val = util.linlin(lb[2],lb[2]+lb[4],lz_y_min,lz_y_max,y_val)
         ext.play_crow_lz_xy("y",lz_y_val)
         ext.play_midi_lz_xy("y",lz_y_val)
+        params:set("lz_y",lz_y_val)
       end
     end,
     division = 1/64,-- 1/256, --1/16,
@@ -184,14 +200,14 @@ function init()
     while true do
 
       if norns.menu.status()  == false then
-        screen.aa(0)
-        if params:get("grid_display") == 2 and gui_level > 0 then 
-          sound_controller:display() 
-        end
+        -- screen.aa(0)
+        -- if params:get("grid_display") > 1 and gui_level > 0 then 
+        --   sound_controller:display() 
+        -- end
         gui:display()
         -- screen.update()
-        screen.aa(1)
-        lorenz.display(true)
+        -- screen.aa(1)
+        -- lorenz.display(true)
       else
         lorenz.display(false)
       end
@@ -251,7 +267,13 @@ function init()
   params:set("sequencing_mode",1)
   params:set("sequencing_mode",2)
 end
+
 function finish_init()
+  mod_matrix:init()
+  save_load.init()
+  if params:get("autosave") == 2 then
+    save_load.load_krill_data(folder_path.."autosave.krl")
+  end  
   initializing = false
   clock.sleep(1)
   vuja_de_patterns[1]:start()
@@ -270,7 +292,6 @@ function finish_init()
   -- params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
   -- params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
   -- params:set("sequencing_mode",1)
-
 end
 
 function init_polling()
@@ -329,4 +350,8 @@ function init_polling()
   fall_poll:start()
 end
 
-
+function cleanup()
+  if params:get("autosave") == 2 then
+    save_load.save_krill_data("autosave")
+  end
+end
