@@ -85,6 +85,7 @@ function mod_matrix.enc(n, d)
         local input = mod_matrix.inputs[mod_matrix.active_input]
         input =  util.wrap(input+d,1,#mod_matrix.lookup)
         mod_matrix.inputs[mod_matrix.active_input] = input
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 1
       end
       mod_matrix.selecting_param = "in"
     elseif mod_matrix.active_gui_sector == 3 then
@@ -98,6 +99,7 @@ function mod_matrix.enc(n, d)
         local output = mod_matrix.outputs[mod_matrix.active_output]  
         output =  util.wrap(output+d,1,#mod_matrix.lookup)
         mod_matrix.outputs[mod_matrix.active_output] = output
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 1
       end
       mod_matrix.selecting_param = "out"
     elseif mod_matrix.active_gui_sector == 3 then
