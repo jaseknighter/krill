@@ -121,10 +121,9 @@ function mod_matrix.enc(n, d)
 end
 
 function mod_matrix.key(n,z)
-  print("key",n,z)
-  if n==0 and k==2 then
+  if z==0 and n==2 then
     mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 1
-  elseif n==0 and k==3 then
+  elseif z==0 and n==3 then
     mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 2
   end
 end

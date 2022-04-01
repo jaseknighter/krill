@@ -103,7 +103,7 @@ function gui.set_gui_level(amt)
     gui_level = 0
     set_gui_level_initiated = false
     if params:get("grid_display") == 2 then
-      clock.run(gui.clear)
+      -- clock.run(gui.clear)
     end
   end
 end
@@ -112,7 +112,7 @@ function gui:display()
   if page == 1 then
     gui:display_lorenz()
   else 
-    screen.clear()
+    -- screen.clear()
     screen.font_size(8)
     lorenz.display(false)
     mod_matrix:display_mod_matrix()

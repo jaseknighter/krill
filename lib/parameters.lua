@@ -629,7 +629,7 @@ function parameters.init()
 
   for i=1, #resonator_param_data,1 do
     local p_data = resonator_param_data[i]
-    print(p_data[1], p_data[2], p_data[3] ,p_data[4], p_data[5], p_data[6])
+    -- print(p_data[1], p_data[2], p_data[3] ,p_data[4], p_data[5], p_data[6])
     params:add{
       type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],  
       action=function(x) 
