@@ -1,6 +1,7 @@
 # krill
 
 **installation**
+
 the install process requires 3 steps to properly install!
 
 1. open maiden and below the "matron" tab, enter:
@@ -10,9 +11,11 @@ the install process requires 3 steps to properly install!
 3. restart your norns.
 
 **view switching**
+
 k1+e1: switch back and forth between the *krill sequencer* and *mod matrix*
 
 **krill sequencer**
+
 e1: top-level menu
 e2: sub-menu
 e3: change sub-menu values
@@ -20,18 +23,23 @@ e3: change sub-menu values
 there are two sequencer modes:
 
 *krell* 
+
 modelled after Todd Barton's Krell script
 
 *vuja de* 
+
 modelled after MI Marbles
 
 **resonator engine**
+
 params to change the built-in resonator are found in the PARAMETERS `resonator` sub-menu.
 
 **lorenz algorithm x/y outputs**
+
 params to change the x/y outputs are found in the PARAMETERS `lz x/y outputs` sub-menu. these outputs may be sent to midi or crow (see the *midi* and *crow* PARAMETER sub-menus for details)
 
 **mod matrix**
+
 * alt+k1: switch to/from mod_matrix 
 * e1: switch between the 3 mod matrix menus:
   1. row/col: use e2/e3 to change the selected row/column
@@ -54,6 +62,7 @@ mod matrix notes
   * a value with carrots at the front and end (e.g. "<\<lorenz view>>") indicates a param sub-menu.
 
 **DATA MANAGEMENT**
+
 the *krill data* sub-menu at the end of the PARAMETERS menu has all the options for saving, loading, deleting mod_matrix settings. this sub-menu is also where you can enable/disable autosave. 
 
 there is a global parameter in the `globals.lua` file called `AUTOSAVE_DEFAULT`. setting it to 2 means autosave is on by default. setting it to one means autosave is off by default.
