@@ -608,12 +608,12 @@ function parameters.init()
   local resonator_param_data = {
     --Rings params
     {"taper","resonator_pos","pos",0,1,0.05},
-    {"taper","resonator_structure_base","struct",0,1,0.2,"resonator_structure"},
-    {"taper","resonator_structure_range","struct rng",0,1,0,"resonator_structure"},
-    {"taper","resonator_brightnes_base","bright",0,1,0.3,"resonator_brightness"},
-    {"taper","resonator_brightness_range","bright rng",0,1,0,"resonator_brightness"},
-    {"taper","resonator_damping_base","damping",0,1,0.675,"resonator_damping"},
-    {"taper","resonator_damping_range","damp rng",0,1,0,"resonator_damping"},
+    {"taper","resonator_structure_base","str",0,1,0.2,"resonator_structure"},
+    {"taper","resonator_structure_range","str rng",0,1,0,"resonator_structure"},
+    {"taper","resonator_brightnes_base","brt",0,1,0.3,"resonator_brightness"},
+    {"taper","resonator_brightness_range","brt rng",0,1,0,"resonator_brightness"},
+    {"taper","resonator_damping_base","dmp",0,1,0.675,"resonator_damping"},
+    {"taper","resonator_damping_range","dmp rng",0,1,0,"resonator_damping"},
   }
 
   params:add_group("resonator",#resonator_param_data+1)

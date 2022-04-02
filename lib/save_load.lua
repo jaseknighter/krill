@@ -10,16 +10,17 @@ function save_load.save_krill_data(name_or_path)
     end
 
     local save_path
-    
     if string.find(name_or_path,"/") == 1 then
       local x,y = string.find(name_or_path,folder_path)
       local filename = string.sub(name_or_path,y+1,#name_or_path-4)
       local pset_path = pset_folder_path .. filename
       params:write(pset_path)
       save_path = name_or_path
-    elseif string.find(pset_path,"autosave")==nil then -- load pset unless loading from autosave 
+    elseif string.find(name_or_path,"autosave")==nil then -- load pset unless loading from autosave 
       local pset_path = pset_folder_path .. name_or_path
       params:write(pset_path)
+      save_path = folder_path .. name_or_path  ..".krl"
+    else
       save_path = folder_path .. name_or_path  ..".krl"
     end
     
@@ -33,7 +34,7 @@ function save_load.save_krill_data(name_or_path)
     local save_object = {}
     save_object.mod_matrix_data          = mod_matrix_data
     tab.save(save_object, save_path)
-    print("saved!")
+    print("saved krill data!")
   else
     print("save cancel")
   end

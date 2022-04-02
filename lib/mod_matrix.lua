@@ -35,10 +35,10 @@ function mod_matrix:enrich_param_actions()
     -- if p ~= nil and p.osc_casted == nil then -- edge case where sync issue between `params.lookup` & `params.params`
     if p ~= nil  then -- edge case where sync issue between `params.lookup` & `params.params`
       -- p.osc_casted = true
-      p.og_action = fn.clone_function(p.action)
+      p.og_action_mod_matrix = fn.clone_function(p.action)
       p.action = function(x)
         -- do something
-        p.og_action(x)
+        p.og_action_mod_matrix(x)
         self:process_updated_param(p_ix,p_id,params:get(p_ix))
       end
     end
@@ -280,7 +280,6 @@ function mod_matrix:update_matrix()
     self.patch_points[self.active_input] = {}
   end
   if self.patch_points[self.active_input][self.active_output] == nil then
-    print("add defaults",self.active_input,self.active_output)
     local enabled_mod  = mod_matrix.default_pp_option_selections[1]
     local level_mod  = mod_matrix.default_pp_option_selections[2]
     local self_mod  = mod_matrix.default_pp_option_selections[3]

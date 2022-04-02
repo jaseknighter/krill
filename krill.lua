@@ -271,6 +271,7 @@ end
 function finish_init()
   mod_matrix:init()
   save_load.init()
+  gui.init()
   if params:get("autosave") == 2 then
     save_load.load_krill_data(folder_path.."autosave.krl")
   end  
