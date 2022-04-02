@@ -196,6 +196,11 @@ end
 -------------------------------------------
 folder_path = norns.state.data .. "krill_data/" 
 AUTOSAVE_DEFAULT=2
+
+-- UI_DISPLAY_DEFAULT possible values:
+-- 1 = never show grid. only show UI when using encoders
+-- 2 = show grid and UI when using encoders
+-- 3 = always show grid and UI
 UI_DISPLAY_DEFAULT=3
 alt_key_active = false
 page = 1
