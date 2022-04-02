@@ -264,7 +264,7 @@ function parameters.init()
   params:add_separator("QUANT GRID")
   -- params:add_group("lorenz",19)
   params:add{type = "option", id = "grid_display", name = "grid display",
-    options = {"hide","show","always show"}, default = 2,
+    options = {"hide","show","always show"}, default = UI_DISPLAY_DEFAULT,
     action = function(x)
       if x == 1 then screen.clear() 
       elseif x == 3 then gui_level = 1

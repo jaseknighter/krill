@@ -196,12 +196,13 @@ end
 -------------------------------------------
 folder_path = norns.state.data .. "krill_data/" 
 AUTOSAVE_DEFAULT=2
+UI_DISPLAY_DEFAULT=3
 alt_key_active = false
 page = 1
 CENTER_X = 84
 CENTER_Y = 32
 blank_pixel = screen.peek(1,1,2,2)
-gui_level = 0
+gui_level = UI_DISPLAY_DEFAULT < 3 and 0 or 1
 set_gui_level_initiated = false
 rise = 1.5
 fall = 1.5

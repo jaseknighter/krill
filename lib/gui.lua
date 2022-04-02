@@ -110,7 +110,9 @@ function gui.set_gui_level(amt)
     if params:get("grid_display") ~= 3 then gui_level = amt end 
     clock.run(gui.set_gui_level,amt)
   else
-    gui_level = 0
+    if params:get("grid_display") ~= 3 then
+      gui_level = 0
+    end
     set_gui_level_initiated = false
     if params:get("grid_display") == 2 then
       -- clock.run(gui.clear)
