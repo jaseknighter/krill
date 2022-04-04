@@ -367,10 +367,10 @@ function parameters.init()
       
   end
 
-  function parameters.set_pats(num_pats)   
+  function parameters.set_pats(num_divs)   
     print("set divs") 
     for i=1,VJD_MAX_DIVISIONS,1 do
-      if i>num_pats then
+      if i>num_divs then
         params:hide("vuja_de_div_numerator"..i)
         params:hide("vuja_de_div_denominator"..i)
         params:hide("pat_lab"..i)
@@ -381,41 +381,41 @@ function parameters.init()
       end
     end
 
-    if params:get("vjd_div_asn_engine1") > num_pats then 
+    if params:get("vjd_div_asn_engine1") > num_divs then 
       params:set("vjd_div_asn_engine1",1)
     end
-    if params:get("vjd_div_asn_midi1") > num_pats then 
+    if params:get("vjd_div_asn_midi1") > num_divs then 
       params:set("vjd_div_asn_midi1",1)
     end
-    if params:get("vjd_div_asn_crow1") > num_pats then 
+    if params:get("vjd_div_asn_crow1") > num_divs then 
       params:set("vjd_div_asn_crow1",1)
     end
-    if params:get("vjd_div_asn_jf1") > num_pats then 
+    if params:get("vjd_div_asn_jf1") > num_divs then 
       params:set("vjd_div_asn_jf1",1)
     end
-    if params:get("vjd_div_asn_wsyn1") > num_pats then 
+    if params:get("vjd_div_asn_wsyn1") > num_divs then 
       params:set("vjd_div_asn_wsyn1",1)
     end
-    if params:get("vjd_div_asn_wdelkarp1") > num_pats then 
+    if params:get("vjd_div_asn_wdelkarp1") > num_divs then 
       params:set("vjd_div_asn_wdelkarp1",1)
     end
 
-    if params:get("vjd_div_asn_engine2") > num_pats then 
+    if params:get("vjd_div_asn_engine2") > num_divs then 
       params:set("vjd_div_asn_engine2",1)
     end
-    if params:get("vjd_div_asn_midi2") > num_pats then 
+    if params:get("vjd_div_asn_midi2") > num_divs then 
       params:set("vjd_div_asn_midi2",1)
     end
-    if params:get("vjd_div_asn_crow2") > num_pats then 
+    if params:get("vjd_div_asn_crow2") > num_divs then 
       params:set("vjd_div_asn_crow2",1)
     end
-    if params:get("vjd_div_asn_jf2") > num_pats then 
+    if params:get("vjd_div_asn_jf2") > num_divs then 
       params:set("vjd_div_asn_jf2",1)
     end
-    if params:get("vjd_div_asn_wsyn2") > num_pats then 
+    if params:get("vjd_div_asn_wsyn2") > num_divs then 
       params:set("vjd_div_asn_wsyn2",1)
     end
-    if params:get("vjd_div_asn_wdelkarp2") > num_pats then 
+    if params:get("vjd_div_asn_wdelkarp2") > num_divs then 
       params:set("vjd_div_asn_wdelkarp2",1)
     end
 
@@ -425,12 +425,12 @@ function parameters.init()
     local vjd_div_asn_jf1 = params:lookup_param("vjd_div_asn_jf1")
     local vjd_div_asn_wsyn1 = params:lookup_param("vjd_div_asn_wsyn1")
     local vjd_div_asn_wdelkarp1 = params:lookup_param("vjd_div_asn_wdelkarp1")
-    vjd_div_asn_engine1.max = num_pats
-    vjd_div_asn_midi1.max = num_pats
-    vjd_div_asn_crow1.max = num_pats
-    vjd_div_asn_jf1.max = num_pats
-    vjd_div_asn_wsyn1.max = num_pats
-    vjd_div_asn_wdelkarp1.max = num_pats
+    vjd_div_asn_engine1.max = num_divs
+    vjd_div_asn_midi1.max = num_divs
+    vjd_div_asn_crow1.max = num_divs
+    vjd_div_asn_jf1.max = num_divs
+    vjd_div_asn_wsyn1.max = num_divs
+    vjd_div_asn_wdelkarp1.max = num_divs
 
     local vjd_div_asn_engine2 = params:lookup_param("vjd_div_asn_engine2")
     local vjd_div_asn_midi2 = params:lookup_param("vjd_div_asn_midi2")
@@ -438,16 +438,50 @@ function parameters.init()
     local vjd_div_asn_jf2 = params:lookup_param("vjd_div_asn_jf2")
     local vjd_div_asn_wsyn2 = params:lookup_param("vjd_div_asn_wsyn2")
     local vjd_div_asn_wdelkarp2 = params:lookup_param("vjd_div_asn_wdelkarp2")
-    vjd_div_asn_engine2.max = num_pats
-    vjd_div_asn_midi2.max = num_pats
-    vjd_div_asn_crow2.max = num_pats
-    vjd_div_asn_jf2.max = num_pats
-    vjd_div_asn_wsyn2.max = num_pats
-    vjd_div_asn_wdelkarp2.max = num_pats
+    vjd_div_asn_engine2.max = num_divs
+    vjd_div_asn_midi2.max = num_divs
+    vjd_div_asn_crow2.max = num_divs
+    vjd_div_asn_jf2.max = num_divs
+    vjd_div_asn_wsyn2.max = num_divs
+    vjd_div_asn_wdelkarp2.max = num_divs
   end
 
 
+  -- params:add{type = "number", id = "rest_pats_per_div", name = "rest pats per div"..i.." rest pat",
+  --   min=1, max=8, default=1,
+  --   action = function(x)
+  --     _menu.rebuild_params()
+  -- end}
 
+  -- local rppd = params:get("rest_pats_per_div")
+  local rppd = 1
+  parameters.rest_pattern_formatters = {}
+
+  params:add_group("rest patterns",(VJD_MAX_DIVISIONS)*rppd)
+  for i=1,VJD_MAX_DIVISIONS do
+    local rest_formatter = function(x)
+      -- tab.print(x)
+      local ca_id = x.value
+      local ca_rs = vuja_de_rest_patterns[i].get_ruleset()
+      local ca_rs_string = vuja_de_rest_patterns[i].get_ruleset_string(ca_rs)
+      return ca_rs_string .. " ("..ca_id ..")"
+    end
+    parameters.rest_pattern_formatters[i] = rest_formatter  
+
+    params:add{type = "number", id = "vuja_de_rest"..i, name = "vjd "..i.." rest pat",
+      min=0, max=255, default=255,
+      formatter=parameters.rest_pattern_formatters[i],
+      action = function(x)
+        local rs = vuja_de_rest_patterns[i].set_ruleset(x)
+        vuja_de_rest_sequins[i] = Sequins{table.unpack(rs)}
+    end}  
+  
+    if i>params:get("vuja_de_num_divs") then
+      params:hide("vuja_de_rest"..i)
+    else
+      params:show("vuja_de_rest"..i)
+    end
+  end
   
 
   --------------------------------
@@ -465,19 +499,14 @@ function parameters.init()
       sequencing_mode = value
       engine.switch_sequencing_mode(value)
       if sequencing_mode == 1 then
+        -- engine.rise_fall(nil,nil)        
         engine.play_note(notes[math.random(15)],2)
-        if krell_rise then
-          engine.rise_fall(krell_rise,krell_fall)
-          krell_rise = nil
-          krell_fall = nil
-        end
-        sub_menu_map = sub_menu_map_krell
       else
         -- engine.play_note(notes[math.random(15)],2)
-        krell_rise = rise
-        krell_fall = fall
-        sub_menu_map = sub_menu_map_vuja_de
+        -- krell_rise = rise
+        -- krell_fall = fall        
       end
+      gui.setup_menu_maps()
   end}
 
   --------------------------------
@@ -606,7 +635,7 @@ function parameters.init()
   }
 
   params:add{
-    type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 100,
+    type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 150,
     action=function(x) 
       engine.env_scalar(x/100)
     end
@@ -617,6 +646,7 @@ function parameters.init()
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
       -- engine.rise_fall(x/1000,0)
+      -- engine.rise_fall(x/1000,params:get("fall_time")/1000)
     end
   }
 
@@ -626,6 +656,7 @@ function parameters.init()
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
       -- engine.rise_fall(0,x/1000)
+      -- engine.rise_fall(params:get("rise_time")/1000,x/1000)
     end
   }
 

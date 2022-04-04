@@ -59,6 +59,7 @@ cs = require "controlspec"
 s = require "sequins"
 textentry = require "textentry"
 fileselect = require "fileselect"
+Sequins = require "sequins"
 
 encoders_and_keys = include("lib/encoders_and_keys")
 globals = include("lib/globals")
@@ -73,6 +74,7 @@ vuja_de = include("lib/vuja_de")
 vector = include("lib/vector")
 mod_matrix = include("lib/mod_matrix")
 save_load = include("lib/save_load")
+cellular_automata = include("lib/cellular_automata")
 
 
 -- engine.name="AcidTest"
@@ -86,7 +88,7 @@ sel_note=1
 disable_transport=false
 chaos_x={}
 chaos_y={}
-
+        
 
 initializing = true
 function init()
@@ -103,7 +105,7 @@ function init()
   
   active_notes = {}
   ext = externals:new(active_notes)
-  
+
   sound_controller:init(NUM_OCTAVES_DEFAULT,fn.get_num_notes_per_octave())
   lorenz:reset()
   -- input[1].mode('change', 1,0.1,'rising')
@@ -178,18 +180,31 @@ function init()
     enabled = true
   }
   
+  vuja_de_rest_patterns = {}
+  vuja_de_rest_sequins = {}
+  -- vuja_de_rest_patterns[1].get_ruleset_id()
+  -- vuja_de_rest_patterns[1].get_ruleset(vuja_de_rest_patterns[1].ruleset)
   for i=1,VJD_MAX_DIVISIONS,1 do
-    
+    vuja_de_rest_patterns[i] = cellular_automata:new()
+    vuja_de_rest_patterns[i].generate()
+
+    local rs = vuja_de_rest_patterns[1].get_ruleset()
+    vuja_de_rest_sequins[i] = Sequins{table.unpack(rs)}
     vuja_de_patterns[i]= krill_lattice:new_pattern{
       action = function(t) 
+        -- local rs_id = vuja_de_rest_patterns[1].get_ruleset_id()
+        -- local rs = vuja_de_rest_patterns[1].get_ruleset()
+
         -- play note from quant grid
         local active = pixels[pixels.active]
         vuja_de:update_length()
-        if active and params:get("sequencing_mode") == 2 then -- vuja de mode
+        local rest = vuja_de_rest_sequins[i]() == 0
+        -- if rest==true then print("rest",rest) end
+        if active and params:get("sequencing_mode") == 2 and rest==false then -- vuja de mode
           sound_controller:play_vuja_de_note(i)
         end
       end,
-      division = 1/5, --3/1, --1/8, --1/16,
+      division = 1/16, --3/1, --1/8, --1/16,
       enabled = false
     }
   end
@@ -197,38 +212,16 @@ function init()
 
   clock.run( function()
     while true do
-
-      if norns.menu.status()  == false then
-        -- screen.aa(0)
-        -- if params:get("grid_display") > 1 and gui_level > 0 then 
-        --   sound_controller:display() 
-        -- end
-        gui:display()
-        -- screen.update()
-        -- screen.aa(1)
-        -- lorenz.display(true)
-      else
-        lorenz.display(false)
+      if initializing == false then
+        if norns.menu.status()  == false then
+          -- screen.aa(0)
+          gui:display()
+          -- ca.display()
+        else
+          lorenz.display(false)
+        end
+        screen.update()
       end
-
-
-      if lz_x then
-        local param_val = util.linlin(0,1,-40,40,lz_x)/10
-        local param_val1 = util.linlin(0,1,-50,40,lz_y)/10
-        -- if lz_x > 0.1 then params:set("wsyn_pluckylog", 1) end
-        
-        -- params:set("wsyn_fm_ratio_numerator", param_val)
-        -- local rand = math.random(4) == 1 and 1 or 0
-        -- if rand == 1 then params:set("wsyn_pluckylog", 1) end
-        -- params:set("wsyn_curve", param_val)
-        -- params:set("wsyn_ramp", param_val1)
-        -- params:set("wsyn_fm_env", param_val1)
-      end
-      if lz_x then
-        -- externals.wiggle(lz_x,lz_y)
-      end
-
-      screen.update()
       clock.sleep(1/SCREEN_REFRESH_DENOMINATOR)
     end
   end)
@@ -255,16 +248,10 @@ function init()
   -- params:set("vuja_de_div_denominator2",8)
   -- params:set("vuja_de_div_denominator3",8)
   
-  params:set("env_scalar",100)
-  params:set("rise_time",1)
-  params:set("fall_time",100)
-  -- params:set("sequencing_mode",2)
   -- params:set("midi_out_device",2)
   
   
   clock.run(finish_init)
-  params:set("sequencing_mode",1)
-  params:set("sequencing_mode",2)
 end
 
 function finish_init()
@@ -283,7 +270,7 @@ function finish_init()
   -- vuja_de_patterns[2].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   
-  params:set("vuja_de_div_numerator1",3)
+  params:set("vuja_de_div_numerator1",1)
   params:set("vuja_de_div_denominator1",16)
   params:set("vuja_de_div_numerator2",1)
   params:set("vuja_de_div_denominator2",2)
@@ -291,7 +278,13 @@ function finish_init()
   params:set("vuja_de_div_denominator3",2)
   -- params:set("vuja_de_div_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
   -- params:set("vuja_de_div_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
+  clock.run(gui.update_menu_display)
+  -- engine.rise_fall(rise,fall)        
+  -- engine.play_note(notes[math.random(15)],2)
+  params:set("sequencing_mode",2)
+  params:set("env_scalar",160)
   -- params:set("sequencing_mode",1)
+  
 end
 
 function init_polling()

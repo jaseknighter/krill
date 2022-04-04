@@ -227,3 +227,6 @@ lz_y_val = 0
 ENV_MAX_LEVEL_DEFAULT = 10
 ENV_SHAPE_DEFAULT = -10
 LORENZ_WEIGHTS_DEFAULT = {{1,0,0}, {0,1,0}, {0,0,1}, {2.0,1.0,1.0}}
+sequencing_mode = 2
+menu_map = {}
+sub_menu_map = {}

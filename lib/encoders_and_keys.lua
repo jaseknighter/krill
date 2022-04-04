@@ -28,7 +28,7 @@ function enc(n, d)
         local new_d = params:get(param_name)+(d*param.controlspec.step)
         -- local new_d = params:get(param_name)+(d*param.controlspec.step)
         params:set(param_name,new_d)
-        print("p_type,new_d",p_type,new_d,d,param.controlspec.step)
+        -- print("p_type,new_d",p_type,new_d,d,param.controlspec.step)
       elseif p_type == 5 then -- taper param
         local new_d
         local max = param.max and param.max or param.controlspec.maxval

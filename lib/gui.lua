@@ -1,63 +1,83 @@
 local gui = {}
 
+local lz_ix = 1
 local lb = lorenz.boundary
-active_menu = 1
-active_sub_menu = {1,1,1,1}
-active_sub_menu_label = ""
-active_sub_menu_value = ""
 
-gui.updating_menu_display = false
-
--- menu_map = {"lzv","lzp","mod","xy","vd"}
--- menu_map = {"mod","lzv","lzp","xy","vd"}
-menu_map = {"seq","scr","lrz","res"}
-
-local lrz_params = {"lz_speed","rho","beta"}
-local outs = {"first","second","third","sum"}
-local axes = {"x","y","z"}
-for i=1,4 do
-  local out=outs[i]
-  for j=1,3 do
-    local axis=axes[j]
-    local lzw="lz_weight"..i.."_"..j
-    table.insert(lrz_params,lzw)
-  end  
-end
-
-sub_menu_map_krell = {
-  {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
-  {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
-  lrz_params,
-  {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},
-}
+function gui.setup_menu_maps()
 
 
-sub_menu_map_vuja_de = {
-  {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"},
-  {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
-  lrz_params,
-  {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
-}
+  local lrz_params = {"lz_speed","rho","beta"}
+  local outs = {"first","second","third","sum"}
+  local axes = {"x","y","z"}
+  for i=1,4 do
+    local out=outs[i]
+    for j=1,3 do
+      local axis=axes[j]
+      local lzw="lz_weight"..i.."_"..j
+      table.insert(lrz_params,lzw)
+    end  
+  end
 
-sub_menu_map = sub_menu_map_krell
+  function gui.vjd_rests()
+    return {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"}
+  end
 
-function gui.init()
+  gui.sub_menu_map_krell = {
+    {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
+    {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
+    lrz_params,
+    {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},
+  }
+
+
+  gui.sub_menu_map_vuja_de = {
+    {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"},
+    -- gui.vjd_rests(),
+    {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
+    lrz_params,
+    {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
+  }
+
+  if sequencing_mode == 1 then
+    menu_map = {"seq","scr","lrz","res"}
+    sub_menu_map = gui.sub_menu_map_krell
+  else
+    menu_map = {"seq","scr","lrz","res"}
+    -- menu_map = {"seq","rst","scr","lrz","res"}
+    sub_menu_map = gui.sub_menu_map_vuja_de
+  end
+
   for i=1,#menu_map,1 do
-    for j=1,#sub_menu_map_vuja_de[i] do
+    for j=1,#gui.sub_menu_map_vuja_de[i] do
       
-      local param_name = sub_menu_map_vuja_de[i][j]
+      local param_name = gui.sub_menu_map_vuja_de[i][j]
       local p = params:lookup_param(param_name)
-      p.og_action_menu_map = fn.clone_function(p.action)
-      p.action = function(x)
-        -- do something
-        p.og_action_menu_map(x)
-        if norns.menu.status()  == false and page == 1 then
-          clock.run(gui.update_menu_display)
+      if p.og_action_menu_map == nil then
+        p.og_action_menu_map = fn.clone_function(p.action)
+        p.action = function(x)
+          -- do something
+          p.og_action_menu_map(x)
+          if norns.menu.status()  == false and page == 1 then
+            clock.run(gui.update_menu_display)
+          end
         end
       end
-
     end
   end
+end
+
+function gui.init()
+
+  active_menu = 1
+  -- active_sub_menu = {1,1,1,1}
+  active_sub_menu = {1,1,1,1,1}
+  active_sub_menu_label = ""
+  active_sub_menu_value = ""
+
+  gui.updating_menu_display = false
+
+  gui.setup_menu_maps()
+
 end
 
 function gui.update_menu_display()
@@ -78,25 +98,28 @@ function gui.update_menu_display()
     screen.fill()
 
     
-    -- if active_menu < 4 then
-    param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
-    param = params:lookup_param(param_name)
-    local p_type = params:t(param_name)
-    active_sub_menu_label = param.name
-    if p_type == 2 then -- options param
-      active_sub_menu_value = param.options[param.selected]
-    elseif p_type == 1 then -- number param
-      active_sub_menu_value = param.value
-    elseif p_type == 3  then -- control param
-      local val = params:get(param_name)
-      active_sub_menu_value = val
-    elseif p_type == 5  then -- taper param
-      local val = params:get(param_name)
-      active_sub_menu_value = util.linlin(0,1,param.min,param.max,val)
-    end
+    if type(sub_menu_map[active_menu]) == "table" then
+      param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
+      param = params:lookup_param(param_name)
+      local p_type = params:t(param_name)
+      active_sub_menu_label = param.name
+      if p_type == 2 then -- options param
+        active_sub_menu_value = param.options[param.selected]
+      elseif p_type == 1 then -- number param
+        active_sub_menu_value = param.value
+      elseif p_type == 3  then -- control param
+        local val = params:get(param_name)
+        active_sub_menu_value = val
+      elseif p_type == 5  then -- taper param
+        local val = params:get(param_name)
+        active_sub_menu_value = util.linlin(0,1,param.min,param.max,val)
+      end
 
-    if type(active_sub_menu_value) == "number" then
-      active_sub_menu_value = fn.round_decimals (active_sub_menu_value, 3, "down")
+      if type(active_sub_menu_value) == "number" then
+        active_sub_menu_value = fn.round_decimals (active_sub_menu_value, 3, "down")
+      end
+    else
+      print("vjd_rests")
     end
     gui.updating_menu_display = false
   end
@@ -143,8 +166,8 @@ function gui:display()
   end
 end
 
-local lz_ix = 1
 function gui:display_lorenz()
+  -- print("disp")
   screen.aa(0)
   if params:get("grid_display") > 1 and gui_level > 0 then 
     sound_controller:display() 
@@ -172,12 +195,12 @@ function gui:display_lorenz()
   screen.text(text1)
   
   screen.level(math.floor(gui_level*(active_menu == 2 and 10 or 3)))
-  screen.move(20,lb[2]+8)
+  screen.move(18,lb[2]+8)
   local text2 = active_menu < 4 and menu_map[2] or menu_map[(active_menu-1)] 
   screen.text(text2)
   
   screen.level(math.floor(gui_level*(active_menu >= 3 and 10 or 3)))
-  screen.move(35,lb[2]+8)
+  screen.move(32,lb[2]+8)
   local text3 = active_menu < 4 and menu_map[3] or menu_map[(active_menu)]
   screen.text(text3)
 
