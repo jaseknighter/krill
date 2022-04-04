@@ -12,7 +12,9 @@ end
   
 
 function externals.set_midi_cc(cc,note_tab,channel)
-  midi_out_device:cc (cc, note_tab, channel)
+  if midi_out_device then
+    midi_out_device:cc (cc, note_tab, channel)
+  end
 end
 
 externals.midi_note_off = function(delay, note_num, channel, voice_id, note_location)
@@ -26,7 +28,9 @@ externals.midi_note_off = function(delay, note_num, channel, voice_id, note_loca
   if note_location <= #active_notes then
     table.remove(active_notes, note_location)
   end
-  midi_out_device:note_off(note_num, nil, channel)
+  if midi_out_device then
+    midi_out_device:note_off(note_num, nil, channel)
+  end
 end
 
 externals.midi_note_off_beats = function(delay, note_num, channel, voice_id, note_location)
@@ -36,7 +40,9 @@ externals.midi_note_off_beats = function(delay, note_num, channel, voice_id, not
   else
     --note location is out of bounds!!!
   end
-  midi_out_device:note_off(note_num, nil, channel)
+  if midi_out_device then
+    midi_out_device:note_off(note_num, nil, channel)
+  end
 end
 
 externals.wiggle = function(x,y) 
@@ -67,24 +73,24 @@ externals.note_on = function(voice_id, note_tab, target,mode)
       end
       -- print(note_tab.pitch)
     end
-    -- if mode == 1 or (params:get("vjd_pat_asn_midi1") == note_tab.pat_id or params:get("vjd_pat_asn_midi2") == note_tab.pat_id) then
-    if target == "midi" and (mode == 1 or (params:get("vjd_pat_asn_midi1") == note_tab.pat_id or params:get("vjd_pat_asn_midi2") == note_tab.pat_id)) then
+    -- if mode == 1 or (params:get("vjd_div_asn_midi1") == note_tab.div_id or params:get("vjd_div_asn_midi2") == note_tab.div_id) then
+    if target == "midi" and (mode == 1 or (params:get("vjd_div_asn_midi1") == note_tab.div_id or params:get("vjd_div_asn_midi2") == note_tab.div_id)) then
        externals.midi_note_on(voice_id, note_tab, target)
     end
-    -- if mode == 1 or (params:get("vjd_pat_asn_crow1") == note_tab.pat_id or params:get("vjd_pat_asn_crow2") == note_tab.pat_id) then
-    if target == "crow" and (mode == 1 or (params:get("vjd_pat_asn_crow1") == note_tab.pat_id or params:get("vjd_pat_asn_crow2") == note_tab.pat_id)) then
+    -- if mode == 1 or (params:get("vjd_div_asn_crow1") == note_tab.div_id or params:get("vjd_div_asn_crow2") == note_tab.div_id) then
+    if target == "crow" and (mode == 1 or (params:get("vjd_div_asn_crow1") == note_tab.div_id or params:get("vjd_div_asn_crow2") == note_tab.div_id)) then
       externals.crow_note_on(voice_id, note_tab, target)
     end
-    -- if mode == 1 or (params:get("vjd_pat_asn_jf1") == note_tab.pat_id or params:get("vjd_pat_asn_jf2") == note_tab.pat_id) then
-    if target == "jf" and (mode == 1 or (params:get("vjd_pat_asn_jf1") == note_tab.pat_id or params:get("vjd_pat_asn_jf2") == note_tab.pat_id)) then
+    -- if mode == 1 or (params:get("vjd_div_asn_jf1") == note_tab.div_id or params:get("vjd_div_asn_jf2") == note_tab.div_id) then
+    if target == "jf" and (mode == 1 or (params:get("vjd_div_asn_jf1") == note_tab.div_id or params:get("vjd_div_asn_jf2") == note_tab.div_id)) then
        externals.jf_note_on(voice_id, note_tab, target)
     end
-    -- if mode == 1 or (params:get("vjd_pat_asn_wsyn1") == note_tab.pat_id or params:get("vjd_pat_asn_wsyn2") == note_tab.pat_id) then
-    if target == "wsyn" and (mode == 1 or (params:get("vjd_pat_asn_wsyn1") == note_tab.pat_id or params:get("vjd_pat_asn_wsyn2") == note_tab.pat_id)) then
+    -- if mode == 1 or (params:get("vjd_div_asn_wsyn1") == note_tab.div_id or params:get("vjd_div_asn_wsyn2") == note_tab.div_id) then
+    if target == "wsyn" and (mode == 1 or (params:get("vjd_div_asn_wsyn1") == note_tab.div_id or params:get("vjd_div_asn_wsyn2") == note_tab.div_id)) then
        externals.wsyn_note_on(voice_id, note_tab, target)
     end
-    -- if mode == 1 or (params:get("vjd_pat_asn_wdelkarp1") == note_tab.pat_id or params:get("vjd_pat_asn_wdelkarp2") == note_tab.pat_id) then
-    if target == "wdel_ks" and (mode == 1 or (params:get("vjd_pat_asn_wdelkarp1") == note_tab.pat_id or params:get("vjd_pat_asn_wdelkarp2") == note_tab.pat_id)) then
+    -- if mode == 1 or (params:get("vjd_div_asn_wdelkarp1") == note_tab.div_id or params:get("vjd_div_asn_wdelkarp2") == note_tab.div_id) then
+    if target == "wdel_ks" and (mode == 1 or (params:get("vjd_div_asn_wdelkarp1") == note_tab.div_id or params:get("vjd_div_asn_wdelkarp2") == note_tab.div_id)) then
        externals.wdel_note_on(voice_id, note_tab, target)
     end
   end
@@ -104,14 +110,18 @@ externals.midi_note_on = function(voice_id, note_tab, target)
       local velocity = note_tab.level and math.floor(util.linlin(0,10,0,127,note_tab.level)) or 80
       local duration = note_tab.duration and note_tab.duration or (params:get("rise_time")/1000)*(params:get("env_scalar")/100)+(params:get("fall_time")/1000)*(params:get("env_scalar")/100)
       duration = tonumber(duration) and duration or fn.fraction_to_decimal(duration)    
-      midi_out_device:note_on(pitch, velocity, channel)
+      if midi_out_device then
+        midi_out_device:note_on(pitch, velocity, channel)
+      end
       table.insert(active_notes, pitch)
       clock.run(externals.midi_note_off_beats, duration, pitch, channel, 1, #active_notes)
     elseif mode == 2 then -- stop/start
       if note_tab.stop_start == 1 then -- stop
         midi_out_device:stop()
       else -- start
-        midi_out_device:start()
+        if midi_out_device then
+          midi_out_device:start()
+        end
       end
     end
   end
@@ -126,14 +136,18 @@ externals.play_midi_lz_xy = function(source,volts)
     local cc = params:get("output_midi_lz_x_cc")
     local ch = params:get("output_midi_lz_x_chan")
     ch = ch > 0 and ch or nil
-    midi_out_device:cc (cc, cc_val, ch)
+    if midi_out_device then
+      midi_out_device:cc (cc, cc_val, ch)
+    end
     -- print("x",cc_val)
   elseif source == "y" and output_midi_y == 2 then -- lz y output
     local slew = params:get("lz_y_slew")/1000
     local cc = params:get("output_midi_lz_y_cc")
     local ch = params:get("output_midi_lz_y_chan")
     ch = ch > 0 and ch or nil
-    midi_out_device:cc (cc, cc_val, ch)
+    if midi_out_device then
+      midi_out_device:cc (cc, cc_val, ch)
+    end
   end
 end
 

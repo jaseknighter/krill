@@ -1,5 +1,7 @@
 -- midi helper global variables and functions 
 
+local midi_helper = {}
+
 function clock.transport.stop()
   if sc.selected_sequin_group and initializing == false then
     grid_sequencer.activate_grid_key_at(sc.selected_sequin_group,1)
@@ -14,7 +16,7 @@ function clock.transport.start()
 end
 
 
-function get_midi_devices()
+function midi_helper.get_midi_devices()
   local devices = {}
   for i=1,#midi.vports,1
   do
@@ -29,7 +31,7 @@ function get_midi_devices()
   -- tab.print(midi_devices)
 end
 
-midi_out_device = midi.connect(1)
+-- midi_out_device = midi.connect(1)
 
 
 -- set_midi_channels = function()
@@ -238,12 +240,12 @@ end
 
 
 midi.add = function(device)
-  params.get_midi_devices()
+  midi_helper.get_midi_devices()
 
-  --print("midi device add ", device.id, device.name)
+  print("midi device add ", device.id, device.name)
   if device.name == "16n" then 
       device_16n = device 
-      -- send_16n_sysex(midi,get_16n_data_table)
+      send_16n_sysex(midi,get_16n_data_table)
   end
   device.event = midi_event
 end
@@ -291,3 +293,4 @@ end
     
   -- end
 
+return midi_helper

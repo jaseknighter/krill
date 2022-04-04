@@ -4,7 +4,7 @@
 function enc(n, d)
   clock.run(gui.update_menu_display)
   param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
-  if initializing == false and alt_key_active == true then
+  if n== 1 and initializing == false and alt_key_active == true then
     page = util.clamp(page+d,1,2)
     screen.clear()
   elseif page == 1 and initializing == false and gui_level == 1 then
@@ -28,7 +28,7 @@ function enc(n, d)
         local new_d = params:get(param_name)+(d*param.controlspec.step)
         -- local new_d = params:get(param_name)+(d*param.controlspec.step)
         params:set(param_name,new_d)
-        clock.run(gui.update_menu_display)
+        print("p_type,new_d",p_type,new_d,d,param.controlspec.step)
       elseif p_type == 5 then -- taper param
         local new_d
         local max = param.max and param.max or param.controlspec.maxval

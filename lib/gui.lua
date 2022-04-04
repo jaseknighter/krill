@@ -12,10 +12,22 @@ gui.updating_menu_display = false
 -- menu_map = {"mod","lzv","lzp","xy","vd"}
 menu_map = {"seq","scr","lrz","res"}
 
+local lrz_params = {"lz_speed","rho","beta"}
+local outs = {"first","second","third","sum"}
+local axes = {"x","y","z"}
+for i=1,4 do
+  local out=outs[i]
+  for j=1,3 do
+    local axis=axes[j]
+    local lzw="lz_weight"..i.."_"..j
+    table.insert(lrz_params,lzw)
+  end  
+end
+
 sub_menu_map_krell = {
   {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
-  {"lz_speed","rho","beta"},
+  lrz_params,
   {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},
 }
 
@@ -23,7 +35,7 @@ sub_menu_map_krell = {
 sub_menu_map_vuja_de = {
   {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"},
   {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
-  {"lz_speed","rho","beta"},
+  lrz_params,
   {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
 }
 
@@ -142,7 +154,7 @@ function gui:display_lorenz()
   -- display left menu 
   screen.level(math.floor(gui_level*3))
   screen.move(1,lb[2]+14)
-  screen.rect(1,lb[2]+14,lb[1]-5,lb[4]-15)
+  screen.rect(1,lb[2]+14,lb[1]-5,lb[4]-19)
   screen.stroke()
   screen.font_size(8)
 
@@ -172,7 +184,7 @@ function gui:display_lorenz()
   -- display left menu sub items
   screen.level(math.floor(gui_level*3))
   screen.move(1,lb[2]+14)
-  screen.rect(1,lb[2]+14,lb[1]-10,10)
+  screen.rect(1,lb[2]+14,lb[1]-8,11)
   screen.stroke()
   screen.move(3,lb[2]+21)
   screen.level(math.floor(gui_level*10))

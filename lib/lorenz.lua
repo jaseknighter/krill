@@ -1,5 +1,5 @@
 --- lorenz attractor
--- sam wolk 2019.10.13
+-- by sam wolk 2019.10.13 via galapagoose
 -- in1 resets the attractor to the {x,y,z} coordinates stored in the lorenz.origin table
 -- in2 controls the speed of the attractor
 -- out1 is the x-coordinate (by default)
@@ -21,7 +21,7 @@ function pixels.update(display)
     pixels[i]:update(display)
   end
   for i=1,#pixels,1 do
-    if pixels[i] and pixels[i].remove == true then
+    if pixels[i] and pixels[i].remove == true and display == true then
       if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
         local x = math.floor(pixels[i].last_x)
         local y = math.floor(pixels[i].last_y)
@@ -64,7 +64,7 @@ end
 function pixel:update(display)
   self.timer = self.timer + 1
   if self.timer == SCREEN_REFRESH_DENOMINATOR then
-    self.level = self.level - 1
+    self.level = self.level > 8 and 8 or self.level - 0.5
     self.timer = 1
     self.redraw = true
   end
@@ -72,13 +72,13 @@ function pixel:update(display)
     self.remove = true  
   elseif self.level > 0 and self.redraw == true then
     local lb = lorenz.get_boundary()
-    if display == true then
-      if (self.last_x>lb[1] and self.last_x<lb[1]+lb[3] and self.last_y>lb[2] and self.last_y<lb[2]+lb[4]) then
-        -- screen.level(0)
-        -- screen.pixel(self.last_x,self.last_y)
-        -- screen.stroke()
-      end
-    end
+    -- if display == true then
+    --   if (self.last_x>lb[1] and self.last_x<lb[1]+lb[3] and self.last_y>lb[2] and self.last_y<lb[2]+lb[4]) then
+    --     screen.level(0)
+    --     screen.pixel(self.last_x,self.last_y)
+    --     screen.stroke()
+    --   end
+    -- end
 
     local x_offset = params:get("x_offset")
     local y_offset = params:get("y_offset")
@@ -95,8 +95,13 @@ function pixel:update(display)
       self.last_x = x
       self.last_y = y
       if display == true then
-        screen.level(self.level)
-        screen.pixel(x,y)
+        screen.level(math.ceil(self.level))
+        if self.active == true then
+          screen.move(x,y)
+          screen.rect(x,y,x+1,y+1)
+        else
+          screen.pixel(x,y)
+        end
         screen.stroke()
       end
     end
@@ -126,7 +131,7 @@ lorenz = {
   third = 0,
   x_map = 0,
   y_map = 0,
-  boundary = {51,5,104,55}
+  boundary = {51,5,104,55},
   -- boundary = {51,5,74,55}
 }
 
@@ -136,7 +141,9 @@ function lorenz.init()
 end
 
 -- lorenz.weigths = {{1,0,0}, {0,1,0}, {0,0,1}, {0.33,0.33,0}}
-lorenz.weigths = {{1,0,0}, {0,1,0}, {0,0,1}, {2.0,1.0,1.0}}
+lorenz.weigths = LORENZ_WEIGHTS_DEFAULT
+
+
 
 function lorenz:process(steps,dt)
   steps = steps or self.steps
@@ -173,6 +180,7 @@ lorenz.display = function(display)
   -- screen.move(42,1)
   pixels.update(display) 
 end
+
 
 lorenz.update = function()
   local xyz = {}

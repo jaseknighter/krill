@@ -64,8 +64,8 @@ encoders_and_keys = include("lib/encoders_and_keys")
 globals = include("lib/globals")
 lorenz = include("lib/lorenz")
 parameters = include("lib/parameters")
-sound_controller = include("lib/sound_controller")
 midi_helper = include("lib/midi_helper")
+sound_controller = include("lib/sound_controller")
 w_slash = include("lib/w_slash")
 externals = include("lib/externals")
 gui = include("lib/gui")
@@ -178,7 +178,7 @@ function init()
     enabled = true
   }
   
-  for i=1,VJD_MAX_PATTERNS,1 do
+  for i=1,VJD_MAX_DIVISIONS,1 do
     
     vuja_de_patterns[i]= krill_lattice:new_pattern{
       action = function(t) 
@@ -186,7 +186,6 @@ function init()
         local active = pixels[pixels.active]
         vuja_de:update_length()
         if active and params:get("sequencing_mode") == 2 then -- vuja de mode
-          -- vuja_de:update()
           sound_controller:play_vuja_de_note(i)
         end
       end,
@@ -252,15 +251,15 @@ function init()
   -- clock.run(gui.set_gui_level)
   params:set("x_offset",-10)
   params:set("y_scale",0.85)
-  -- params:set("vuja_de_pat_denominator1",8)
-  -- params:set("vuja_de_pat_denominator2",8)
-  -- params:set("vuja_de_pat_denominator3",8)
+  -- params:set("vuja_de_div_denominator1",8)
+  -- params:set("vuja_de_div_denominator2",8)
+  -- params:set("vuja_de_div_denominator3",8)
   
   params:set("env_scalar",100)
   params:set("rise_time",1)
   params:set("fall_time",100)
   -- params:set("sequencing_mode",2)
-  params:set("midi_out_device",2)
+  -- params:set("midi_out_device",2)
   
   
   clock.run(finish_init)
@@ -284,14 +283,14 @@ function finish_init()
   -- vuja_de_patterns[2].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   
-  params:set("vuja_de_pat_numerator1",3)
-  params:set("vuja_de_pat_denominator1",16)
-  params:set("vuja_de_pat_numerator2",1)
-  params:set("vuja_de_pat_denominator2",2)
-  params:set("vuja_de_pat_numerator3",1)
-  params:set("vuja_de_pat_denominator3",2)
-  -- params:set("vuja_de_pat_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
-  -- params:set("vuja_de_pat_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
+  params:set("vuja_de_div_numerator1",3)
+  params:set("vuja_de_div_denominator1",16)
+  params:set("vuja_de_div_numerator2",1)
+  params:set("vuja_de_div_denominator2",2)
+  params:set("vuja_de_div_numerator3",1)
+  params:set("vuja_de_div_denominator3",2)
+  -- params:set("vuja_de_div_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
+  -- params:set("vuja_de_div_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
   -- params:set("sequencing_mode",1)
 end
 

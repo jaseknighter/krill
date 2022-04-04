@@ -28,7 +28,7 @@ end
 
 local sound_controller = {}
 
-sound_controller.random_pat_div = 1
+sound_controller.random_div_div = 1
 
 function sound_controller:init(rows,cols)
   sound_controller.sectors={}
@@ -98,7 +98,7 @@ function sound_controller.play_note(note_tab,mode)
       note_tab.pitch = fn.quantize(note_tab.pitch)
     end
 
-    if mode==1 or (params:get("vjd_pat_asn_engine1") == note_tab.pat_id or params:get("vjd_pat_asn_engine2") == note_tab.pat_id) then
+    if mode==1 or (params:get("vjd_div_asn_engine1") == note_tab.div_id or params:get("vjd_div_asn_engine2") == note_tab.div_id) then
       play_engine(note_tab.pitch)
     end
 
@@ -138,14 +138,14 @@ function sound_controller:play_krill_note(value)
   -- sound_controller:play_note(note_tab)
 end
 
-function sound_controller:play_vuja_de_note(pat_id)
+function sound_controller:play_vuja_de_note(div_id)
   local note_to_play = vuja_de:get_note()
 
   local note_tab = {
     pitch = note_to_play,
     level = params:get("env_max_level"),
     mode = 1,
-    pat_id = pat_id
+    div_id = div_id
   }
 
   sound_controller.play_note(note_tab,2)
