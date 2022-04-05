@@ -343,6 +343,10 @@ function parameters.init()
   
   params:add_separator("")
   params:add_separator("divisions")
+
+
+  local vjd_jitter_cs = cs.new(-100, 100, 'lin', 0, 1, "",1)
+
   for i=1,VJD_MAX_DIVISIONS,1 do
     -- params:add_separator("pattern "..i)
     params:add{ type = "option", id = "pat_lab"..i, name = "---------- division " .. i .. " ----------",  options = {" "}}
@@ -358,9 +362,23 @@ function parameters.init()
         vuja_de_patterns[i]:set_division(params:get("vuja_de_div_numerator"..i)/x)
     end}
 
+    params:add{type = "number", id = "vuja_de_jitter"..i, name = "vjd jitter"..i,
+      min=-100,max=100,default=0,
+      -- controlspec=vjd_jitter_cs,
+      action = function(x)
+        if x ~= 0 then
+          -- local numerator   =   params:get("vuja_de_div_numerator"..i)
+          -- local divisor     =   params:get("vuja_de_div_denominator"..i)
+          -- local new_div = (numerator/divisor)+(math.random(0,x)/10000)
+          -- print(x,new_div)
+          -- vuja_de_patterns[i].division = new_div
+        end
+    end}
+
     if i>3 then
       params:hide("vuja_de_div_numerator"..i)
       params:hide("vuja_de_div_denominator"..i)
+      params:hide("vuja_de_jitter"..i)
       params:hide("pat_lab"..i)
       
     end
@@ -374,10 +392,12 @@ function parameters.init()
         params:hide("vuja_de_div_numerator"..i)
         params:hide("vuja_de_div_denominator"..i)
         params:hide("pat_lab"..i)
+        params:hide("vuja_de_jitter"..i)
       else
         params:show("vuja_de_div_numerator"..i)
         params:show("vuja_de_div_denominator"..i)    
         params:show("pat_lab"..i)    
+        params:show("vuja_de_jitter"..i)
       end
     end
 
@@ -669,11 +689,54 @@ function parameters.init()
   end}
 
   --------------------------------
-  -- resonator params
+  -- engine (resonator & karplus strong) params
   --------------------------------
+  function parameters.set_engine_params(param_data)
+    for i=1, #param_data,1 do
+      local p_data = param_data[i]
+      -- print(p_data[1], p_data[2], p_data[3] ,p_data[4], p_data[5], p_data[6])
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],  
+        action=function(x) 
+          local base, range, min, max
+          if string.find(p_data[2],"_range")~=nil then
+            range = x
+            base = params:get(param_data[i-1][2])
+            min = util.clamp(base-range,0,1)
+            max = util.clamp(base+range,0,1)
+            local engine_min = engine[p_data[7].."_min"]
+            local engine_max = engine[p_data[7].."_max"]
+            engine_min(min)
+            engine_max(max)
+          elseif string.find(p_data[2],"_base")~=nil then
+            base = x
+            range = params:get(param_data[i+1][2])
+            min = util.clamp(base-range,0,1)
+            max = util.clamp(base+range,0,1)
+            local engine_min = engine[p_data[7].."_min"]
+            local engine_max = engine[p_data[7].."_max"]
+            engine_min(min)
+            engine_max(max)
+          else
+            local engine_command = engine[p_data[2]]
+            engine_command(x)
+          end
+        end
+      }          
+    end
+  end
 
+  params:add{
+    type = "option", id = "engine_mode", name = "eng mode", 
+    options = {"res","str"},
+    default = 1,
+    action = function(value) 
+      engine.engine_mode(value)
+      gui.setup_menu_maps()
+  end}
+
+  --resonator params
   local resonator_param_data = {
-    --Rings params
     {"taper","resonator_pos","pos",0,1,0.05},
     {"taper","resonator_structure_base","str",0,1,0.2,"resonator_structure"},
     {"taper","resonator_structure_range","str rng",0,1,0,"resonator_structure"},
@@ -686,46 +749,38 @@ function parameters.init()
   params:add_group("resonator",#resonator_param_data+1)
 
   params:add{
-    type = "option", id = "triger_mode", name = "trigger mode", 
+    type = "option", id = "resonator_triger_mode", name = "res trig mode", 
     options = {"internal","external"},
     default = 1,
     action = function(value) 
       engine.trigger_mode(value-1)
-    end}
+  end}
 
+  parameters.set_engine_params(resonator_param_data)
+  
+  --karplus strong params
+  local string_param_data = {
+    {"taper","string_accent_base","acc",0,1,0.2,"string_accent"},
+    {"taper","string_accent_range","acc rng",0,1,0,"string_accent"},
+    {"taper","string_structure_base","str",0,1,0.2,"string_structure"},
+    {"taper","string_structure_range","str rng",0,1,0,"string_structure"},
+    {"taper","string_brightnes_base","brt",0,1,0.3,"string_brightness"},
+    {"taper","string_brightness_range","brt rng",0,1,0,"string_brightness"},
+    {"taper","string_damping_base","dmp",0,1,0.675,"string_damping"},
+    {"taper","string_damping_range","dmp rng",0,1,0,"string_damping"},
+  }
 
-  for i=1, #resonator_param_data,1 do
-    local p_data = resonator_param_data[i]
-    -- print(p_data[1], p_data[2], p_data[3] ,p_data[4], p_data[5], p_data[6])
-    params:add{
-      type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],  
-      action=function(x) 
-        local base, range, min, max
-        if string.find(p_data[2],"_range")~=nil then
-          range = x
-          base = params:get(resonator_param_data[i-1][2])
-          min = util.clamp(base-range,0,1)
-          max = util.clamp(base+range,0,1)
-          local engine_min = engine[p_data[7].."_min"]
-          local engine_max = engine[p_data[7].."_max"]
-          engine_min(min)
-          engine_max(max)
-        elseif string.find(p_data[2],"_base")~=nil then
-          base = x
-          range = params:get(resonator_param_data[i+1][2])
-          min = util.clamp(base-range,0,1)
-          max = util.clamp(base+range,0,1)
-          local engine_min = engine[p_data[7].."_min"]
-          local engine_max = engine[p_data[7].."_max"]
-          engine_min(min)
-          engine_max(max)
-        else
-          local engine_command = engine[p_data[2]]
-          engine_command(x)
-        end
-      end
-    }          
-  end
+  params:add_group("string",#string_param_data+1)
+
+  params:add{
+    type = "option", id = "string_triger_mode", name = "str trig mode", 
+    options = {"internal","external"},
+    default = 1,
+    action = function(value) 
+      engine.trigger_mode(value-1)
+  end}
+
+  parameters.set_engine_params(string_param_data)
 
   params:add_group("midi",11)
 

@@ -203,6 +203,34 @@ function init()
         if active and params:get("sequencing_mode") == 2 and rest==false then -- vuja de mode
           sound_controller:play_vuja_de_note(i)
         end
+        -- local jitter = params:get("vuja_de_jitter"..i)
+        -- local numerator   =   params:get("vuja_de_div_numerator"..i)
+        -- local divisor     =   params:get("vuja_de_div_denominator"..i)
+        -- if jitter ==0 and  vuja_de_patterns[i].division ~= numerator/divisor then
+        --   print("no jitter",i,vuja_de_patterns[i].division == numerator/divisor)
+        --   vuja_de_patterns[i].division = numerator/divisor          
+        -- end
+        -- if jitter ==0 and  vuja_de_patterns[i].division ~= numerator/divisor then
+        -- end
+        local numerator   =   params:get("vuja_de_div_numerator"..i)
+        local divisor     =   params:get("vuja_de_div_denominator"..i)
+        local jitter      =   math.floor(params:get("vuja_de_jitter"..i))
+        local new_div
+        if jitter>=0 then
+          new_div = (numerator/divisor)+(math.random(0,jitter)/10000)
+        elseif jitter<0 then
+          new_div = (numerator/divisor)+(math.random(jitter,0)/10000)
+        -- elseif vuja_de_patterns[i].division and numerator/divisor ~= vuja_de_patterns[i].division then
+        --   krill_lattice.reset()
+        --   new_div = (numerator/divisor)+(math.random(jitter,0)/10000)
+        --   print("reset")
+        -- else
+        --   new_div = (numerator/divisor)
+        end
+        -- print(jitter,new_div)
+        if vuja_de_patterns[i].division then
+          vuja_de_patterns[i].division = new_div
+        end
       end,
       division = 1/16, --3/1, --1/8, --1/16,
       enabled = false
@@ -276,6 +304,7 @@ function finish_init()
   params:set("vuja_de_div_denominator2",2)
   params:set("vuja_de_div_numerator3",1)
   params:set("vuja_de_div_denominator3",2)
+  params:set("vjd_div_asn_engine2",1)
   -- params:set("vuja_de_div_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
   -- params:set("vuja_de_div_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
   clock.run(gui.update_menu_display)
@@ -348,3 +377,4 @@ function cleanup()
     save_load.save_krill_data("autosave")
   end
 end
+

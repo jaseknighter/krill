@@ -7,6 +7,7 @@ function gui.setup_menu_maps()
 
 
   local lrz_params = {"lz_speed","rho","beta"}
+  local eng_params
   local outs = {"first","second","third","sum"}
   local axes = {"x","y","z"}
   for i=1,4 do
@@ -22,11 +23,27 @@ function gui.setup_menu_maps()
     return {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"}
   end
 
+  local eng_mode = params:get("engine_mode")
+
+  -- if sequencing_mode == 1 then
+  if eng_mode == 1 then
+    eng_params = {"engine_mode","resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",}
+  else
+    eng_params = {"engine_mode","string_accent_base","string_accent_range","string_structure_base","string_structure_range","string_brightnes_base","string_brightness_range","string_damping_base","string_damping_range",}
+  end
+  -- else
+  --   if eng_mode == 1 then
+  --     eng_params = {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",}  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
+  --   else
+  --     eng_params = {"string_accent_base","string_accent_range","string_structure_base","string_structure_range","string_brightnes_base","string_brightness_range","string_damping_base","string_damping_range",}    
+  --   end
+  -- end
+  
   gui.sub_menu_map_krell = {
     {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
     {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
     lrz_params,
-    {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},
+    eng_params,
   }
 
 
@@ -35,14 +52,14 @@ function gui.setup_menu_maps()
     -- gui.vjd_rests(),
     {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
     lrz_params,
-    {"resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",},  -- {"lz_speed","origin1","origin2","origin3","sigma","rho","beta","state1","state2","state3","steps","dt"},
+    eng_params,
   }
 
   if sequencing_mode == 1 then
-    menu_map = {"seq","scr","lrz","res"}
+    menu_map = {"seq","scr","lrz","eng"}
     sub_menu_map = gui.sub_menu_map_krell
   else
-    menu_map = {"seq","scr","lrz","res"}
+    menu_map = {"seq","scr","lrz","eng"}
     -- menu_map = {"seq","rst","scr","lrz","res"}
     sub_menu_map = gui.sub_menu_map_vuja_de
   end

@@ -41,8 +41,6 @@ function vuja_de:get_note()
     -- local next_seq_ix = util.clamp(self.seq.ix+1,1,self.seq.length)
     local next_seq_ix = util.clamp(math.ceil(new_prob*self.seq.length),1,self.seq.length)
     self.seq:select(next_seq_ix)
-    print("jumblenext_note",self.seq.ix,next_seq_ix)
-
   end
   
   

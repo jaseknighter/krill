@@ -4,7 +4,7 @@
 
 fn = {}
 
--- utility to clone function
+-- utility to clone function (from @eigen)
 function fn.clone_function(fn)
   local dumped=string.dump(fn)
   local cloned=load(dumped)
@@ -42,13 +42,35 @@ function fn.deep_copy(orig, copies)
   return copy
 end
 
+function fn.get_num_decimal_places(num)
+  local num_str = tostring(num)
+  if type(num) == "number" and string.find(num_str,"%.") then
+    local num_decimals = #num_str - string.find(num_str,"%.")
+    return num_decimals
+  else
+    return nil
+  end
+end
+
+function fn.constrain_decimals(val_to_constrain, source_val)
+  if type(source_val) == "number" then
+    local num_decimals = fn.get_num_decimal_places(source_val)
+    local constrained_val = fn.round_decimals(val_to_constrain, num_decimals)
+    return constrained_val
+  else
+    return val_to_constrain
+  end
+end
+
 function fn.round_decimals (value_to_round, num_decimals, rounding_direction)
+  local num_decimals = num_decimals and num_decimals or 2
+  local rounding_direction = rounding_direction and rounding_direction or "down"
   local rounded_val
   local mult = 10^num_decimals
-  if rounding_direction == "up" then
+  if rounding_direction == "down" then
     rounded_val = math.floor(value_to_round * mult + 0.5) / mult
   else
-    rounded_val = math.floor(value_to_round * mult + 0.5) / mult
+    rounded_val = math.ceil(value_to_round * mult + 0.5) / mult
   end
   return rounded_val
 end
@@ -178,17 +200,6 @@ fn.quantize = function(note_num)
     end
   end
   return new_note_num
-end
-
-fn.round_decimals = function (value_to_round, num_decimals, rounding_direction)
-  local rounded_val
-  local mult = 10^num_decimals
-  if rounding_direction == "up" then
-    rounded_val = math.floor(value_to_round * mult + 0.5) / mult
-  else
-    rounded_val = math.floor(value_to_round * mult + 0.5) / mult
-  end
-  return rounded_val
 end
 
 -------------------------------------------
