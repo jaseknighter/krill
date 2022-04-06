@@ -652,7 +652,7 @@ function parameters.init()
     
     
   -- quantize notes
-  params:add_group("envelope params",5)
+  params:add_group("envelope params",7)
 
 
   params:add{
@@ -695,6 +695,22 @@ function parameters.init()
     controlspec = controlspec.new(-10, 10, "lin", 1, ENV_SHAPE_DEFAULT, ""), 
     action = function(value) 
       engine.env_shape(value)
+  end}
+
+  params:add{
+    type = "control", id = "env_pos", name = "env pos", 
+    -- min=-10,max=10, default = ENV_SHAPE_DEFAULT,
+    controlspec = controlspec.new(0, 1, "lin", 0.0001, 0, "", 0.0001), 
+    action = function(value) 
+      -- print("env pos param",value)
+  end}
+
+  params:add{
+    type = "control", id = "env_level", name = "env level", 
+    -- min=-10,max=10, default = ENV_SHAPE_DEFAULT,
+    controlspec = controlspec.new(0, 1, "lin", 0.0001, 0, "", 0.0001), 
+    action = function(value) 
+      -- print("env level param",value)
   end}
 
   --------------------------------

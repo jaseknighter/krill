@@ -338,6 +338,19 @@ function init_polling()
     -- print("note_start_poll",rise,fall)l
   end)
 
+  env_pos_poll = poll.set("env_pos_poll", function(value)
+    if initializing == false then
+      params:set("env_pos",value)
+    end
+  end)
+
+  env_level_poll = poll.set("env_level_poll", function(value)
+    if initializing == false then
+      -- print("level", value)
+      params:set("env_level",value)
+    end
+  end)
+
   rise_poll = poll.set("rise_poll", function(value)
     -- print("rise done",value)
     prev_rise = rise
@@ -369,7 +382,10 @@ function init_polling()
   end
 
   -- pitch_poll:start()
+  -- next_note_poll:start()
   next_note_poll:start()
+  env_pos_poll:start()
+  env_level_poll:start()
   rise_poll:start()
   fall_poll:start()
 end

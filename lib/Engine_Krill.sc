@@ -8,6 +8,8 @@ Engine_Krill : CroneEngine {
   var voiceList;
 	var krillVoice;
 	var id=0;
+	var envPosPoll,envPosPollFunc;
+	var envLevelPoll,envLevelPollFunc;
 	var risePoll,risePollFunc;
 	var fallPoll,fallPollFunc;
 	var nextNotePoll,nextNotePollFunc;
@@ -83,11 +85,11 @@ Engine_Krill : CroneEngine {
 			// rise_rate =  (rise * ((sh1/2)+1) * env_scalar);
 			rise_phase = Decay.kr(Impulse.kr(0), rise * env_scalar);
 			env_phase = rise_phase <= 0.001;
-
 			rise_rate =  1/(rise * env_scalar);
 			fall_rate =  1/(fall * env_scalar);
 			env_rate = Select.kr(env_phase, [rise_rate, fall_rate]);
 			env_pos = Sweep.kr(Impulse.kr(0), env_rate);
+			
 			
 			amp_env = Env([0.001, 1, 0.001], [rise * env_scalar, fall * env_scalar], env_shape);
 			env_gen = IEnvGen.kr(amp_env, env_pos); 
@@ -134,6 +136,9 @@ Engine_Krill : CroneEngine {
 			fall_done = env_gen <= 0.001;
 
 			// SendReply.kr(Impulse.kr(10), '/triggerPitchPoll', pitch.midicps);
+			SendReply.kr(Impulse.kr(50), '/triggerEnvPosPoll', env_pos);
+			SendReply.kr(Impulse.kr(50), '/triggerEnvLevelPoll', env_gen);
+			
 			SendReply.kr(env_changed * env_phase, '/triggerRiseDonePoll', foc1);
 			SendReply.kr(fall_done, '/triggerFallDonePoll', eor1);
 			
@@ -153,6 +158,16 @@ Engine_Krill : CroneEngine {
 		// 	// ("pitchpoll"+msg[3]).postln;
 		// 	pitchPoll.update(msg[3]);
     // }, path: '/triggerPitchPoll', srcID: context.server.addr);
+
+    envPosPollFunc = OSCFunc({
+      arg msg;
+			envPosPoll.update(msg[3]);
+    }, path: '/triggerEnvPosPoll', srcID: context.server.addr);
+    
+		envLevelPollFunc = OSCFunc({
+      arg msg;
+			envLevelPoll.update(msg[3]);
+    }, path: '/triggerEnvLevelPoll', srcID: context.server.addr);
 
     nextNotePollFunc = OSCFunc({
       arg msg;
@@ -186,6 +201,8 @@ Engine_Krill : CroneEngine {
 
     // add polls
     // pitchPoll = this.addPoll(name: "pitch_poll", periodic: false);
+    envPosPoll = this.addPoll(name: "env_pos_poll", periodic: false);
+    envLevelPoll = this.addPoll(name: "env_level_poll", periodic: false);
     nextNotePoll = this.addPoll(name: "next_note_poll", periodic: false);
     risePoll = this.addPoll(name: "rise_poll", periodic: false);
     fallPoll = this.addPoll(name: "fall_poll", periodic: false);
