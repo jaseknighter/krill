@@ -791,7 +791,7 @@ function parameters.init()
 
   parameters.set_engine_params(string_param_data)
 
-  params:add_group("midi",10)
+  params:add_group("midi",9)
 
   -- params:add{type = "option", id = "midi_engine_control", name = "midi engine control",
   --   options = {"off","on"},
