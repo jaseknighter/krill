@@ -14,7 +14,7 @@ Engine_Krill : CroneEngine {
 	// var pitchPoll,pitchPollFunc;
 	// var noteStartPoll;
 	var sh1=1, sh2=1;
-	var rise=0.05, fall=0.5, rise_time=0.05, fall_time=1, env_scalar=1;
+	var rise=0.05, fall=0.5, rise_time=0.05, fall_time=0.5, env_scalar=1;
 	var env_shape=8;
 	var lorenz_sample = 1;
 	var minRiseFall = 0.005;
@@ -39,7 +39,7 @@ Engine_Krill : CroneEngine {
 
 	alloc {
 
-		var scale = Scale.choose.postln;
+		// var scale = Scale.choose.postln;
     voiceGroup = Group.new(context.xg);
     voiceList = List.new();
 
@@ -116,7 +116,6 @@ Engine_Krill : CroneEngine {
         damping: TRand.kr(resonator_damping_min,resonator_damping_max, trig)
   	  );
 			
-			(engine_mode).poll;
 			out = out + ((engine_mode-1) * StringVoice.ar(
         trig: trig,
 				infsustain: exciter,
@@ -127,8 +126,8 @@ Engine_Krill : CroneEngine {
         damping: TRand.kr(string_damping_min,string_damping_max, trig)
       ));
 			
+			// out = 	VAKorg35.ar(out, freq: pitch.midicps, res:rise_phase, overdrive: rise_phase.unipolar, type:0);
 
-			// out = LeakDC.ar((out * amp).tanh/2.7);
 			out = LeakDC.ar((out * env_gen * amp).tanh/2.7);
 			sig = out.tanh;	
 			env_changed = Changed.kr(env_phase);

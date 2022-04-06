@@ -182,10 +182,10 @@ function mod_matrix:process_updated_param(ix,id,value)
               local input_obj = mod_matrix:get_param_props(input)
               local output_obj = mod_matrix:get_param_props(output)
               local new_output_value = util.linlin(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
-              new_output_value = output_obj.type ==2 and math.floor(new_output_value) or new_output_value
+              new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
               new_output_value = fn.constrain_decimals(new_output_value, params:get(output_id))
               params:set(output_id,new_output_value)
-              -- print("input_value",input_obj.val)
+              -- print(output_obj.type,new_output_value,input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
               -- print("output_value",output_id,new_output_value)
               -- print(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
               -- print(">>>>>>>>>>>>>")

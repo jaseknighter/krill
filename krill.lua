@@ -311,7 +311,9 @@ function finish_init()
   -- engine.rise_fall(rise,fall)        
   -- engine.play_note(notes[math.random(15)],2)
   params:set("sequencing_mode",2)
-  params:set("env_scalar",160)
+  params:set("env_scalar",100)
+  params:set("rise_time",30)
+  params:set("fall_time",100)
   -- params:set("sequencing_mode",1)
   
 end

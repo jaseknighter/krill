@@ -3,16 +3,11 @@
 local midi_helper = {}
 
 function clock.transport.stop()
-  if sc.selected_sequin_group and initializing == false then
-    grid_sequencer.activate_grid_key_at(sc.selected_sequin_group,1)
-  end
+  -- do something
 end
 
 function clock.transport.start()
-  if sc.selected_sequin_group == nil and initializing == false then
-    local sequin_group = sc.last_active_sequin_group and sc.last_active_sequin_group or 1
-    grid_sequencer.activate_grid_key_at(sequin_group,1)
-  end
+  -- do something
 end
 
 
@@ -238,15 +233,20 @@ midi_event = function(data)
   end
 end
 
+midi.remove = function(device)
+  -- print("midi device remove ", device.id, device.name)
+  print("midi device remove ",device)
+  -- tab.print(device)
+  midi_helper.get_midi_devices()  
+end
 
 midi.add = function(device)
   midi_helper.get_midi_devices()
-
   print("midi device add ", device.id, device.name)
-  if device.name == "16n" then 
-      device_16n = device 
-      send_16n_sysex(midi,get_16n_data_table)
-  end
+  -- if device.name == "16n" then 
+  --     device_16n = device 
+  --     send_16n_sysex(midi,get_16n_data_table)
+  -- end
   device.event = midi_event
 end
 
