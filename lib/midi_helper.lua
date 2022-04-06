@@ -18,8 +18,8 @@ function midi_helper.get_midi_devices()
     table.insert(devices, i .. ". " .. midi.vports[i].name)
   end
   midi_devices = devices
-  local midi_in = params:lookup_param("midi_in_device")
-  midi_in.options = midi_devices
+  -- local midi_in = params:lookup_param("midi_in_device")
+  -- midi_in.options = midi_devices
   local midi_out = params:lookup_param("midi_out_device")
   midi_out.options = midi_devices
   
