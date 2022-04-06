@@ -791,7 +791,7 @@ function parameters.init()
 
   parameters.set_engine_params(string_param_data)
 
-  params:add_group("midi",11)
+  params:add_group("midi",10)
 
   -- params:add{type = "option", id = "midi_engine_control", name = "midi engine control",
   --   options = {"off","on"},
@@ -802,19 +802,19 @@ function parameters.init()
 
   local midi_devices = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 
-  params:add_separator("midi in")
+  -- params:add_separator("midi in")
 
-  midi_in_device = {}
-  params:add{
-    type = "option", id = "midi_in_device", name = "in device", options = midi_devices, 
-    min = 1, max = 16, 
-    -- default = 1, 
-    action = function(value)
-      midi_in_device.event = nil
-      midi_in_device = midi.connect(value)
-      midi_in_device.event = midi_event
-    end
-  }
+  -- midi_in_device = {}
+  -- params:add{
+  --   type = "option", id = "midi_in_device", name = "in device", options = midi_devices, 
+  --   min = 1, max = 16, 
+  --   -- default = 1, 
+  --   action = function(value)
+  --     midi_in_device.event = nil
+  --     midi_in_device = midi.connect(value)
+  --     midi_in_device.event = midi_event
+  --   end
+  -- }
 
   -- params:add{
   --   type = "number", id = "midi_in_channel1", name = "midi_in channel1",

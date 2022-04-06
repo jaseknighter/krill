@@ -242,7 +242,10 @@ end
 
 midi.add = function(device)
   midi_helper.get_midi_devices()
-  print("midi device add ", device.id, device.name)
+  print("midi device add ", device.id, device.name, device.dev)
+  -- for k,v in (device.dev) do
+  --   print(k,v)
+  -- end
   -- if device.name == "16n" then 
   --     device_16n = device 
   --     send_16n_sysex(midi,get_16n_data_table)
