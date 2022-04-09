@@ -760,6 +760,23 @@ function parameters.init()
       gui.setup_menu_maps()
   end}
 
+
+  params:add{
+    type = "option", id = "resonator_triger_mode", name = "trig mode", 
+    options = {"internal","external"},
+    default = 1,
+    action = function(value) 
+      engine.trigger_mode(value-1)
+  end}
+
+  params:add{
+    type = "option", id = "internal_triger_type", name = "trig type", 
+    options = {"snare","bass"},
+    default = 1,
+    action = function(value) 
+      engine.trigger_type(value-1)
+  end}
+
   --resonator params
   local resonator_param_data = {
     {"taper","resonator_pos","pos",0,1,0.05},
@@ -771,23 +788,8 @@ function parameters.init()
     {"taper","resonator_damping_range","dmp rng",0,1,0,"resonator_damping"},
   }
 
-  params:add_group("resonator",#resonator_param_data+2)
 
-  params:add{
-    type = "option", id = "resonator_triger_mode", name = "trig mode", 
-    options = {"internal","external"},
-    default = 1,
-    action = function(value) 
-      engine.trigger_mode(value-1)
-  end}
-
-  params:add{
-    type = "option", id = "internal_resonator_triger_type", name = "trig type", 
-    options = {"snare","bass"},
-    default = 1,
-    action = function(value) 
-      engine.trigger_type(value-1)
-  end}
+  params:add_group("resonator",#resonator_param_data)
 
   parameters.set_engine_params(resonator_param_data)
   
@@ -803,23 +805,8 @@ function parameters.init()
     {"taper","string_damping_range","dmp rng",0,1,0,"string_damping"},
   }
 
-  params:add_group("string",#string_param_data+2)
+  params:add_group("string",#string_param_data)
 
-  params:add{
-    type = "option", id = "string_triger_mode", name = "str trig mode", 
-    options = {"internal","external"},
-    default = 1,
-    action = function(value) 
-      engine.trigger_mode(value-1)
-  end}
-
-  params:add{
-    type = "option", id = "internal_string_triger_type", name = "trig type", 
-    options = {"snare","bass"},
-    default = 1,
-    action = function(value) 
-      engine.trigger_type(value-1)
-  end}
 
 
   parameters.set_engine_params(string_param_data)
