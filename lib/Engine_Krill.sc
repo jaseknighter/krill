@@ -20,7 +20,7 @@ Engine_Krill : CroneEngine {
 	var env_shape=8;
 	var lorenz_sample = 1;
 	var minRiseFall = 0.005;
-	var sequencing_mode, trigger_mode, engine_mode;
+	var sequencing_mode, trigger_mode, trigger_type, engine_mode;
 	var krillSynth;
 
 	//resonator vars
@@ -52,7 +52,7 @@ Engine_Krill : CroneEngine {
 			gate=1,
 			env_scalar=1, env_shape=8,
 			sh1=1,sh2=1,
-			sequencing_mode=1, trigger_mode=1, engine_mode=1,
+			sequencing_mode=1, trigger_mode=1, trigger_type=1, engine_mode=1,
 			logExpBuffer,
 			ext_freq,
 			exciter_decay_min=0.1,exciter_decay_max=0.5, 
@@ -90,20 +90,27 @@ Engine_Krill : CroneEngine {
 			env_rate = Select.kr(env_phase, [rise_rate, fall_rate]);
 			env_pos = Sweep.kr(Impulse.kr(0), env_rate);
 			
-			
-			amp_env = Env([0.001, 1, 0.001], [rise * env_scalar, fall * env_scalar], env_shape);
+			amp_env = Env([0.001, 1, 0.001], [rise * env_scalar, fall * env_scalar], env_shape, gate);
 			env_gen = IEnvGen.kr(amp_env, env_pos); 
-
+			
 			pitch = ext_freq;
 			
-			filter_env = EnvGen.ar(Env.adsr(0.001, 0.8, 0, 0.8, 70, -4), gate);
+			// filter_env = EnvGen.ar(Env.adsr(0.001, 0.8, 0, 0.8, 70, -4), gate);
 			// filter_env = EnvGen.ar(Env.adsr(0.001, rise_rate, 0, fall_rate, 70, -4), gate);
 			// out = LFSaw.ar(pitch.midicps, 2, -1);
 
-			trig = Impulse.kr(1);
-			exciter = AnalogSnareDrum.ar(
-					trig, decay: rise*env_scalar
+
+			// trig = Impulse.kr(pitch.midicps);
+			trig = Impulse.kr(0);
+
+			exciter = (1-trigger_type) * AnalogSnareDrum.ar(
+					trig, decay: (rise+fall)*env_scalar,
+					// trig, decay: rise*env_scalar, freq: pitch.midicps,
 			);
+			exciter = exciter + (trigger_type * AnalogBassDrum.ar(
+					trig, decay: (rise+fall)*env_scalar,
+					// trig, decay: rise*env_scalar, freq: pitch.midicps,
+			));
 
 			exciter = ((1-trigger_mode) * exciter) + SoundIn.ar([0,1],mul:trigger_mode);
 
@@ -133,14 +140,15 @@ Engine_Krill : CroneEngine {
 			out = LeakDC.ar((out * env_gen * amp).tanh/2.7);
 			sig = out.tanh;	
 			env_changed = Changed.kr(env_phase);
-			fall_done = env_gen <= 0.001;
-
+			fall_done = (env_gen <= 0.01) * (env_phase > 0);
+			
 			// SendReply.kr(Impulse.kr(10), '/triggerPitchPoll', pitch.midicps);
 			SendReply.kr(Impulse.kr(50), '/triggerEnvPosPoll', env_pos);
 			SendReply.kr(Impulse.kr(50), '/triggerEnvLevelPoll', env_gen);
-			
-			SendReply.kr(env_changed * env_phase, '/triggerRiseDonePoll', foc1);
-			SendReply.kr(fall_done, '/triggerFallDonePoll', eor1);
+
+			// ([rise,env_scalar,rise_phase,env_phase,env_gen,fall_done]).poll;
+			SendReply.kr(env_changed * env_phase, '/triggerRiseDonePoll', env_phase);
+			SendReply.kr(fall_done, '/triggerFallDonePoll', fall_done);
 			
 			Out.ar(0, sig.dup);
 		}).add;
@@ -178,11 +186,9 @@ Engine_Krill : CroneEngine {
       arg msg;
 			if (sequencing_mode == 1){
 				sh1 = lorenz_sample;
-			}{
-				sh1 = 1;
+				rise = (rise_time * sh1);
 			};
 
-			rise = (rise_time * sh1);
 			risePoll.update(rise);
     }, path: '/triggerRiseDonePoll', srcID: context.server.addr);
 
@@ -190,11 +196,9 @@ Engine_Krill : CroneEngine {
 			arg msg;
 			if (sequencing_mode == 1){
 				sh2 = lorenz_sample;
-			}{
-				sh2 = 1;
+				fall = (fall_time * sh2).abs;
 			};
 
-			fall = (fall_time * sh2).abs;
 			fallPoll.update(fall);
 			nextNotePoll.update(sh1+sh2);
     }, path: '/triggerFallDonePoll', srcID: context.server.addr);
@@ -233,6 +237,7 @@ Engine_Krill : CroneEngine {
 					\fall_time,fall_time,
 					\engine_mode,engine_mode,
 					\trigger_mode,trigger_mode,
+					\trigger_type,trigger_type,
 					\exciter_decay_min,exciter_decay_min,
 					\exciter_decay_max,exciter_decay_max,
 					//resonator args
@@ -270,7 +275,7 @@ Engine_Krill : CroneEngine {
 					voiceList.do{ arg v,i; 
 						// v.theSynth.set(\t_trig, 1);
 						if (i >= maxNumVoices){
-							// v.theSynth.set(\gate, 0);
+							v.theSynth.set(\gate, 0);
 							v.theSynth.free;
 						}
 					};
@@ -293,6 +298,12 @@ Engine_Krill : CroneEngine {
 			if (msg[2] > 0){
 				fall_time = msg[2];
 			};
+			if (sequencing_mode != 1){
+				rise = rise_time;
+			};
+			if (sequencing_mode != 1){
+				fall = fall_time.abs;
+			};
     });
 	  
 		this.addCommand("env_scalar","f",{ arg msg;
@@ -314,7 +325,12 @@ Engine_Krill : CroneEngine {
 		this.addCommand("engine_mode","f",{ arg msg;
 			engine_mode = msg[1];
 			(["set eng mode", engine_mode]).postln;
-			// krillVoice.theSynth.set(\trigger_mode,trigger_mode)
+			// krillVoice.theSynth.set(\engine_mode,engine_mode)
+		});
+
+		this.addCommand("trigger_type","f",{ arg msg;
+			trigger_type = msg[1];
+			// krillVoice.theSynth.set(\trigger_type,trigger_type)
 		});
 
 		this.addCommand("trigger_mode","f",{ arg msg;

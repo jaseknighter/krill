@@ -664,7 +664,7 @@ function parameters.init()
   }
 
   params:add{
-    type="number", id = "env_scalar", name = "env sclr",min=10, max=200, default = 100,
+    type="number", id = "env_scalar", name = "env sclr",min=1, max=2000, default = 100,
     action=function(x) 
       engine.env_scalar(x/100)
     end
@@ -674,8 +674,8 @@ function parameters.init()
     type="control", id = "rise_time", name = "rise (ms)",
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(x/100,0)
-      engine.rise_fall(x/100,params:get("fall_time")/100)
+      engine.rise_fall(x/1000,0)
+      engine.rise_fall(x/1000,params:get("fall_time")/1000)
     end
   }
 
@@ -684,8 +684,8 @@ function parameters.init()
     type="control", id = "fall_time", name = "fall (ms)",
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(0,x/100)
-      engine.rise_fall(params:get("rise_time")/100,x/100)
+      engine.rise_fall(0,x/1000)
+      engine.rise_fall(params:get("rise_time")/1000,x/1000)
     end
   }
 
@@ -771,14 +771,22 @@ function parameters.init()
     {"taper","resonator_damping_range","dmp rng",0,1,0,"resonator_damping"},
   }
 
-  params:add_group("resonator",#resonator_param_data+1)
+  params:add_group("resonator",#resonator_param_data+2)
 
   params:add{
-    type = "option", id = "resonator_triger_mode", name = "res trig mode", 
+    type = "option", id = "resonator_triger_mode", name = "trig mode", 
     options = {"internal","external"},
     default = 1,
     action = function(value) 
       engine.trigger_mode(value-1)
+  end}
+
+  params:add{
+    type = "option", id = "internal_resonator_triger_type", name = "trig type", 
+    options = {"snare","bass"},
+    default = 1,
+    action = function(value) 
+      engine.trigger_type(value-1)
   end}
 
   parameters.set_engine_params(resonator_param_data)
@@ -795,7 +803,7 @@ function parameters.init()
     {"taper","string_damping_range","dmp rng",0,1,0,"string_damping"},
   }
 
-  params:add_group("string",#string_param_data+1)
+  params:add_group("string",#string_param_data+2)
 
   params:add{
     type = "option", id = "string_triger_mode", name = "str trig mode", 
@@ -804,6 +812,15 @@ function parameters.init()
     action = function(value) 
       engine.trigger_mode(value-1)
   end}
+
+  params:add{
+    type = "option", id = "internal_string_triger_type", name = "trig type", 
+    options = {"snare","bass"},
+    default = 1,
+    action = function(value) 
+      engine.trigger_type(value-1)
+  end}
+
 
   parameters.set_engine_params(string_param_data)
 
@@ -857,32 +874,32 @@ function parameters.init()
     end
   }
 
-  params:add{type = "option", id = "output_midi_lz_x", name = "midi lz x out",
+  params:add{type = "option", id = "play_midi_cc_lz_x", name = "midi lz cc x out",
     options = {"off","on"},
     default = 2,
   }
-  params:add{type = "option", id = "output_midi_lz_y", name = "midi lz y out",
+  params:add{type = "option", id = "play_midi_cc_lz_y", name = "midi lz cc y out",
     options = {"off","on"},
     default = 2,
   }
 
-  params:add{type = "number", id = "output_midi_lz_x_cc", name = "midi lz x cc",
-  min=1,max=127,default=100,
+  params:add{type = "number", id = "play_midi_cc_lz_x_cc", name = "midi lz x cc",
+  min=0,max=127,default=100,
   action=function() end
 }
 
-params:add{type = "number", id = "output_midi_lz_y_cc", name = "midi lz y c",
-  min=1,max=127,default=101,
+params:add{type = "number", id = "play_midi_cc_lz_y_cc", name = "midi lz y cc",
+  min=0,max=127,default=101,
   action=function() end
 }
 
 
-  params:add{type = "number", id = "output_midi_lz_x_chan", name = "midi lz x chan",
+  params:add{type = "number", id = "play_midi_cc_lz_x_chan", name = "midi lz x chan",
     min=0,max=16,default=1,
     action=function() end
   }
 
-  params:add{type = "number", id = "output_midi_lz_y_chan", name = "midi lz y chan",
+  params:add{type = "number", id = "play_midi_cc_lz_y_chan", name = "midi lz y chan",
     min=0,max=16,default=2,
     action=function() end
   }

@@ -27,9 +27,9 @@ function gui.setup_menu_maps()
 
   -- if sequencing_mode == 1 then
   if eng_mode == 1 then
-    eng_params = {"engine_mode","resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",}
+    eng_params = {"engine_mode","internal_resonator_triger_type","resonator_pos","resonator_structure_base","resonator_structure_range","resonator_brightnes_base","resonator_brightness_range","resonator_damping_base","resonator_damping_range",}
   else
-    eng_params = {"engine_mode","string_accent_base","string_accent_range","string_structure_base","string_structure_range","string_brightnes_base","string_brightness_range","string_damping_base","string_damping_range",}
+    eng_params = {"engine_mode","internal_string_triger_type","string_accent_base","string_accent_range","string_structure_base","string_structure_range","string_brightnes_base","string_brightness_range","string_damping_base","string_damping_range",}
   end
   -- else
   --   if eng_mode == 1 then

@@ -127,23 +127,23 @@ externals.midi_note_on = function(voice_id, note_tab, target)
   end
 end
   
-externals.play_midi_lz_xy = function(source,volts)
-  local output_midi_x = params:get("output_midi_lz_x")
-  local output_midi_y = params:get("output_midi_lz_y")
+externals.play_midi_cc_lz_xy = function(source,volts)
+  local output_midi_x = params:get("play_midi_cc_lz_x")
+  local output_midi_y = params:get("play_midi_cc_lz_y")
   local cc_val = math.floor(util.linlin(-5,10,1,127,volts))
   if source == "x" and output_midi_x == 2 then -- lz x output
     local slew = params:get("lz_x_slew")/1000
-    local cc = params:get("output_midi_lz_x_cc")
-    local ch = params:get("output_midi_lz_x_chan")
+    local cc = params:get("play_midi_cc_lz_x_cc")
+    local ch = params:get("play_midi_cc_lz_x_chan")
     ch = ch > 0 and ch or nil
-    if midi_out_device then
+    if midi_out_device then  
       midi_out_device:cc (cc, cc_val, ch)
     end
     -- print("x",cc_val)
   elseif source == "y" and output_midi_y == 2 then -- lz y output
     local slew = params:get("lz_y_slew")/1000
-    local cc = params:get("output_midi_lz_y_cc")
-    local ch = params:get("output_midi_lz_y_chan")
+    local cc = params:get("play_midi_cc_lz_y_cc")
+    local ch = params:get("play_midi_cc_lz_y_chan")
     ch = ch > 0 and ch or nil
     if midi_out_device then
       midi_out_device:cc (cc, cc_val, ch)

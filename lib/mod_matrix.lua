@@ -13,9 +13,9 @@ mod_matrix.active_inputs = {}
 mod_matrix.active_outputs = {}
 mod_matrix.selecting_param = "in"
 mod_matrix.active_pp_option=1
-mod_matrix.default_pp_option_selections={1,4,1,1}
+mod_matrix.default_pp_option_selections={1,6,1,1}
 mod_matrix.enabled_options={"off","on"}
-mod_matrix.level_options={0,1/4,1/2,1,2,10}
+mod_matrix.level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
 mod_matrix.self_mod_options = {"none","inv","rect"}
 mod_matrix.relative_mod_options = {"none","and","or"}
 
@@ -159,9 +159,6 @@ function mod_matrix:get_param_props(param)
 end
 
 function mod_matrix:process_updated_param(ix,id,value)
-  -- print("process>>>",ix,id,value)
-
-  -- print(id,name,value)
   for i=1,self.num_inputs,1 do
     local input = self.inputs[i]
     for j=1,self.num_outputs,1 do
@@ -171,7 +168,6 @@ function mod_matrix:process_updated_param(ix,id,value)
           if self.patch_points[i][j].enabled == 2 then
             local pp_input_id    =   mod_matrix.inputs[i] 
             local pp_output_id   =   mod_matrix.outputs[j] 
-            -- print("pp_input_id,pp_output_id",pp_input_id,pp_output_id)
             local input_id       = mod_matrix.lookup[pp_input_id].id
             local output_id      = mod_matrix.lookup[pp_output_id].id
             if (input_id == id) then
@@ -182,13 +178,17 @@ function mod_matrix:process_updated_param(ix,id,value)
               local input_obj = mod_matrix:get_param_props(input)
               local output_obj = mod_matrix:get_param_props(output)
               local new_output_value = util.linlin(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
+              local pp_level = self.patch_points[i][j].level
+              pp_level = mod_matrix.level_options[pp_level]
+              new_output_value = new_output_value * pp_level
               new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
+              if output_obj.type == 1 then
+                new_output_value = fn.round_decimals(new_output_value, 0)
+              end
               new_output_value = fn.constrain_decimals(new_output_value, params:get(output_id))
+              new_output_value = util.clamp(new_output_value,output_obj.min,output_obj.max)
+              -- print(new_output_value, pp_level)
               params:set(output_id,new_output_value)
-              -- print(output_obj.type,new_output_value,input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
-              -- print("output_value",output_id,new_output_value)
-              -- print(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
-              -- print(">>>>>>>>>>>>>")
             end
           end
         end
@@ -410,7 +410,7 @@ function mod_matrix:display_patch_point_options()
   local rect_level = self.active_gui_sector == 3 and 15 or 5
   screen.level(rect_level)
   screen.move(5,5)
-  screen.rect(5,15,45,39)
+  screen.rect(5,15,47,39)
   screen.stroke()
   
   if self.patch_points[self.active_input] and self.patch_points[self.active_input][self.active_output] then

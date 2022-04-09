@@ -155,7 +155,7 @@ function init()
         local x_val = pixels[pixels.active].x_display
         lz_x_val = util.linlin(lb[1],lb[1]+lb[3],lz_x_min,lz_x_max,x_val)
         ext.play_crow_lz_xy("x",lz_x_val)
-        ext.play_midi_lz_xy("x",lz_x_val)
+        ext.play_midi_cc_lz_xy("x",lz_x_val)
         params:set("lz_x",lz_x_val)
       end
     end,
@@ -172,7 +172,7 @@ function init()
         local y_val = pixels[pixels.active].y_display
         lz_y_val = util.linlin(lb[2],lb[2]+lb[4],lz_y_min,lz_y_max,y_val)
         ext.play_crow_lz_xy("y",lz_y_val)
-        ext.play_midi_lz_xy("y",lz_y_val)
+        ext.play_midi_cc_lz_xy("y",lz_y_val)
         params:set("lz_y",lz_y_val)
       end
     end,
@@ -299,7 +299,7 @@ function finish_init()
   -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
   
   params:set("vuja_de_div_numerator1",1)
-  params:set("vuja_de_div_denominator1",16)
+  params:set("vuja_de_div_denominator1",8)
   params:set("vuja_de_div_numerator2",1)
   params:set("vuja_de_div_denominator2",2)
   params:set("vuja_de_div_numerator3",1)
@@ -312,8 +312,8 @@ function finish_init()
   -- engine.play_note(notes[math.random(15)],2)
   params:set("sequencing_mode",2)
   params:set("env_scalar",100)
-  params:set("rise_time",30)
-  params:set("fall_time",100)
+  params:set("rise_time",250)
+  params:set("fall_time",500)
   -- params:set("sequencing_mode",1)
   
 end
@@ -365,6 +365,8 @@ function init_polling()
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
+    -- print("fall done",value)
+    
     prev_fall = fall
     fall = value * params:get("env_scalar")/100
     if params:get("sequencing_mode") == 1 then

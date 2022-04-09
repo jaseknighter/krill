@@ -126,8 +126,11 @@ function cellular_automata:new(initial_cells)
 
   function ca.number_convert(number, base)
     local s = ""
+    -- print(number,base)
+    -- print(number%base,number,base)
+    local number = math.floor(number)
     repeat
-       local remainder = number%base
+      local remainder = number%base
        s = ca.digits[remainder]..s
        number = (number-remainder)/base
     until number==0
@@ -155,7 +158,7 @@ function cellular_automata:new(initial_cells)
       ca.ruleset[i] = tonumber(ca:string_cut(new_ruleset, i, i))
       ruleset_string = ruleset_string .. ca.ruleset[i]
     end
-    print("using new ruleset: ", tonumber(tostring(ruleset_string),2), ": ", ruleset_string)
+    -- print("using new ruleset: ", tonumber(tostring(ruleset_string),2), ": ", ruleset_string)
     return ca.get_ruleset()
   end
   
@@ -180,7 +183,7 @@ function cellular_automata:new(initial_cells)
       ca.ruleset[i] = math.random(0,1)
       ruleset_string = ruleset_string .. ca.ruleset[i]
     end
-    print("using new random ruleset: ", tonumber(tostring(ruleset_string),2), ": ", ruleset_string)
+    -- print("using new random ruleset: ", tonumber(tostring(ruleset_string),2), ": ", ruleset_string)
   end
   
   -- function to compute the next generation

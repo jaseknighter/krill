@@ -18,12 +18,6 @@ function midi_helper.get_midi_devices()
     table.insert(devices, i .. ". " .. midi.vports[i].name)
   end
   midi_devices = devices
-  -- local midi_in = params:lookup_param("midi_in_device")
-  -- midi_in.options = midi_devices
-  local midi_out = params:lookup_param("midi_out_device")
-  midi_out.options = midi_devices
-  
-  -- tab.print(midi_devices)
 end
 
 -- midi_out_device = midi.connect(1)
@@ -235,7 +229,7 @@ end
 
 midi.remove = function(device)
   -- print("midi device remove ", device.id, device.name)
-  print("midi device remove ",device)
+  print("midi device remove ", device.id, device.name, device.port)
   -- tab.print(device)
   midi_helper.get_midi_devices()  
 end
