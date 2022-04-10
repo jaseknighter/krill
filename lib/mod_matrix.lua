@@ -143,7 +143,7 @@ function mod_matrix.enc(n, d)
       end
       mod_matrix.selecting_param = "out"
     elseif mod_matrix.active_gui_sector == 3 then 
-      local option_num = mod_matrix.active_crow_pp_option 
+      local option_num = mod_matrix.active_pp_option 
       local pp_values = mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output]
       if option_num == 1 then
         mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = util.clamp(pp_values.enabled+d,1,#mod_matrix.enabled_options)
@@ -187,6 +187,7 @@ function mod_matrix.key(n,z)
   
   if z==0 and n==2 then
     if mod_matrix.active_gui_sector < 4 then
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  1
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  1
     elseif mod_matrix.active_gui_sector == 4 then
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_enabled      =  1
