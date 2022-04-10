@@ -24,7 +24,7 @@ end
 -- At 12 o’clock, the module is thus stuck in a loop, because it never generates fresh random data. In this case, the illuminated pushbuttons [F] and [G] blink.
 -- From 12 o’clock to 5 o’clock, the probability of randomly jumping within the loop goes from 0 to 1.
 -- At 5 o’clock, the module thus plays random permutations of the same set of decisions/voltages.
-function vuja_de:get_note()
+function vuja_de:get_note(div_id)
   self.prob = params:get("vuja_de_prob")
 
   local new_prob = math.random()
@@ -32,7 +32,10 @@ function vuja_de:get_note()
   if active_sector and self.prob <= 0 and new_prob > math.abs(tonumber(self.prob)/10) then
     local octave =  active_sector.row
     local note =    active_sector.col
-    local next_note = ((octave)*note)-14+midi_pitch_offset
+    local doo_param = params:lookup_param("vuja_de_oct_offset"..div_id)
+    local doo_options = doo_param.options
+    local div_oct_offset = doo_options[params:get("vuja_de_oct_offset"..div_id)]
+    local next_note = ((octave*div_oct_offset)*note)-14+midi_pitch_offset
     local next_seq_ix = util.clamp(self.seq.ix+1,1,self.seq.length)
     self.seq[next_seq_ix] = next_note
     -- print("next_note",next_note,self.prob,new_prob)

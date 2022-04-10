@@ -139,7 +139,7 @@ function sound_controller:play_krill_note(value)
 end
 
 function sound_controller:play_vuja_de_note(div_id)
-  local note_to_play = vuja_de:get_note()
+  local note_to_play = vuja_de:get_note(div_id)
 
   local note_tab = {
     pitch = note_to_play,

@@ -4,6 +4,7 @@ local mod_matrix = {}
 
 mod_matrix.lookup = {}
 mod_matrix.params = {}
+mod_matrix.num_gui_sectors = 5
 
 mod_matrix.num_inputs=5
 mod_matrix.num_outputs=7
@@ -12,12 +13,43 @@ mod_matrix.active_output=1
 mod_matrix.active_inputs = {}
 mod_matrix.active_outputs = {}
 mod_matrix.selecting_param = "in"
+
+-- pp options
 mod_matrix.active_pp_option=1
-mod_matrix.default_pp_option_selections={1,6,1,1}
+mod_matrix.active_crow_pp_option=1
+mod_matrix.active_midi_pp_option=1
+-- mod_matrix.default_pp_option_selections={1,6,1,1}
+mod_matrix.default_pp_option_selections={1,6}
 mod_matrix.enabled_options={"off","on"}
 mod_matrix.level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
-mod_matrix.self_mod_options = {"none","inv","rect"}
-mod_matrix.relative_mod_options = {"none","and","or"}
+-- mod_matrix.self_mod_options = {"none","inv","rect"}
+-- mod_matrix.relative_mod_options = {"none","and","or"}
+
+-- crow output options
+mod_matrix.active_crow_output_option=1
+mod_matrix.default_crow_option_selections={1,3,6,1} -- crow enabled, crow output, crow_level, crow_slew
+mod_matrix.crow_enabled_options={"off","on"}
+mod_matrix.crow_output_options={1,2,3,4}
+mod_matrix.crow_level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
+mod_matrix.crow_slew_options={}
+for i=0,2000 do
+  table.insert(mod_matrix.crow_slew_options,i)
+end
+
+-- midi output options
+mod_matrix.active_midi_output_option=1
+mod_matrix.default_midi_option_selections={1,1,1,6} -- midi enabled, midi cc, midi channel, midi level
+mod_matrix.midi_cc_enabled_options={"off","on"}
+mod_matrix.midi_cc_options={}
+for i=1,127 do
+  table.insert(mod_matrix.midi_cc_options,i)
+end
+mod_matrix.midi_channel_options={}
+for i=1,16 do
+  table.insert(mod_matrix.midi_channel_options,i)
+end
+mod_matrix.midi_level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
+
 
 --tables to be saved/recalled (for save_load.lua)
 mod_matrix.inputs={}
@@ -76,55 +108,99 @@ end
 function mod_matrix.enc(n, d)
   mod_matrix:display_params()
   if n==1 then
-    mod_matrix.active_gui_sector = util.clamp(mod_matrix.active_gui_sector+d,1,3)
+    mod_matrix.active_gui_sector = util.clamp(mod_matrix.active_gui_sector+d,1,mod_matrix.num_gui_sectors)
   elseif n==2 then
-    if mod_matrix.active_gui_sector == 1 then
+    if mod_matrix.active_gui_sector == 1 or alt_key_active then
       mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
     elseif mod_matrix.active_gui_sector == 2 then
       if mod_matrix.selecting_param == "in" then
         local input = mod_matrix.inputs[mod_matrix.active_input]
         input =  util.wrap(input+d,1,#mod_matrix.lookup)
         mod_matrix.inputs[mod_matrix.active_input] = input
-        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 1
+        -- for i=1,#input_labels do
+        --   mod_matrix.patch_points[mod_matrix.active_input][i].enabled = 1
+        -- end
       end
       mod_matrix.selecting_param = "in"
     elseif mod_matrix.active_gui_sector == 3 then
-      mod_matrix.active_pp_option = util.clamp(mod_matrix.active_pp_option+d,1,4)
+      mod_matrix.active_pp_option = util.clamp(mod_matrix.active_pp_option+d,1,#mod_matrix.default_pp_option_selections)
+    elseif mod_matrix.active_gui_sector == 4 then
+      mod_matrix.active_crow_pp_option = util.clamp(mod_matrix.active_crow_pp_option+d,1,#mod_matrix.default_crow_option_selections)
+    elseif mod_matrix.active_gui_sector == 5 then
+      mod_matrix.active_midi_pp_option = util.clamp(mod_matrix.active_midi_pp_option+d,1,#mod_matrix.default_midi_option_selections)
     end
   elseif n==3 then
-    if mod_matrix.active_gui_sector == 1 then
+    if mod_matrix.active_gui_sector == 1 or alt_key_active then
       mod_matrix.active_output = util.clamp(mod_matrix.active_output+d,1,mod_matrix.num_outputs)
     elseif mod_matrix.active_gui_sector == 2 then
       if mod_matrix.selecting_param == "out" then
         local output = mod_matrix.outputs[mod_matrix.active_output]  
         output =  util.wrap(output+d,1,#mod_matrix.lookup)
         mod_matrix.outputs[mod_matrix.active_output] = output
-        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 1
+        -- for i=1,#output_labels do
+        --   mod_matrix.patch_points[i][mod_matrix.active_output].enabled = 1
+        -- end
       end
       mod_matrix.selecting_param = "out"
-    elseif mod_matrix.active_gui_sector == 3 then
-      local option_num = mod_matrix.active_pp_option 
+    elseif mod_matrix.active_gui_sector == 3 then 
+      local option_num = mod_matrix.active_crow_pp_option 
       local pp_values = mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output]
-      -- tab.print(pp_values)
       if option_num == 1 then
-        -- print(pp_values.enabled)
         mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = util.clamp(pp_values.enabled+d,1,#mod_matrix.enabled_options)
       elseif option_num == 2 then
         mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].level = util.clamp(pp_values.level+d,1,#mod_matrix.level_options)
+      -- elseif option_num == 3 then
+      --   mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].self_mod = util.clamp(pp_values.self_mod+d,1,#mod_matrix.self_mod_options)
+      -- elseif option_num == 4 then
+      --   mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].relative_mod = util.clamp(pp_values.relative_mod+d,1,#mod_matrix.relative_mod_options)
+      end
+    elseif mod_matrix.active_gui_sector == 4 then -- crow options
+      local option_num = mod_matrix.active_crow_pp_option 
+      local pp_values = mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output]
+      if option_num == 1 then
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_enabled = util.clamp(pp_values.crow_enabled+d,1,#mod_matrix.crow_enabled_options)
+      elseif option_num == 2 then
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_output = util.clamp(pp_values.crow_output+d,1,#mod_matrix.crow_output_options)
       elseif option_num == 3 then
-        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].self_mod = util.clamp(pp_values.self_mod+d,1,#mod_matrix.self_mod_options)
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_level = util.clamp(pp_values.crow_level+d,1,#mod_matrix.crow_level_options)
       elseif option_num == 4 then
-        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].relative_mod = util.clamp(pp_values.relative_mod+d,1,#mod_matrix.relative_mod_options)
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_slew = util.clamp(pp_values.crow_slew+d,1,#mod_matrix.crow_slew_options)
+      end
+    elseif mod_matrix.active_gui_sector == 5 then -- midi options
+      local option_num = mod_matrix.active_midi_pp_option 
+      local pp_values = mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output]
+      if option_num == 1 then
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc_enabled = util.clamp(pp_values.enabled+d,1,#mod_matrix.midi_cc_enabled_options)
+      elseif option_num == 2 then
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc = util.clamp(pp_values.midi_cc+d,1,#mod_matrix.midi_cc_options)
+      elseif option_num == 3 then
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_channel = util.clamp(pp_values.midi_channel+d,1,#mod_matrix.midi_channel_options)
+      elseif option_num == 4 then
+        mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_level = util.clamp(pp_values.midi_level+d,1,#mod_matrix.midi_level_options)
       end
     end
   end
 end
 
 function mod_matrix.key(n,z)
+  local enabled
+  
   if z==0 and n==2 then
-    mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 1
+    if mod_matrix.active_gui_sector < 4 then
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  1
+    elseif mod_matrix.active_gui_sector == 4 then
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_enabled      =  1
+    else
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc_enabled   =  1
+    end
   elseif z==0 and n==3 then
-    mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = 2
+    if mod_matrix.active_gui_sector < 4 then
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  2
+    elseif mod_matrix.active_gui_sector == 4 then
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_enabled      =  2
+    else
+      mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc_enabled   =  2
+    end
   end
 end
 
@@ -140,7 +216,6 @@ function mod_matrix:get_param_props(param)
     local type = param.t
     local val = params:get(param.id)
     local min, max
-    -- tab.print(param.controlspec)
     if type == 1 then      -- 1: number
       min = param.min
       max = param.max
@@ -160,35 +235,64 @@ end
 
 function mod_matrix:process_updated_param(ix,id,value)
   for i=1,self.num_inputs,1 do
-    local input = self.inputs[i]
+    -- local input = self.inputs[i]
     for j=1,self.num_outputs,1 do
-      local output = self.outputs[j] 
+      -- local output = self.outputs[j] 
       if self.patch_points[i] then
         if self.patch_points[i][j] then
-          if self.patch_points[i][j].enabled == 2 then
+          local enabled     =   self.patch_points[i][j].enabled == 2 or
+                                self.patch_points[i][j].crow_enabled or
+                                self.patch_points[i][j].midi_cc_enabled == 2 
+          if enabled then
             local pp_input_id    =   mod_matrix.inputs[i] 
             local pp_output_id   =   mod_matrix.outputs[j] 
             local input_id       = mod_matrix.lookup[pp_input_id].id
             local output_id      = mod_matrix.lookup[pp_output_id].id
             if (input_id == id) then
               local input        = params:lookup_param(input_id)
-              local output       = params:lookup_param(output_id)
               
               --get min/max/current val
               local input_obj = mod_matrix:get_param_props(input)
-              local output_obj = mod_matrix:get_param_props(output)
-              local new_output_value = util.linlin(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
-              local pp_level = self.patch_points[i][j].level
-              pp_level = mod_matrix.level_options[pp_level]
-              new_output_value = new_output_value * pp_level
-              new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
-              if output_obj.type == 1 then
-                new_output_value = fn.round_decimals(new_output_value, 0)
+              --crow mod matrix out
+              if self.patch_points[i][j].enabled == 2 then
+                local output       = params:lookup_param(output_id)
+                local output_obj = mod_matrix:get_param_props(output)
+                local new_output_value = util.linlin(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
+                local pp_level = self.patch_points[i][j].level
+                pp_level = mod_matrix.level_options[pp_level]
+                new_output_value = new_output_value * pp_level
+                new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
+                if output_obj.type == 1 then
+                  new_output_value = fn.round_decimals(new_output_value, 0)
+                end
+                new_output_value = fn.constrain_decimals(new_output_value, params:get(output_id))
+                new_output_value = util.clamp(new_output_value,output_obj.min,output_obj.max)            
+                params:set(output_id,new_output_value)
               end
-              new_output_value = fn.constrain_decimals(new_output_value, params:get(output_id))
-              new_output_value = util.clamp(new_output_value,output_obj.min,output_obj.max)
-              -- print(new_output_value, pp_level)
-              params:set(output_id,new_output_value)
+              --crow out
+              if self.patch_points[i][j].crow_enabled == 2 then
+                local output = self.patch_points[i][j].crow_output
+                local volts = util.linlin(input_obj.min,input_obj.max,-5,10,input_obj.val)
+                local slew = self.patch_points[i][j].crow_slew/1000
+                -- slew = self.crow_slew_options[slew]
+                local pp_level = self.patch_points[i][j].crow_level
+                pp_level = mod_matrix.crow_level_options[pp_level]
+                volts = volts * pp_level
+                volts = util.clamp(volts,-5,10)
+                mod_matrix.crow_output(output, volts, slew)
+              end
+              
+              --midi out
+              if self.patch_points[i][j].midi_cc_enabled == 2 then
+                local cc = self.patch_points[i][j].midi_cc
+                local midi_channel = self.patch_points[i][j].midi_channel
+                local cc_val = util.linlin(input_obj.min,input_obj.max,1,127,input_obj.val)
+                local pp_level = self.patch_points[i][j].midi_level
+                pp_level = mod_matrix.midi_level_options[pp_level]
+                local cc_val = cc_val * pp_level
+
+                externals.play_midi_cc_mod_matrix(cc,cc_val,midi_channel)
+              end
             end
           end
         end
@@ -197,42 +301,18 @@ function mod_matrix:process_updated_param(ix,id,value)
   end
 end
 
---[[
-function mod_matrix:process_matrix()
-  for i=1,self.num_inputs,1 do
-    local input = self.inputs[i]
-    for j=1,self.num_outputs,1 do
-      local output = self.outputs[j] 
-      if self.patch_points[i] then
-        if self.patch_points[i][j] then
-          if self.patch_points[i][j].enabled == 2 then
-            -- print("enabled?",self.patch_points[i][j],self.patch_points[i][j].enabled)
-            local pp_input_id    =   mod_matrix.inputs[i] 
-            local pp_output_id   =   mod_matrix.outputs[j] 
-            -- print("pp_input_id,pp_output_id",pp_input_id,pp_output_id)
-            local input_id       = mod_matrix.lookup[pp_input_id].id
-            local output_id      = mod_matrix.lookup[pp_output_id].id
-            if input_id and output_id then
-              local input        = params:lookup_param(input_id)
-              local output       = params:lookup_param(output_id)
-              --types
-              -- 1: number
-              -- 2: options
-              -- 3: control
-              -- 5: taper
-              local input_type   = input.t
-              local output_type  = output.t
-              --get min/max/current val
-              tab.print(input)
-            end
-          end
-        end
-      end
-    end
-  end
-end
-]]
 
+-------------------------------------------
+--- mod matrix crow output
+-------------------------------------------
+function mod_matrix.crow_output(output, volts,slew)
+  if params:get("output_crow"..output)~=8 then
+    params:set("output_crow"..output,8) 
+  end
+  crow.output[output].volts = volts 
+  crow.output[output].slew = slew 
+  crow.output[output].execute() 
+end
 -------------------------------------------
 --- mod matrix gui
 -------------------------------------------
@@ -241,7 +321,9 @@ end
 -- gui sectors:
 --    2 = row/column selection
 --    3 = inputs/output selection
---    4 = patch point options
+--    3 = patch point options
+--    4 = crow options
+--    5 = midi options
 ----------------------------
 mod_matrix.active_gui_sector = 1
 function mod_matrix:display_mod_matrix()
@@ -260,8 +342,12 @@ function mod_matrix:display_mod_matrix()
     text = "row/col"
   elseif self.active_gui_sector == 2 then
     text = "in/out"
-  else 
+  elseif self.active_gui_sector == 3 then
     text = "pp opt"
+  elseif self.active_gui_sector == 4 then
+    text = "crow"
+  else 
+    text = "midi"
   end
   screen.text(text)
   screen.stroke()
@@ -280,17 +366,47 @@ function mod_matrix:update_matrix()
   if self.patch_points[self.active_input] == nil then
     self.patch_points[self.active_input] = {}
   end
-  if self.patch_points[self.active_input][self.active_output] == nil then
-    local enabled_mod  = mod_matrix.default_pp_option_selections[1]
-    local level_mod  = mod_matrix.default_pp_option_selections[2]
-    local self_mod  = mod_matrix.default_pp_option_selections[3]
-    local relative_mod  = mod_matrix.default_pp_option_selections[4]
+
+  local pp = self.patch_points[self.active_input][self.active_output]
+  local crow_enabled = pp and pp.crow_enabled
+  local midi_cc_enabled = pp and pp.midi_cc_enabled
+  
+  if pp == nil or (crow_enabled == nil or midi_cc_enabled == nil) then
+    -- main patch point options
+    local enabled  = mod_matrix.default_pp_option_selections[1]
+    local level  = mod_matrix.default_pp_option_selections[2]
+    -- local self_mod  = mod_matrix.default_pp_option_selections[3]
+    -- local relative_mod  = mod_matrix.default_pp_option_selections[4]
     self.patch_points[self.active_input][self.active_output] = {
-      enabled        =    enabled_mod,    -- options: off, on
-      level          =    level_mod,      -- options: 0,1/4,1/2,1,2,10
-      self_mod       =    self_mod,       -- options: none,invert,rectify
-      relative_mod   =    relative_mod,   -- options: none, and, or
+      enabled        =    enabled,    -- options: off, on
+      level          =    level,      -- options: 0,1/4,1/2,1,2,10
+      -- self_mod       =    self_mod,       -- options: none,invert,rectify
+      -- relative_mod   =    relative_mod,   -- options: none, and, or
     }
+
+    
+  
+    -- crow patch point options
+    local enabled  = mod_matrix.default_crow_option_selections[1]
+    local output  = mod_matrix.default_crow_option_selections[2]
+    local level  = mod_matrix.default_crow_option_selections[3]
+    local slew  = mod_matrix.default_crow_option_selections[4]
+    self.patch_points[self.active_input][self.active_output].crow_enabled  =   enabled
+    self.patch_points[self.active_input][self.active_output].crow_output   =   output
+    self.patch_points[self.active_input][self.active_output].crow_level    =   level
+    self.patch_points[self.active_input][self.active_output].crow_slew     =   slew
+    -- print("enabled",self.patch_points[self.active_input][self.active_output].crow_enabled)
+    
+    -- midi patch point options
+    local enabled   = mod_matrix.default_midi_option_selections[1]
+    local cc        = mod_matrix.default_midi_option_selections[2]
+    local channel   = mod_matrix.default_midi_option_selections[3]
+    local level     = mod_matrix.default_midi_option_selections[4]
+    
+    self.patch_points[self.active_input][self.active_output].midi_cc_enabled  =   enabled
+    self.patch_points[self.active_input][self.active_output].midi_cc          =   cc
+    self.patch_points[self.active_input][self.active_output].midi_channel     =   channel
+    self.patch_points[self.active_input][self.active_output].midi_level       =   level
   end
 
     
@@ -377,13 +493,29 @@ function mod_matrix:display_patch_points()
       
       
       local level
-      if self.patch_points[i] and self.patch_points[i][j] and self.patch_points[i][j].enabled == 2 then
-        level = 15
+      if self.patch_points[i] and self.patch_points[i][j] then
+        local enabled
+
+        if mod_matrix.active_gui_sector < 4 then
+          enabled = self.patch_points[i][j].enabled == 2
+        elseif mod_matrix.active_gui_sector == 4 then
+          enabled = self.patch_points[i][j].crow_enabled == 2
+        else
+          enabled = self.patch_points[i][j].midi_cc_enabled == 2
+        end
+        if enabled then 
+          level = 15
+        elseif self.active_input == i and self.active_output == j then
+          level = 5
+        else
+          level = 1
+        end
       elseif self.active_input == i and self.active_output == j then
         level = 5
       else
         level = 1
       end
+    
       screen.level(level)
       screen.move(9*(j+1)+51,(9*i)+9)
       screen.circle(9*(j+1)+51,(9*i)+6,3)  
@@ -407,7 +539,7 @@ function mod_matrix:display_patch_points()
 end
 
 function mod_matrix:display_patch_point_options()
-  local rect_level = self.active_gui_sector == 3 and 15 or 5
+  local rect_level = self.active_gui_sector >2 and 15 or 5
   screen.level(rect_level)
   screen.move(5,5)
   screen.rect(5,15,47,39)
@@ -416,29 +548,73 @@ function mod_matrix:display_patch_point_options()
   if self.patch_points[self.active_input] and self.patch_points[self.active_input][self.active_output] then
     pp = self.patch_points[self.active_input][self.active_output]
 
-    local enabled_mod   = self.enabled_options[self.patch_points[self.active_input][self.active_output].enabled]
-    local level_mod     = self.level_options[self.patch_points[self.active_input][self.active_output].level]
-    local self_mod      = self.self_mod_options[self.patch_points[self.active_input][self.active_output].self_mod]
-    local relative_mod  = self.relative_mod_options[self.patch_points[self.active_input][self.active_output].relative_mod]
+    if self.active_gui_sector < 4 then
+      local enabled   = self.enabled_options[self.patch_points[self.active_input][self.active_output].enabled]
+      local level     = self.level_options[self.patch_points[self.active_input][self.active_output].level]
+      -- local self_mod      = self.self_mod_options[self.patch_points[self.active_input][self.active_output].self_mod]
+      -- local relative_mod  = self.relative_mod_options[self.patch_points[self.active_input][self.active_output].relative_mod]
 
-    screen.move(8,24)
-    screen.level(mod_matrix.active_pp_option == 1 and 15 or 5)
-    screen.text("enbl: " .. enabled_mod)
-    screen.stroke()
-    screen.move(8,32)
-    screen.level(mod_matrix.active_pp_option == 2 and 15 or 5)
-    screen.text("lvl: " .. level_mod)
-    screen.stroke()
-    screen.move(8,40)
-    screen.level(mod_matrix.active_pp_option == 3 and 15 or 5)
-    screen.text("sm: " .. self_mod)
-    screen.stroke()
-    screen.move(8,48)
-    screen.level(mod_matrix.active_pp_option == 4 and 15 or 5)
-    screen.text("rm: " .. relative_mod)
-    screen.stroke()
+      screen.move(8,24)
+      screen.level(mod_matrix.active_pp_option == 1 and 15 or 5)
+      screen.text("enbl: " .. enabled)
+      screen.stroke()
+      screen.move(8,32)
+      screen.level(mod_matrix.active_pp_option == 2 and 15 or 5)
+      screen.text("lvl: " .. level)
+      screen.stroke()
+      -- screen.move(8,40)
+      -- screen.level(mod_matrix.active_pp_option == 3 and 15 or 5)
+      -- screen.text("sm: " .. self_mod)
+      -- screen.stroke()
+      -- screen.move(8,48)
+      -- screen.level(mod_matrix.active_pp_option == 4 and 15 or 5)
+      -- screen.text("rm: " .. relative_mod)
+      screen.stroke()
+    elseif self.active_gui_sector == 4 then -- crow gui
+      local enabled   = self.crow_enabled_options[self.patch_points[self.active_input][self.active_output].crow_enabled]
+      local output    = self.crow_output_options[self.patch_points[self.active_input][self.active_output].crow_output]
+      local level     = self.crow_level_options[self.patch_points[self.active_input][self.active_output].crow_level]
+      level = fn.round_decimals(level, 3)
+      local slew     = self.crow_slew_options[self.patch_points[self.active_input][self.active_output].crow_slew]
+      screen.move(8,24)
+      screen.level(mod_matrix.active_crow_pp_option == 1 and 15 or 5)
+      screen.text("enbl: " .. enabled)
+      screen.stroke()
+      screen.move(8,32)
+      screen.level(mod_matrix.active_crow_pp_option == 2 and 15 or 5)
+      screen.text("out: " .. output)
+      screen.stroke()
+      screen.move(8,40)
+      screen.level(mod_matrix.active_crow_pp_option == 3 and 15 or 5)
+      screen.text("lvl: " .. level)
+      screen.stroke()
+      screen.move(8,48)
+      screen.level(mod_matrix.active_crow_pp_option == 4 and 15 or 5)
+      screen.text("slew: " .. slew)
+      screen.stroke()
+    elseif self.active_gui_sector == 5 then -- midi gui
+      local enabled   = self.midi_cc_enabled_options[self.patch_points[self.active_input][self.active_output].midi_cc_enabled]
+      local cc        = self.midi_cc_options[self.patch_points[self.active_input][self.active_output].midi_cc]
+      local channel   = self.midi_channel_options[self.patch_points[self.active_input][self.active_output].midi_channel]
+      local level     = self.midi_level_options[self.patch_points[self.active_input][self.active_output].midi_level]
+      screen.move(8,24)
+      screen.level(mod_matrix.active_midi_pp_option == 1 and 15 or 5)
+      screen.text("enbl: " .. enabled)
+      screen.stroke()
+      screen.move(8,32)
+      screen.level(mod_matrix.active_midi_pp_option == 2 and 15 or 5)
+      screen.text("cc: " .. cc)
+      screen.stroke()
+      screen.move(8,40)
+      screen.level(mod_matrix.active_midi_pp_option == 3 and 15 or 5)
+      screen.text("ch: " .. channel)
+      screen.stroke()
+      screen.move(8,48)
+      screen.level(mod_matrix.active_midi_pp_option == 4 and 15 or 5)
+      screen.text("lvl: " .. level)
+      screen.stroke()
+    end
   end
 end
 
 return mod_matrix
-

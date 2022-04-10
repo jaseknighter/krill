@@ -375,19 +375,19 @@ function parameters.init()
       min=-100,max=100,default=0,
       -- controlspec=vjd_jitter_cs,
       action = function(x)
-        if x ~= 0 then
-          -- local numerator   =   params:get("vuja_de_div_numerator"..i)
-          -- local divisor     =   params:get("vuja_de_div_denominator"..i)
-          -- local new_div = (numerator/divisor)+(math.random(0,x)/10000)
-          -- print(x,new_div)
-          -- vuja_de_patterns[i].division = new_div
-        end
+    end}
+
+    params:add{type = "option", id = "vuja_de_oct_offset"..i, name = "vjd oct offset"..i,
+      options={-4,-3,-2,-1,1,2,3,4}, default=5,
+      -- controlspec=vjd_jitter_cs,
+      action = function(x)
     end}
 
     if i>3 then
       params:hide("vuja_de_div_numerator"..i)
       params:hide("vuja_de_div_denominator"..i)
       params:hide("vuja_de_jitter"..i)
+      params:hide("vuja_de_oct_offset"..i)
       params:hide("pat_lab"..i)
       
     end
@@ -402,11 +402,13 @@ function parameters.init()
         params:hide("vuja_de_div_denominator"..i)
         params:hide("pat_lab"..i)
         params:hide("vuja_de_jitter"..i)
+        params:hide("vuja_de_oct_offset"..i)
       else
         params:show("vuja_de_div_numerator"..i)
         params:show("vuja_de_div_denominator"..i)    
         params:show("pat_lab"..i)    
         params:show("vuja_de_jitter"..i)
+        params:show("vuja_de_oct_offset"..i)
       end
     end
 
@@ -809,18 +811,11 @@ function parameters.init()
 
 
 
+  -- local midi_devices = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
   parameters.set_engine_params(string_param_data)
 
   params:add_group("midi",9)
 
-  -- params:add{type = "option", id = "midi_engine_control", name = "midi engine control",
-  --   options = {"off","on"},
-  --   default = 2,
-  --   -- action = function(value)
-  --   -- end
-  -- }
-
-  local midi_devices = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 
   -- params:add_separator("midi in")
 
@@ -854,20 +849,19 @@ function parameters.init()
   
   params:add{
     type = "option", id = "midi_out_device", name = "out device", options = midi_devices,
-    -- default = 1,
+    default = 1,
     action = function(value) 
-      print("midi out action", value)
       midi_out_device = midi.connect(value) 
     end
   }
 
   params:add{type = "option", id = "play_midi_cc_lz_x", name = "midi lz cc x out",
     options = {"off","on"},
-    default = 2,
+    default = 1,
   }
   params:add{type = "option", id = "play_midi_cc_lz_y", name = "midi lz cc y out",
     options = {"off","on"},
-    default = 2,
+    default = 1,
   }
 
   params:add{type = "number", id = "play_midi_cc_lz_x_cc", name = "midi lz x cc",
@@ -891,6 +885,7 @@ params:add{type = "number", id = "play_midi_cc_lz_y_cc", name = "midi lz y cc",
     action=function() end
   }
 
+  
   midi_helper.get_midi_devices()
 
 
@@ -933,7 +928,7 @@ params:add{type = "number", id = "play_midi_cc_lz_y_cc", name = "midi lz y cc",
     params:add{type = "option", id = "output_crow"..i, name = "crow out ".. i .." mode",
       -- options = {"off","on"},
       -- options = {"off","on"},
-      options = {"off","lz note","envelope","trigger","gate","lz x voltage", "lz y voltage"},
+      options = {"off","lz note","envelope","trigger","gate","lz x voltage", "lz y voltage", "mod matrix"},
 
       default = c_default,
       action = function(value)

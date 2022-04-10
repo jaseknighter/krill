@@ -241,3 +241,4 @@ LORENZ_WEIGHTS_DEFAULT = {{1,0,0}, {0,1,0}, {0,0,1}, {2.0,1.0,1.0}}
 sequencing_mode = 2
 menu_map = {}
 sub_menu_map = {}
+midi_devices = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}

@@ -11,9 +11,9 @@ function externals:new()
 end
   
 
-function externals.set_midi_cc(cc,note_tab,channel)
+function externals.set_midi_cc(cc,cc_val,cc_channel)
   if midi_out_device then
-    midi_out_device:cc (cc, note_tab, channel)
+    midi_out_device:cc (cc, cc_val, cc_channel)
   end
 end
 
@@ -151,6 +151,14 @@ externals.play_midi_cc_lz_xy = function(source,volts)
   end
 end
 
+
+externals.play_midi_cc_mod_matrix = function(cc,cc_val,cc_channel)
+  if midi_out_device == nil then
+    midi_out_device = midi.connect(params:get("midi_out_device"))
+  end
+  midi_out_device:cc (cc, cc_val, cc_channel)
+end
+
 ---------------------------------------
 --crow
 ---------------------------------------
@@ -237,42 +245,15 @@ externals.crow_note_on = function(voice_id, note_tab, target)
   end
 end
 
+
 externals.play_crow_lz_xy = function(source,volts)
   for i=1,4,1 do
     local output_crow = params:get("output_crow"..i)
     if source == "x" and output_crow == 6 then -- lz x output
-      -- print("x",volts,params:get("lz_x_slew"))
-      -- if params:get("lz_x_quantize") == 2 then
-      --   local notes_per_octave = fn.get_num_notes_per_octave()
-      --   local num_octaves = #sound_controller.sectors
-      --   local num_notes = notes_per_octave * num_octaves 
-
-      --   local lz_x_min = params:get("lz_x_min")
-      --   local lz_x_max = params:get("lz_x_max")
-        
-      --   volts = math.floor(util.linlin(lz_x_min,lz_x_max,1,num_notes,volts))
-
-      --   -- volts = (volts)+midi_pitch_offset - (notes_per_octave*3)
-      --   -- print("volts",volts)
-      --   volts = fn.quantize(volts-midi_pitch_offset)/12
-      -- end 
       crow.output[i].slew = params:get("lz_x_slew")/1000
       crow.output[i].volts = volts 
       crow.output[i]() 
     elseif source == "y" and output_crow == 7 then -- lz y output
-      -- if params:get("lz_y_quantize") == 2 then
-      --   local notes_per_octave = fn.get_num_notes_per_octave()
-      --   local num_octaves = #sound_controller.sectors
-      --   local num_notes = notes_per_octave * num_octaves 
-
-      --   local lz_y_min = params:get("lz_y_min")
-      --   local lz_y_max = params:get("lz_y_max")
-      
-      --   volts = math.floor(util.linlin(lz_y_min,lz_y_max,1,num_notes,volts))
-
-      --   -- volts = (volts)+midi_pitch_offset - (notes_per_octave*3)
-      --   volts = fn.quantize(volts-midi_pitch_offset)/12
-      -- end 
       crow.output[i].slew = params:get("lz_y_slew")/1000
       crow.output[i].volts = volts 
       crow.output[i]() 
