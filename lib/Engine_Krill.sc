@@ -187,6 +187,10 @@ Engine_Krill : CroneEngine {
 			if (sequencing_mode == 1){
 				sh1 = lorenz_sample;
 				rise = (rise_time * sh1);
+				// if (rise * env_scalar < 0.1){
+				// 	rise = env_scalar*2.5;
+				// ("set min rise "+rise).postln;
+				// };
 			};
 
 			risePoll.update(rise);
@@ -197,6 +201,10 @@ Engine_Krill : CroneEngine {
 			if (sequencing_mode == 1){
 				sh2 = lorenz_sample;
 				fall = (fall_time * sh2).abs;
+				// if (fall * env_scalar < 0.1){
+				// 	fall = env_scalar*2.5;
+				// ("set min fall "+fall).postln;
+				// };
 			};
 
 			fallPoll.update(fall);

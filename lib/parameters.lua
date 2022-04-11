@@ -666,7 +666,7 @@ function parameters.init()
   }
 
   params:add{
-    type="number", id = "env_scalar", name = "env sclr",min=1, max=2000, default = 100,
+    type="number", id = "env_scalar", name = "env sclr",min=25, max=2000, default = 100,
     action=function(x) 
       engine.env_scalar(x/100)
     end
@@ -676,8 +676,8 @@ function parameters.init()
     type="control", id = "rise_time", name = "rise (ms)",
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(x/1000,0)
-      engine.rise_fall(x/1000,params:get("fall_time")/1000)
+      engine.rise_fall(x/100,0)
+      engine.rise_fall(x/100,params:get("fall_time")/100)
     end
   }
 
@@ -686,8 +686,8 @@ function parameters.init()
     type="control", id = "fall_time", name = "fall (ms)",
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(0,x/1000)
-      engine.rise_fall(params:get("rise_time")/1000,x/1000)
+      engine.rise_fall(0,x/100)
+      engine.rise_fall(params:get("rise_time")/100,x/100)
     end
   }
 

@@ -270,7 +270,7 @@ function init()
   init_polling()
   -- engine.env_time(0.5);
   -- clock.run(gui.set_gui_level)
-  params:set("x_offset",-10)
+  params:set("x_offset",-7)
   params:set("y_scale",0.85)
   -- params:set("vuja_de_div_denominator1",8)
   -- params:set("vuja_de_div_denominator2",8)
@@ -289,6 +289,8 @@ function finish_init()
   if params:get("autosave") == 2 then
     save_load.load_krill_data(folder_path.."autosave.krl")
   end  
+  params:set("internal_triger_type",2)
+  
   initializing = false
   clock.sleep(1)
   vuja_de_patterns[1]:start()
@@ -312,8 +314,8 @@ function finish_init()
   -- engine.play_note(notes[math.random(15)],2)
   params:set("sequencing_mode",2)
   params:set("env_scalar",100)
-  params:set("rise_time",250)
-  params:set("fall_time",500)
+  params:set("rise_time",10)
+  params:set("fall_time",150)
   -- params:set("sequencing_mode",1)
   
 end
