@@ -92,7 +92,7 @@ function sound_controller:get_active_sector()
 end
 
 function sound_controller.play_note(note_tab,mode)
-  if initializing == false then
+  if initializing == false and play_enabled == true then
     note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
     if params:get("quantize") == 2 then          
       note_tab.pitch = fn.quantize(note_tab.pitch)

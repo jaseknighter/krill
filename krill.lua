@@ -317,6 +317,7 @@ function finish_init()
   params:set("rise_time",10)
   params:set("fall_time",150)
   -- params:set("sequencing_mode",1)
+  play_enabled = true
 end
 
 function init_polling()

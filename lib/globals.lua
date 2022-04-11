@@ -242,3 +242,4 @@ sequencing_mode = 2
 menu_map = {}
 sub_menu_map = {}
 midi_devices = {"-----"}
+play_enabled = false

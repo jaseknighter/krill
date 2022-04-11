@@ -4,10 +4,14 @@ local midi_helper = {}
 
 function clock.transport.stop()
   -- do something
+  play_enabled = false
+  print("clock transport stopped")
 end
 
 function clock.transport.start()
   -- do something
+  play_enabled = true
+  print("clock transport started")
 end
 
 

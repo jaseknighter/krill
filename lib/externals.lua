@@ -157,7 +157,8 @@ externals.play_midi_cc_mod_matrix = function(cc,cc_val,cc_channel)
   if midi_out_device == nil then
     midi_out_device = midi.connect(params:get("midi_out_device"))
   end
-  midi_out_device:cc (cc, cc_val, cc_channel)
+
+  midi_out_device:cc(cc, math.floor(cc_val), cc_channel)
 end
 
 ---------------------------------------

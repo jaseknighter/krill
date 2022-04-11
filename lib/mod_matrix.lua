@@ -302,7 +302,6 @@ function mod_matrix:process_updated_param(ix,id,value)
                 local pp_level = self.patch_points[i][j].midi_level
                 pp_level = mod_matrix.midi_level_options[pp_level]
                 local cc_val = cc_val * pp_level
-
                 externals.play_midi_cc_mod_matrix(cc,cc_val,midi_channel)
               end
             end
