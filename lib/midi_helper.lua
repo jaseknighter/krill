@@ -12,7 +12,7 @@ end
 
 
 function midi_helper.get_midi_devices()
-  local devices = {}
+  local devices = {"-----"}
   for i=1,#midi.vports,1
   do
     table.insert(devices, i .. ". " .. midi.vports[i].name)
@@ -22,6 +22,7 @@ function midi_helper.get_midi_devices()
   -- midi_in.options = midi_devices
   local midi_out = params:lookup_param("midi_out_device")
   midi_out.options = midi_devices
+  midi_out.count = #midi_devices
   
   -- tab.print(midi_devices)
 end

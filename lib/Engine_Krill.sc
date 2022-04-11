@@ -104,11 +104,13 @@ Engine_Krill : CroneEngine {
 			trig = Impulse.kr(0);
 
 			exciter = (1-trigger_type) * AnalogSnareDrum.ar(
-					trig, decay: (rise+fall)*env_scalar,
+					trig, decay: (rise*env_scalar), freq: pitch.midicps,
+					// trig, decay: (rise+fall)*env_scalar,
 					// trig, decay: rise*env_scalar, freq: pitch.midicps,
 			);
 			exciter = exciter + (trigger_type * AnalogBassDrum.ar(
-					trig, decay: (rise+fall)*env_scalar,
+					trig, decay: (rise)*env_scalar, freq: pitch.midicps, accent: 1, attackfm: 1
+					// trig, decay: (rise+fall)*env_scalar,
 					// trig, decay: rise*env_scalar, freq: pitch.midicps,
 			));
 

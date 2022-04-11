@@ -844,14 +844,14 @@ function parameters.init()
 
   params:add{type = "option", id = "output_midi", name = "midi notes out",
     options = {"off","on"},
-    default = 2,
+    default = 1,
   }
   
   params:add{
     type = "option", id = "midi_out_device", name = "out device", options = midi_devices,
     default = 1,
     action = function(value) 
-      midi_out_device = midi.connect(value) 
+      midi_out_device = midi.connect(value-1) 
     end
   }
 

@@ -102,6 +102,7 @@ end
 ---------------------------------------
 externals.midi_note_on = function(voice_id, note_tab, target)
   local output_midi = params:get("output_midi")
+  
   if (target == "midi" and output_midi == 2) then
     local mode = note_tab.mode and note_tab.mode or 1
     if mode == 1 then -- play_voice
