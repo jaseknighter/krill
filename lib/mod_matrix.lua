@@ -19,18 +19,26 @@ mod_matrix.active_pp_option=1
 mod_matrix.active_crow_pp_option=1
 mod_matrix.active_midi_pp_option=1
 -- mod_matrix.default_pp_option_selections={1,6,1,1}
-mod_matrix.default_pp_option_selections={1,6}
+mod_matrix.default_pp_option_selections={1,101}
 mod_matrix.enabled_options={"off","on"}
-mod_matrix.level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
+mod_matrix.level_options={}
+for i=0,1000 do
+  table.insert(mod_matrix.level_options,i*0.01)
+end
+
 -- mod_matrix.self_mod_options = {"none","inv","rect"}
 -- mod_matrix.relative_mod_options = {"none","and","or"}
 
 -- crow output options
 mod_matrix.active_crow_output_option=1
-mod_matrix.default_crow_option_selections={1,3,6,1} -- crow enabled, crow output, crow_level, crow_slew
+mod_matrix.default_crow_option_selections={1,3,101,1} -- crow enabled, crow output, crow_level, crow_slew
 mod_matrix.crow_enabled_options={"off","on"}
 mod_matrix.crow_output_options={1,2,3,4}
-mod_matrix.crow_level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
+mod_matrix.crow_level_options={}
+for i=0,1000 do
+  table.insert(mod_matrix.crow_level_options,i*0.01)
+end
+
 mod_matrix.crow_slew_options={}
 for i=0,2000 do
   table.insert(mod_matrix.crow_slew_options,i)
@@ -38,7 +46,7 @@ end
 
 -- midi output options
 mod_matrix.active_midi_output_option=1
-mod_matrix.default_midi_option_selections={1,1,1,6} -- midi enabled, midi cc, midi channel, midi level
+mod_matrix.default_midi_option_selections={1,1,1,101} -- midi enabled, midi cc, midi channel, midi level
 mod_matrix.midi_cc_enabled_options={"off","on"}
 mod_matrix.midi_cc_options={}
 for i=1,127 do
@@ -48,7 +56,10 @@ mod_matrix.midi_channel_options={}
 for i=1,16 do
   table.insert(mod_matrix.midi_channel_options,i)
 end
-mod_matrix.midi_level_options={0,1/16,1/8,1/4,1/2,1,2,5,10}
+mod_matrix.midi_level_options={}
+for i=0,1000 do
+  table.insert(mod_matrix.midi_level_options,i*0.01)
+end
 
 
 --tables to be saved/recalled (for save_load.lua)
