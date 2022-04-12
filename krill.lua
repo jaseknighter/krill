@@ -138,7 +138,7 @@ function init()
         local lb_sample_max = lb[3]*lb[4]
         local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
         sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
-        engine.set_lorenz_sample(sample_val)
+        engine.set_lorenz_sample(sample_val + math.random()*(params:get("rise_time")/1000)+params:get("fall_time")/1000)
       end
     end,
     division = 1/256, --1/16,

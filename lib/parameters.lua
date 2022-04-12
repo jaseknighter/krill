@@ -383,11 +383,19 @@ function parameters.init()
       action = function(x)
     end}
 
+    params:add{
+      type = "option", id = "vuja_de_engine_mode"..i, name = "vjd eng mode"..i, 
+      options = {"def","res","str"},
+      default = 1,
+      action = function(value) 
+    end}
+  
     if i>3 then
       params:hide("vuja_de_div_numerator"..i)
       params:hide("vuja_de_div_denominator"..i)
       params:hide("vuja_de_jitter"..i)
       params:hide("vuja_de_oct_offset"..i)
+      params:hide("vuja_de_engine_mode"..i)
       params:hide("pat_lab"..i)
       
     end
@@ -403,12 +411,14 @@ function parameters.init()
         params:hide("pat_lab"..i)
         params:hide("vuja_de_jitter"..i)
         params:hide("vuja_de_oct_offset"..i)
+        params:hide("vuja_de_engine_mode"..i)
       else
         params:show("vuja_de_div_numerator"..i)
         params:show("vuja_de_div_denominator"..i)    
         params:show("pat_lab"..i)    
         params:show("vuja_de_jitter"..i)
         params:show("vuja_de_oct_offset"..i)
+        params:show("vuja_de_engine_mode"..i)
       end
     end
 
@@ -539,7 +549,7 @@ function parameters.init()
       end
       gui.setup_menu_maps()
   end}
-
+  
   --------------------------------
   -- lorenz x/y output params
   --------------------------------
@@ -844,7 +854,7 @@ function parameters.init()
 
   params:add{type = "option", id = "output_midi", name = "midi notes out",
     options = {"off","on"},
-    default = 1,
+    default = 2,
   }
   
   params:add{
