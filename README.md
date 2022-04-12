@@ -30,9 +30,9 @@ modelled after Todd Barton's Krell script
 
 modelled after MI Marbles
 
-**resonator engine**
+**rings engine**
 
-params to change the built-in resonator are found in the PARAMETERS `resonator` sub-menu.
+params to change the built-in rings are found in the PARAMETERS `rings` sub-menu.
 
 **lorenz algorithm x/y outputs**
 

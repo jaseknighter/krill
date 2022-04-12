@@ -23,17 +23,11 @@ Engine_Krill : CroneEngine {
 	var sequencing_mode, trigger_mode, trigger_type, engine_mode;
 	var krillSynth;
 
-	//resonator vars
-	var exciter_decay_min=0.1,exciter_decay_max=0.5, 
-			resonator_pos=0.05, resonator_resolution=24, 
-			resonator_structure_min=0.2,resonator_structure_max=0.2,
-			resonator_brightness_min=0.01,resonator_brightness_max=0.01, resonator_damping_min=0.5,resonator_damping_max=0.5;
-	
-	//karplus-strong vars
-	var string_accent_min=0.5, string_accent_max=0.5,
-			string_structure_min=0.5, string_structure_max=0.5,
-			string_brightness_min=0.5, string_brightness_max=0.5,
-			string_damping_min=0.5,string_damping_max=0.5;
+	//rings vars
+	var exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
+			rings_pos=0.05, rings_easter_egg=0, rings_poly=1,
+			rings_structure_min=0.2,rings_structure_max=0.2,
+			rings_brightness_min=0.01,rings_brightness_max=0.01, rings_damping_min=0.5,rings_damping_max=0.5;
 	
 	*new { arg context, doneCallback;
 		^super.new(context, doneCallback);
@@ -55,16 +49,11 @@ Engine_Krill : CroneEngine {
 			sequencing_mode=1, trigger_mode=1, trigger_type=1, engine_mode=1,
 			logExpBuffer,
 			ext_freq,
-			exciter_decay_min=0.1,exciter_decay_max=0.5, 
-			// resonator args
-			resonator_pos=0.05, resonator_resolution=24, 
-			resonator_structure_min=0.2,resonator_structure_max=0.2,
-			resonator_brightness_min=0.01,resonator_brightness_max=0.01, resonator_damping_min=0.5,resonator_damping_max=0.5,
-			// karplus-strong args
-			string_accent_min=0.5, string_accent_max=0.5,
-			string_structure_min=0.5, string_structure_max=0.5,
-			string_brightness_min=0.5, string_brightness_max=0.5,
-			string_damping_min=0.5,string_damping_max=0.5;
+			exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
+			// rings args
+			rings_pos=0.05,rings_easter_egg=0, rings_poly=1,
+			rings_structure_min=0.2,rings_structure_max=0.2,
+			rings_brightness_min=0.01,rings_brightness_max=0.01, rings_damping_min=0.5,rings_damping_max=0.5;
 
 			var out, osc, rise_phase, env_phase, rise_rate, fall_rate, 
 			env_rate, env_pos, amp_env, env_gen, sig, done, env_changed,
@@ -95,9 +84,6 @@ Engine_Krill : CroneEngine {
 			
 			pitch = ext_freq;
 			
-			// filter_env = EnvGen.ar(Env.adsr(0.001, 0.8, 0, 0.8, 70, -4), gate);
-			// filter_env = EnvGen.ar(Env.adsr(0.001, rise_rate, 0, fall_rate, 70, -4), gate);
-			// out = LFSaw.ar(pitch.midicps, 2, -1);
 
 
 			// trig = Impulse.kr(pitch.midicps);
@@ -115,28 +101,20 @@ Engine_Krill : CroneEngine {
 
 			exciter = ((1-trigger_mode) * exciter) + SoundIn.ar([0,1],mul:trigger_mode);
 
-  	  out = (2-engine_mode) * Resonator.ar(
-        // input: trig,
-				input: exciter,
-        freq: pitch.midicps,
-        position: resonator_pos,
-        resolution: resonator_resolution,
-        structure: SinOsc.kr(resonator_structure_min, resonator_structure_max*pi).unipolar * resonator_structure_max,
-        brightness: SinOsc.kr(resonator_brightness_min, resonator_brightness_max*pi).unipolar * resonator_brightness_max,
-        damping: TRand.kr(resonator_damping_min,resonator_damping_max, trig)
-  	  );
-			
-			out = out + ((engine_mode-1) * StringVoice.ar(
-        trig: trig,
-				infsustain: exciter,
-        freq: pitch.midicps,
-        accent: SinOsc.kr(string_accent_min, string_accent_max*pi).unipolar * string_accent_max,
-        structure: SinOsc.kr(string_structure_min, string_structure_max*pi).unipolar * string_structure_max,
-        brightness: SinOsc.kr(string_brightness_min, string_brightness_max*pi).unipolar * string_brightness_max,
-        damping: TRand.kr(string_damping_min,string_damping_max, trig)
-      ));
-			
-			// out = 	VAKorg35.ar(out, freq: pitch.midicps, res:rise_phase, overdrive: rise_phase.unipolar, type:0);
+  		out = MiRings.ar(in: exciter, trig: trig, 
+											//  pit: Latch.kr(WhiteNoise.kr(), trig).range(30, 60).round, 
+											 pit: pitch, 
+										 	 struct: SinOsc.kr(rings_structure_min, rings_structure_max*pi).unipolar * rings_structure_max, 
+										 	 bright: SinOsc.kr(rings_brightness_min, rings_brightness_max*pi).unipolar * rings_brightness_max,
+											 //  struct: TRand.kr(rings_structure_min, rings_structure_max),
+											 //  bright: TRand.kr(rings_brightness_min, rings_brightness_max),
+										 	 damp: TRand.kr(rings_damping_min,rings_damping_max, trig), 
+										 	 pos: rings_pos, 
+										   model: engine_mode, poly: rings_poly, intern_exciter: internal_exciter, easteregg: rings_easter_egg, bypass: 0, mul: 1.0, add: 0);
+
+
+			// out = LFSaw.ar(pitch.midicps, 2, -1);
+			// out = 	VAKorg35.ar(out, freq: pitch.midicps, res:rise, overdrive: rise.unipolar, type:0);
 
 			out = LeakDC.ar((out * env_gen * amp).tanh/2.7);
 			sig = out.tanh;	
@@ -249,24 +227,17 @@ Engine_Krill : CroneEngine {
 					\trigger_type,trigger_type,
 					\exciter_decay_min,exciter_decay_min,
 					\exciter_decay_max,exciter_decay_max,
-					//resonator args
-					\resonator_pos,resonator_pos,
-					\resonator_resolution,resonator_resolution,
-					\resonator_structure_min,resonator_structure_min,
-					\resonator_structure_max,resonator_structure_max,
-					\resonator_brightness_min,resonator_brightness_min,
-					\resonator_brightness_max,resonator_brightness_max,
-					\resonator_damping_min,resonator_damping_min,
-					\resonator_damping_max,resonator_damping_max,
-					//karplus-string args
-					\string_accent_min,string_accent_min,
-					\string_accent_max,string_accent_max,
-					\string_structure_min,string_structure_min,
-					\string_structure_max,string_structure_max,
-					\string_brightness_min,string_brightness_min,
-					\string_brightness_max,string_brightness_max,
-					\string_damping_min,string_damping_min,
-					\string_damping_max,string_damping_max,
+					//rings args
+					\rings_pos,rings_pos,
+					\rings_structure_min,rings_structure_min,
+					\rings_structure_max,rings_structure_max,
+					\rings_brightness_min,rings_brightness_min,
+					\rings_brightness_max,rings_brightness_max,
+					\rings_damping_min,rings_damping_min,
+					\rings_damping_max,rings_damping_max,
+					\rings_easter_egg,rings_easter_egg,
+					\rings_poly,rings_poly,
+					\internal_exciter,internal_exciter,
 				],
 					target: voiceGroup).onFree({ 
 						voiceList.remove(newVoice); 
@@ -329,11 +300,11 @@ Engine_Krill : CroneEngine {
 
 
 		/////////////////////////////////
-		//resonator / karplus strong commands
+		//rings / karplus strong commands
 		/////////////////////////////////
 		this.addCommand("engine_mode","f",{ arg msg;
 			engine_mode = msg[1];
-			(["set eng mode", engine_mode]).postln;
+			// (["set eng mode", engine_mode]).postln;
 			// krillVoice.theSynth.set(\engine_mode,engine_mode)
 		});
 
@@ -361,124 +332,77 @@ Engine_Krill : CroneEngine {
 			};
 		});
 
-		this.addCommand("resonator_pos","f",{ arg msg;
-			resonator_pos = msg[1];
+		this.addCommand("rings_pos","f",{ arg msg;
+			rings_pos = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_pos,resonator_pos)
+				krillVoice.theSynth.set(\rings_pos,rings_pos)
 			};
 		});
 
-		this.addCommand("resonator_resolution","f",{ arg msg;
-			resonator_resolution = msg[1];
+		this.addCommand("rings_structure_min","f",{ arg msg;
+			rings_structure_min = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_resolution,resonator_resolution)
+				krillVoice.theSynth.set(\rings_structure_min,rings_structure_min);
 			};
 		});
 
-		// this.addCommand("resonator_structure","f",{ arg msg;
-		// 	resonator_structure = msg[1];
-		// 	if (voiceList.size > 0){ 
-				// krillVoice.theSynth.set(\resonator_structure,resonator_structure)
-		// });
-
-		this.addCommand("resonator_structure_min","f",{ arg msg;
-			resonator_structure_min = msg[1];
+		this.addCommand("rings_structure_max","f",{ arg msg;
+			rings_structure_max = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_structure_min,resonator_structure_min);
+				krillVoice.theSynth.set(\rings_structure_max,rings_structure_max);
 			};
 		});
 
-		this.addCommand("resonator_structure_max","f",{ arg msg;
-			resonator_structure_max = msg[1];
+		this.addCommand("rings_brightness_min","f",{ arg msg;
+			rings_brightness_min = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_structure_max,resonator_structure_max);
+				krillVoice.theSynth.set(\rings_brightness_min,rings_brightness_min)
 			};
 		});
 
-		this.addCommand("resonator_brightness_min","f",{ arg msg;
-			resonator_brightness_min = msg[1];
+		this.addCommand("rings_brightness_max","f",{ arg msg;
+			rings_brightness_max = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_brightness_min,resonator_brightness_min)
+				krillVoice.theSynth.set(\rings_brightness_max,rings_brightness_max)
 			};
 		});
 
-		this.addCommand("resonator_brightness_max","f",{ arg msg;
-			resonator_brightness_max = msg[1];
+		this.addCommand("rings_damping_min","f",{ arg msg;
+			rings_damping_min = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_brightness_max,resonator_brightness_max)
+				krillVoice.theSynth.set(\rings_damping_min,rings_damping_min)
 			};
 		});
 
-		this.addCommand("resonator_damping_min","f",{ arg msg;
-			resonator_damping_min = msg[1];
+		this.addCommand("rings_damping_max","f",{ arg msg;
+			rings_damping_max = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_min,resonator_damping_min)
+				krillVoice.theSynth.set(\rings_damping_max,rings_damping_max)
 			};
 		});
 
-		this.addCommand("resonator_damping_max","f",{ arg msg;
-			resonator_damping_max = msg[1];
+		this.addCommand("rings_easter_egg","f",{ arg msg;
+			rings_easter_egg = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,resonator_damping_max)
-			};
-		});
-		
-		// karplus-strong commands
-		this.addCommand("string_accent_min","f",{ arg msg;
-			string_accent_min = msg[1];
-			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_accent_min)
+				("rings_easter_egg "+ rings_easter_egg).postln;
+				krillVoice.theSynth.set(\rings_easter_egg,rings_easter_egg)
 			};
 		});
 
-		this.addCommand("string_accent_max","f",{ arg msg;
-			string_accent_max = msg[1];
+		this.addCommand("rings_poly","f",{ arg msg;
+			rings_easter_egg = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_accent_max)
+				krillVoice.theSynth.set(\rings_poly,rings_poly)
 			};
 		});
 
-		this.addCommand("string_structure_min","f",{ arg msg;
-			string_structure_min = msg[1];
+		this.addCommand("internal_exciter","f",{ arg msg;
+			internal_exciter = msg[1];
 			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_structure_min)
+				krillVoice.theSynth.set(\internal_exciter,internal_exciter)
 			};
 		});
 
-		this.addCommand("string_structure_max","f",{ arg msg;
-			string_structure_max = msg[1];
-			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_structure_max)
-			};
-		});
-
-		this.addCommand("string_brightness_min","f",{ arg msg;
-			string_brightness_min = msg[1];
-			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_brightness_min)
-			};
-		});
-
-		this.addCommand("string_brightness_max","f",{ arg msg;
-			string_brightness_max = msg[1];
-			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_brightness_max)
-			};
-		});
-
-		this.addCommand("string_damping_min","f",{ arg msg;
-			string_damping_min = msg[1];
-			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_damping_min)
-			};
-		});
-
-		this.addCommand("string_damping_max","f",{ arg msg;
-			string_damping_max = msg[1];
-			if (voiceList.size > 0){ 
-				krillVoice.theSynth.set(\resonator_damping_max,string_damping_max)
-			};
-		});
 	}
 
 

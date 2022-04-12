@@ -6,29 +6,14 @@
 -- _norns.screen_export_png("/home/we/dust/krill"..screenshot..".png")
 
 --[[
-  notes about installing https://github.com/madskjeldgaard/portedplugins
+engine utilizing v7b1's port of MIRings: https://github.com/v7b1/mi-UGens
+
+notes about installing https://github.com/madskjeldgaard/portedplugins
   
   SOLUTION???
   see: https://llllllll.co/t/tapedeck/51919
 
     RUN:  `os.execute("cd /tmp && wget https://github.com/schollz/tapedeck/releases/download/PortedPlugins/PortedPlugins.tar.gz && tar -xvzf PortedPlugins.tar.gz && rm PortedPlugins.tar.gz && sudo rsync -avrP PortedPlugins /home/we/.local/share/SuperCollider/Extensions/")`
-
-]]
---[[
-engine.start()
-engine.env_time(1)
-engine.env_shape('log')
-engine.rise_fall(0.3,1.1)
-engine.rc_fdbk(500)
-engine.rc_freq(15000)
-engine.env_time(12)
-engine.rise_fall(0.01,0.01)
-engine.rc_mul(0.3)
-engine.rc_a(0.36)
-engine.rc_b(0.35)
-engine.rc_c(4.7)
-engine.rc_h(0.01)
-engine.rc_xi(0.5)
 
 ]]
 -- 
@@ -292,6 +277,7 @@ function finish_init()
   params:set("internal_triger_type",2)
   
   initializing = false
+
   clock.sleep(1)
   vuja_de_patterns[1]:start()
   vuja_de_patterns[2]:start()
@@ -316,7 +302,12 @@ function finish_init()
   params:set("env_scalar",100)
   params:set("rise_time",10)
   params:set("fall_time",150)
-  -- params:set("sequencing_mode",1)
+
+  params:set("rings_pos",1)
+  params:set("rings_structure_base",0.25)
+  params:set("rings_structure_base",0.25)
+  params:set("rings_brightnes_base",0.75)
+  params:set("rings_damping_base",0.25)
   play_enabled = true
 end
 

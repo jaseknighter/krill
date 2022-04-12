@@ -726,7 +726,7 @@ function parameters.init()
   end}
 
   --------------------------------
-  -- engine (resonator & karplus strong) params
+  -- engine (rings & karplus strong) params
   --------------------------------
   function parameters.set_engine_params(param_data)
     for i=1, #param_data,1 do
@@ -764,66 +764,103 @@ function parameters.init()
   end
 
   params:add{
+    type = "number", id = "rings_easter_egg", name = "egg mode", 
+    min=0,max=1,default=0,
+    action = function(value) 
+      engine.rings_easter_egg(value)
+
+      local engine_mode = params:lookup_param("engine_mode")
+      if value == 0 then  
+        --[[ 
+          regular mode:
+          0: MODAL_RESONATOR, 
+          1: SYMPATHETIC_STRING, 
+          2: MODULATED/INHARMONIC_STRING, 
+          3: 2-OP_FM_VOICE, 
+          4: SYMPATHETIC_STRING_QUANTIZED, 
+          5: STRING_AND_REVERB
+          --]]
+        engine_mode.options = {"res","sstr","mstr","fm","sstrq","strr"}
+      else
+        --[[
+          easter egg mode:
+          0: FX_FORMANT, 
+          1: FX_CHORUS, 
+          2: FX_REVERB, 
+          3: FX_FORMANT, 
+          4: FX_ENSEMBLE, 
+          5: FX_REVERB
+        ]]
+        engine_mode.options = {"for","chor","rev","for2","ens","rev2"}
+      end
+      _menu.rebuild_params()
+      gui.setup_menu_maps()
+  end}
+
+  params:add{
     type = "option", id = "engine_mode", name = "eng mode", 
-    options = {"res","str"},
+    options = {"res","sstr","mstr","fm","sstrq","strr"},
     default = 1,
     action = function(value) 
-      engine.engine_mode(value)
+      engine.engine_mode(value-1)
       gui.setup_menu_maps()
   end}
 
 
   params:add{
-    type = "option", id = "resonator_triger_mode", name = "trig mode", 
+    type = "option", id = "rings_triger_mode", name = "trig mode", 
     options = {"internal","external"},
     default = 1,
     action = function(value) 
       engine.trigger_mode(value-1)
+      if value == 1 then
+        if params:get("internal_triger_type") < 3 then
+            engine.internal_exciter(0)
+        else
+          engine.internal_exciter(1)
+        end
+      else
+        engine.internal_exciter(0)
+      end
   end}
+
+  params:hide("rings_triger_mode")
 
   params:add{
     type = "option", id = "internal_triger_type", name = "trig type", 
-    options = {"snare","bass"},
+    options = {"snare","bass","built-in", "external"},
     default = 1,
     action = function(value) 
-      engine.trigger_type(value-1)
+      if value < 3 then
+        engine.trigger_type(value-1)
+        engine.internal_exciter(0)
+        params:set("rings_triger_mode",1)
+      elseif value == 3 then
+        engine.internal_exciter(1)
+        params:set("rings_triger_mode",1)
+      else
+        params:set("rings_triger_mode",2)
+        engine.internal_exciter(0)
+      end
   end}
 
-  --resonator params
-  local resonator_param_data = {
-    {"taper","resonator_pos","pos",0,1,0.05},
-    {"taper","resonator_structure_base","str",0,1,0.2,"resonator_structure"},
-    {"taper","resonator_structure_range","str rng",0,1,0,"resonator_structure"},
-    {"taper","resonator_brightnes_base","brt",0,1,0.3,"resonator_brightness"},
-    {"taper","resonator_brightness_range","brt rng",0,1,0,"resonator_brightness"},
-    {"taper","resonator_damping_base","dmp",0,1,0.675,"resonator_damping"},
-    {"taper","resonator_damping_range","dmp rng",0,1,0,"resonator_damping"},
+  --rings params
+  local rings_param_data = {
+    {"taper","rings_pos","pos",0,1,0.05},
+    {"taper","rings_structure_base","str",0,1,0.2,"rings_structure"},
+    {"taper","rings_structure_range","str rng",0,1,0,"rings_structure"},
+    {"taper","rings_brightnes_base","brt",0,1,0.3,"rings_brightness"},
+    {"taper","rings_brightness_range","brt rng",0,1,0,"rings_brightness"},
+    {"taper","rings_damping_base","dmp",0,1,0.675,"rings_damping"},
+    {"taper","rings_damping_range","dmp rng",0,1,0,"rings_damping"},
+    {"number","rings_poly","poly",1,4,1},
   }
 
 
-  params:add_group("resonator",#resonator_param_data)
+  params:add_group("rings",#rings_param_data)
 
-  parameters.set_engine_params(resonator_param_data)
+  parameters.set_engine_params(rings_param_data)
   
-  --karplus strong params
-  local string_param_data = {
-    {"taper","string_accent_base","acc",0,1,0.2,"string_accent"},
-    {"taper","string_accent_range","acc rng",0,1,0,"string_accent"},
-    {"taper","string_structure_base","str",0,1,0.2,"string_structure"},
-    {"taper","string_structure_range","str rng",0,1,0,"string_structure"},
-    {"taper","string_brightnes_base","brt",0,1,0.3,"string_brightness"},
-    {"taper","string_brightness_range","brt rng",0,1,0,"string_brightness"},
-    {"taper","string_damping_base","dmp",0,1,0.675,"string_damping"},
-    {"taper","string_damping_range","dmp rng",0,1,0,"string_damping"},
-  }
-
-  params:add_group("string",#string_param_data)
-
-
-
-  -- local midi_devices = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-  parameters.set_engine_params(string_param_data)
-
   params:add_group("midi",9)
 
 
