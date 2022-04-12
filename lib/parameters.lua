@@ -763,6 +763,21 @@ function parameters.init()
     end
   end
 
+    --rings params
+    local rings_param_data = {
+      {"taper","rings_pos","pos",0,1,0.05},
+      {"taper","rings_structure_base","str",0,1,0.2,"rings_structure"},
+      {"taper","rings_structure_range","str rng",0,1,0,"rings_structure"},
+      {"taper","rings_brightnes_base","brt",0,1,0.3,"rings_brightness"},
+      {"taper","rings_brightness_range","brt rng",0,1,0,"rings_brightness"},
+      {"taper","rings_damping_base","dmp",0,1,0.675,"rings_damping"},
+      {"taper","rings_damping_range","dmp rng",0,1,0,"rings_damping"},
+      {"number","rings_poly","poly",1,4,1},
+    }
+  
+  
+    params:add_group("rings",#rings_param_data + 3)
+  
   params:add{
     type = "number", id = "rings_easter_egg", name = "egg mode", 
     min=0,max=1,default=0,
@@ -843,21 +858,6 @@ function parameters.init()
         engine.internal_exciter(0)
       end
   end}
-
-  --rings params
-  local rings_param_data = {
-    {"taper","rings_pos","pos",0,1,0.05},
-    {"taper","rings_structure_base","str",0,1,0.2,"rings_structure"},
-    {"taper","rings_structure_range","str rng",0,1,0,"rings_structure"},
-    {"taper","rings_brightnes_base","brt",0,1,0.3,"rings_brightness"},
-    {"taper","rings_brightness_range","brt rng",0,1,0,"rings_brightness"},
-    {"taper","rings_damping_base","dmp",0,1,0.675,"rings_damping"},
-    {"taper","rings_damping_range","dmp rng",0,1,0,"rings_damping"},
-    {"number","rings_poly","poly",1,4,1},
-  }
-
-
-  params:add_group("rings",#rings_param_data)
 
   parameters.set_engine_params(rings_param_data)
   
