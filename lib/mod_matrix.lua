@@ -126,17 +126,16 @@ function mod_matrix.enc(n, d)
   if n==1 then
     mod_matrix.active_gui_sector = util.clamp(mod_matrix.active_gui_sector+d,1,mod_matrix.num_gui_sectors)
   elseif n==2 then
+    mod_matrix.selecting_param = "in"
     if mod_matrix.active_gui_sector == 1 or k1_active then
       mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
     elseif mod_matrix.active_gui_sector == 2 then
       if mod_matrix.selecting_param == "in" then
         local input = mod_matrix.inputs[mod_matrix.active_input]
-        local input_name = mod_matrix.lookup[input].name
-        input =  util.wrap(input+d,1,#mod_matrix.lookup)
         if k2_active then
-          -- mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
           local found_separator_sub_menu = false
           while found_separator_sub_menu == false do
+            local input_name = mod_matrix.lookup[input].name
             input =  util.wrap(input+d,1,#mod_matrix.lookup)
             input_name = mod_matrix.lookup[input].name
             if string.find(input_name,"%-%-") ~= nil or string.find(input_name,">>") ~= nil then
@@ -144,6 +143,8 @@ function mod_matrix.enc(n, d)
               found_separator_sub_menu = true
             end
           end
+        else
+          input =  util.wrap(input+d,1,#mod_matrix.lookup)
         end
         mod_matrix.inputs[mod_matrix.active_input] = input
         for i=1,#mod_matrix.input_labels do
@@ -152,7 +153,6 @@ function mod_matrix.enc(n, d)
           end
         end
       end
-      mod_matrix.selecting_param = "in"
     elseif mod_matrix.active_gui_sector == 3 then
       mod_matrix.active_pp_option = util.clamp(mod_matrix.active_pp_option+d,1,#mod_matrix.default_pp_option_selections)
     elseif mod_matrix.active_gui_sector == 4 then
@@ -164,24 +164,22 @@ function mod_matrix.enc(n, d)
     if mod_matrix.active_gui_sector == 1 or k1_active then
       mod_matrix.active_output = util.clamp(mod_matrix.active_output+d,1,mod_matrix.num_outputs)
     elseif mod_matrix.active_gui_sector == 2 then
+      mod_matrix.selecting_param = "out"
       if mod_matrix.selecting_param == "out" then
         local output = mod_matrix.outputs[mod_matrix.active_output]  
-        output =  util.wrap(output+d,1,#mod_matrix.lookup)
-
         if k2_active then
-          -- mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
           local found_separator_sub_menu = false
           while found_separator_sub_menu == false do
             output =  util.wrap(output+d,1,#mod_matrix.lookup)
-            output_name = mod_matrix.lookup[output].name
+            local output_name = mod_matrix.lookup[output].name
             if string.find(output_name,"%-%-") ~= nil or string.find(output_name,">>") ~= nil then
               print("output separator: ",output_name)
               found_separator_sub_menu = true
             end
           end
+        else
+          output =  util.wrap(output+d,1,#mod_matrix.lookup)
         end
-
-
         mod_matrix.outputs[mod_matrix.active_output] = output
         for i=1,#mod_matrix.output_labels do
           if mod_matrix.patch_points[mod_matrix.active_output][i] then
@@ -189,7 +187,6 @@ function mod_matrix.enc(n, d)
           end
         end
       end
-      mod_matrix.selecting_param = "out"
     elseif mod_matrix.active_gui_sector == 3 then 
       local option_num = mod_matrix.active_pp_option 
       local pp_values = mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output]
