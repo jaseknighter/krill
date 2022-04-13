@@ -390,7 +390,7 @@ Engine_Krill : CroneEngine {
 		});
 
 		this.addCommand("rings_poly","f",{ arg msg;
-			rings_easter_egg = msg[1];
+			rings_poly = msg[1];
 			if (voiceList.size > 0){ 
 				krillVoice.theSynth.set(\rings_poly,rings_poly)
 			};
