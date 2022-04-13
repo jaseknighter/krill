@@ -704,7 +704,7 @@ function parameters.init()
   params:add{
     type = "control", id = "env_shape", name = "env shp", 
     -- min=-10,max=10, default = ENV_SHAPE_DEFAULT,
-    controlspec = controlspec.new(-10, 10, "lin", 1, ENV_SHAPE_DEFAULT, ""), 
+    controlspec = controlspec.new(-10, 10, "lin", 1, 0, ""), 
     action = function(value) 
       engine.env_shape(value)
   end}

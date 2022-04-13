@@ -17,7 +17,7 @@ Engine_Krill : CroneEngine {
 	// var noteStartPoll;
 	var sh1=1, sh2=1;
 	var rise=0.05, fall=0.5, rise_time=0.05, fall_time=0.5, env_scalar=1;
-	var env_shape=8;
+	var env_shape=0;
 	var lorenz_sample = 1;
 	var minRiseFall = 0.005;
 	var sequencing_mode, trigger_mode, trigger_type, engine_mode;
@@ -44,7 +44,7 @@ Engine_Krill : CroneEngine {
 			hz=220,amp=0.5, 
 			rise=0.05,fall=0.5, rise_time=0.05, fall_time=1, 
 			gate=1,
-			env_scalar=1, env_shape=8,
+			env_scalar=1, env_shape=0,
 			sh1=1,sh2=1,
 			sequencing_mode=1, trigger_mode=1, trigger_type=1, engine_mode=1,
 			logExpBuffer,

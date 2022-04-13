@@ -243,33 +243,11 @@ function init()
 
   
   krill_lattice:start()
-  
   vuja_de = vuja_de:new()
-  
-  
-  
-  
-  
-  
-  -- params:set("xy_scale",0.9)
-  
-  -- clock.run(setup_polling)
   init_polling()
-  -- engine.env_time(0.5);
-  -- clock.run(gui.set_gui_level)
   params:set("x_offset",-7)
   params:set("y_scale",0.85)
-  -- params:set("vuja_de_div_denominator1",8)
-  -- params:set("vuja_de_div_denominator2",8)
-  -- params:set("vuja_de_div_denominator3",8)
   
-  -- params:set("midi_out_device",2)
-  
-  
-  clock.run(finish_init)
-end
-
-function finish_init()
   mod_matrix:init()
   save_load.init()
   gui.init()
@@ -278,16 +256,15 @@ function finish_init()
   end  
   params:set("internal_triger_type",2)
   
-  initializing = false
+  initializing = false  clock.run(finish_init)
+end
 
+function finish_init()
   clock.sleep(1)
+
   vuja_de_patterns[1]:start()
   vuja_de_patterns[2]:start()
   vuja_de_patterns[3]:start()
-  -- vuja_de_patterns[1].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
-  -- vuja_de_patterns[2].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
-  -- vuja_de_patterns[3].division = VDJ_PAT_DEFAULT_NUMERATOR/VDJ_PAT_DEFAULT_DENOMINATOR
-  
   params:set("vuja_de_div_numerator1",1)
   params:set("vuja_de_div_denominator1",8)
   params:set("vuja_de_div_numerator2",1)
@@ -295,11 +272,6 @@ function finish_init()
   params:set("vuja_de_div_numerator3",1)
   params:set("vuja_de_div_denominator3",2)
   params:set("vjd_div_asn_engine2",1)
-  -- params:set("vuja_de_div_numerator3",VDJ_PAT_DEFAULT_NUMERATOR)
-  -- params:set("vuja_de_div_denominator3",VDJ_PAT_DEFAULT_DENOMINATOR)
-  clock.run(gui.update_menu_display)
-  -- engine.rise_fall(rise,fall)        
-  -- engine.play_note(notes[math.random(15)],2)
   params:set("sequencing_mode",2)
   params:set("env_scalar",100)
   params:set("rise_time",10)
@@ -310,7 +282,16 @@ function finish_init()
   params:set("rings_structure_base",0.25)
   params:set("rings_brightnes_base",0.75)
   params:set("rings_damping_base",0.25)
+  clock.run(gui.update_menu_display)
   play_enabled = true
+
+
+  og_print = fn.clone_function(tab.print)
+  tab.print = function(x)
+    -- do something
+    print("custom print: ")
+    og_print(x)
+  end
 end
 
 function init_polling()
