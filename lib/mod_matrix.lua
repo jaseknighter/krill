@@ -111,9 +111,9 @@ function mod_matrix:enrich_param_actions()
 
       if params.params[i].t == 7 and #name > 0 then
         table.insert(self.lookup,{name=">>"..name.."<<",id=id})
-      elseif params.params[i].t == 0 then
+      elseif params.params[i].t == 0 and name ~= "" then
         table.insert(self.lookup,{name="--"..name.."--",id=id})
-      else
+      elseif name ~= "" then
         table.insert(self.lookup,{name=name,id=id})
         table.insert(self.params,{name=name,id=id,ix=ix})
       end
