@@ -4,11 +4,11 @@
 function enc(n, d)
   clock.run(gui.update_menu_display)
   param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
-  if n== 1 and initializing == false and alt_key_active == true then
+  if n== 1 and initializing == false and k1_active == true then
     page = util.clamp(page+d,1,2)
     screen.clear()
   elseif page == 1 and initializing == false and gui_level == 1 then
-    if n==1 and alt_key_active == false then
+    if n==1 and k1_active == false then
       active_menu =  util.clamp(active_menu+d,1,#menu_map)
       clock.run(gui.update_menu_display)
     elseif n==2 then
@@ -69,9 +69,9 @@ function key(n,z)
   -- if initializing == false then
   -- end
   if n == 1 then
-    if z == 0 then alt_key_active = false else alt_key_active = true end
+    if z == 0 then k1_active = false else k1_active = true end
   end
-  if alt_key_active == false then
+  if k1_active == false then
     if page==2 then
       mod_matrix.key(n,z)
       screen.clear()

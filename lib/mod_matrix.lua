@@ -1,5 +1,6 @@
 -- //https://github.com/p3r7/osc-cast/blob/main/lib/mod.lua
 
+
 local mod_matrix = {}
 
 mod_matrix.lookup = {}
@@ -22,6 +23,10 @@ mod_matrix.active_midi_pp_option=1
 mod_matrix.default_pp_option_selections={1,101}
 mod_matrix.enabled_options={"off","on"}
 mod_matrix.level_options={}
+
+mod_matrix.input_labels = {"a","b","c","d","e"}
+mod_matrix.output_labels = {1,2,3,4,5,6,7}
+
 for i=0,1000 do
   table.insert(mod_matrix.level_options,i*0.01)
 end
@@ -121,16 +126,31 @@ function mod_matrix.enc(n, d)
   if n==1 then
     mod_matrix.active_gui_sector = util.clamp(mod_matrix.active_gui_sector+d,1,mod_matrix.num_gui_sectors)
   elseif n==2 then
-    if mod_matrix.active_gui_sector == 1 or alt_key_active then
+    if mod_matrix.active_gui_sector == 1 or k1_active then
       mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
     elseif mod_matrix.active_gui_sector == 2 then
       if mod_matrix.selecting_param == "in" then
         local input = mod_matrix.inputs[mod_matrix.active_input]
+        local input_name = mod_matrix.lookup[input].name
         input =  util.wrap(input+d,1,#mod_matrix.lookup)
+        if k2_active then
+          -- mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
+          local found_separator_sub_menu = false
+          while found_separator_sub_menu == false do
+            input =  util.wrap(input+d,1,#mod_matrix.lookup)
+            input_name = mod_matrix.lookup[input].name
+            if string.find(input_name,"%-%-") ~= nil or string.find(input_name,">>") ~= nil then
+              print("input separator: ",input_name)
+              found_separator_sub_menu = true
+            end
+          end
+        end
         mod_matrix.inputs[mod_matrix.active_input] = input
-        -- for i=1,#input_labels do
-        --   mod_matrix.patch_points[mod_matrix.active_input][i].enabled = 1
-        -- end
+        for i=1,#mod_matrix.input_labels do
+          if mod_matrix.patch_points[mod_matrix.active_input][i] then
+            mod_matrix.patch_points[mod_matrix.active_input][i].enabled = 1
+          end
+        end
       end
       mod_matrix.selecting_param = "in"
     elseif mod_matrix.active_gui_sector == 3 then
@@ -141,16 +161,33 @@ function mod_matrix.enc(n, d)
       mod_matrix.active_midi_pp_option = util.clamp(mod_matrix.active_midi_pp_option+d,1,#mod_matrix.default_midi_option_selections)
     end
   elseif n==3 then
-    if mod_matrix.active_gui_sector == 1 or alt_key_active then
+    if mod_matrix.active_gui_sector == 1 or k1_active then
       mod_matrix.active_output = util.clamp(mod_matrix.active_output+d,1,mod_matrix.num_outputs)
     elseif mod_matrix.active_gui_sector == 2 then
       if mod_matrix.selecting_param == "out" then
         local output = mod_matrix.outputs[mod_matrix.active_output]  
         output =  util.wrap(output+d,1,#mod_matrix.lookup)
+
+        if k2_active then
+          -- mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
+          local found_separator_sub_menu = false
+          while found_separator_sub_menu == false do
+            output =  util.wrap(output+d,1,#mod_matrix.lookup)
+            output_name = mod_matrix.lookup[output].name
+            if string.find(output_name,"%-%-") ~= nil or string.find(output_name,">>") ~= nil then
+              print("output separator: ",output_name)
+              found_separator_sub_menu = true
+            end
+          end
+        end
+
+
         mod_matrix.outputs[mod_matrix.active_output] = output
-        -- for i=1,#output_labels do
-        --   mod_matrix.patch_points[i][mod_matrix.active_output].enabled = 1
-        -- end
+        for i=1,#mod_matrix.output_labels do
+          if mod_matrix.patch_points[mod_matrix.active_output][i] then
+            mod_matrix.patch_points[i][mod_matrix.active_output].enabled = 1
+          end
+        end
       end
       mod_matrix.selecting_param = "out"
     elseif mod_matrix.active_gui_sector == 3 then 
@@ -214,6 +251,14 @@ function mod_matrix.key(n,z)
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc_enabled   =  2
     end
   end
+
+  if n == 1 then
+    if z == 0 then k1_active = false else k1_active = true end
+  end
+  if n == 2 then
+    if z == 0 then k2_active = false else k2_active = true end
+  end
+
 end
 
 -------------------------------------------
@@ -406,7 +451,6 @@ function mod_matrix:update_matrix()
     self.patch_points[self.active_input][self.active_output].crow_output   =   output
     self.patch_points[self.active_input][self.active_output].crow_level    =   level
     self.patch_points[self.active_input][self.active_output].crow_slew     =   slew
-    -- print("enabled",self.patch_points[self.active_input][self.active_output].crow_enabled)
     
     -- midi patch point options
     local enabled   = mod_matrix.default_midi_option_selections[1]
@@ -451,8 +495,6 @@ function mod_matrix:display_params()
   end
 end
 
-local input_labels = {"a","b","c","d","e"}
-local output_labels = {1,2,3,4,5,6,7}
 function mod_matrix:display_inputs()
   for i=1,self.num_inputs,1 do
     local level
@@ -466,7 +508,7 @@ function mod_matrix:display_inputs()
     screen.level(level)
     screen.move(8+50,9*(i+1)-1)
     -- screen.circle(5+56,9*(i+1)-3,2)
-    screen.text(input_labels[i])
+    screen.text(mod_matrix.input_labels[i])
     if self.active_gui_sector == 2 and self.active_input == i and self.selecting_param == "in" then
       -- screen.fill()
     end
@@ -487,7 +529,7 @@ function mod_matrix:display_outputs()
 
     screen.level(level)
     screen.move(9*(i+1)+49,8)
-    screen.text(output_labels[i])
+    screen.text(mod_matrix.output_labels[i])
     -- screen.circle(9*(i+1)+52,6,2)
     if self.active_gui_sector == 2 and self.active_output == i and self.selecting_param == "out" then
       screen.fill()

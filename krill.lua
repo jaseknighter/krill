@@ -15,6 +15,8 @@ notes about installing https://github.com/madskjeldgaard/portedplugins
 
     RUN:  `os.execute("cd /tmp && wget https://github.com/schollz/tapedeck/releases/download/PortedPlugins/PortedPlugins.tar.gz && tar -xvzf PortedPlugins.tar.gz && rm PortedPlugins.tar.gz && sudo rsync -avrP PortedPlugins /home/we/.local/share/SuperCollider/Extensions/")`
 
+  also, see the pedalboard installer script https://github.com/21echoes/pedalboard/blob/0323837f9f4e2a1b82d0ba0da474300578e58180/lib/ui/util/mi_ugens_installer.lua
+  also, see okyeron's installer script
 ]]
 -- 
 --
