@@ -170,8 +170,9 @@ function mod_matrix.enc(n, d)
         if k2_active then
           local found_separator_sub_menu = false
           while found_separator_sub_menu == false do
-            output =  util.wrap(output+d,1,#mod_matrix.lookup)
             local output_name = mod_matrix.lookup[output].name
+            output =  util.wrap(output+d,1,#mod_matrix.lookup)
+            output_name = mod_matrix.lookup[output].name
             if string.find(output_name,"%-%-") ~= nil or string.find(output_name,">>") ~= nil then
               print("output separator: ",output_name)
               found_separator_sub_menu = true
@@ -183,7 +184,7 @@ function mod_matrix.enc(n, d)
         mod_matrix.outputs[mod_matrix.active_output] = output
         for i=1,#mod_matrix.output_labels do
           if mod_matrix.patch_points[mod_matrix.active_output][i] then
-            mod_matrix.patch_points[i][mod_matrix.active_output].enabled = 1
+            mod_matrix.patch_points[mod_matrix.active_output].enabled = 1
           end
         end
       end
