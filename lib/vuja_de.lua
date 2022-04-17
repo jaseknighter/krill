@@ -35,7 +35,8 @@ function vuja_de:get_note(div_id)
     local doo_param = params:lookup_param("vuja_de_oct_offset"..div_id)
     local doo_options = doo_param.options
     local div_oct_offset = doo_options[params:get("vuja_de_oct_offset"..div_id)]
-    local next_note = ((octave*div_oct_offset)*note)-14+midi_pitch_offset
+    -- local next_note = ((octave*div_oct_offset)*note)-14+midi_pitch_offset
+    local next_note = ((octave*div_oct_offset)*note)+params:get("root_note")-1
     local next_seq_ix = util.clamp(self.seq.ix+1,1,self.seq.length)
     self.seq[next_seq_ix] = next_note
     -- print("next_note",next_note,self.prob,new_prob)

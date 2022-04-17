@@ -1,5 +1,7 @@
 -- //https://github.com/p3r7/osc-cast/blob/main/lib/mod.lua
 
+-- todo: fix mappings when input/output spans positive & negative for types other than control
+          -- note: see how controlspec maping/unmaping appears to address this????
 
 local mod_matrix = {}
 
@@ -26,6 +28,8 @@ mod_matrix.level_options={}
 
 mod_matrix.input_labels = {"a","b","c","d","e"}
 mod_matrix.output_labels = {1,2,3,4,5,6,7}
+
+mod_matrix.pressing = false
 
 for i=0,1000 do
   table.insert(mod_matrix.level_options,i*0.01)
@@ -121,12 +125,16 @@ function mod_matrix:enrich_param_actions()
   end
 end
 
+function mod_matrix.clear_row_col(input_row,output_col)
+  mod_matrix.inputs[input_row] = 1
+  mod_matrix.outputs[output_col] = 1
+end
+
 function mod_matrix.enc(n, d)
   mod_matrix:display_params()
   if n==1 then
     mod_matrix.active_gui_sector = util.clamp(mod_matrix.active_gui_sector+d,1,mod_matrix.num_gui_sectors)
   elseif n==2 then
-    mod_matrix.selecting_param = "in"
     if mod_matrix.active_gui_sector == 1 or k1_active then
       mod_matrix.active_input = util.clamp(mod_matrix.active_input+d,1,mod_matrix.num_inputs)
     elseif mod_matrix.active_gui_sector == 2 then
@@ -153,6 +161,7 @@ function mod_matrix.enc(n, d)
           end
         end
       end
+      mod_matrix.selecting_param = "in"
     elseif mod_matrix.active_gui_sector == 3 then
       mod_matrix.active_pp_option = util.clamp(mod_matrix.active_pp_option+d,1,#mod_matrix.default_pp_option_selections)
     elseif mod_matrix.active_gui_sector == 4 then
@@ -164,7 +173,6 @@ function mod_matrix.enc(n, d)
     if mod_matrix.active_gui_sector == 1 or k1_active then
       mod_matrix.active_output = util.clamp(mod_matrix.active_output+d,1,mod_matrix.num_outputs)
     elseif mod_matrix.active_gui_sector == 2 then
-      mod_matrix.selecting_param = "out"
       if mod_matrix.selecting_param == "out" then
         local output = mod_matrix.outputs[mod_matrix.active_output]  
         if k2_active then
@@ -188,6 +196,7 @@ function mod_matrix.enc(n, d)
           end
         end
       end
+      mod_matrix.selecting_param = "out"
     else
       if k2_active then d = d*10 end
       if mod_matrix.active_gui_sector == 3 then 
@@ -232,9 +241,7 @@ end
 end
 
 function mod_matrix.key(n,z)
-  local enabled
-  
-  if z==0 and n==2 then
+  if z==0 and n==2 and k2_active == false then
     if mod_matrix.active_gui_sector < 4 then
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  1
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  1
@@ -243,7 +250,7 @@ function mod_matrix.key(n,z)
     else
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc_enabled   =  1
     end
-  elseif z==0 and n==3 then
+  elseif z==0 and n==3 and k3_active == false then
     if mod_matrix.active_gui_sector < 4 then
       mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled           =  2
     elseif mod_matrix.active_gui_sector == 4 then
@@ -254,12 +261,58 @@ function mod_matrix.key(n,z)
   end
 
   if n == 1 then
-    if z == 0 then k1_active = false else k1_active = true end
+    if z == 0 then 
+      k1_active = false 
+      mod_matrix.pressing = false
+    else 
+      mod_matrix.pressing = true
+      k1_active = true
+      -- mod_matrix:delay_key_press("k1_active",true,mod_matrix.pressing,true)
+    end
   end
   if n == 2 then
-    if z == 0 then k2_active = false else k2_active = true end
+    if z == 0 then 
+      k2_active = false 
+      mod_matrix.pressing = false
+    else 
+      if k3_active then
+        mod_matrix.clear_row_col(mod_matrix.active_input,mod_matrix.active_output)
+      end
+      mod_matrix.pressing = true
+      clock.run(mod_matrix.delay_key_press,"k2_active",true,mod_matrix.get_pressing,true)
+    end
   end
+  
+  if n == 3 then
+    if z == 0 then 
+      k3_active = false 
+      mod_matrix.pressing = false
+    else 
+      if k2_active then
+        mod_matrix.clear_row_col(mod_matrix.active_input,mod_matrix.active_output)
+      end
 
+      mod_matrix.pressing = true
+      clock.run(mod_matrix.delay_key_press,"k3_active",true,mod_matrix.get_pressing,true)
+    end
+  end
+end
+
+function mod_matrix.get_pressing()
+  return mod_matrix.pressing
+end
+
+function mod_matrix.delay_key_press(delay_prop,delay_value,checker_func,checker_value)
+  clock.sleep(0.5)
+  if checker_func() == checker_value then
+    if delay_prop == "k1_active" then
+       k1_active = delay_value
+    elseif delay_prop == "k2_active" then
+      k2_active = delay_value
+    elseif delay_prop == "k3_active" then
+      k3_active = delay_value
+    end
+  end
 end
 
 -------------------------------------------
@@ -311,12 +364,22 @@ function mod_matrix:process_updated_param(ix,id,value)
               
               --get min/max/current val
               local input_obj = mod_matrix:get_param_props(input)
-              --crow mod matrix out
+              
+              --mod matrix out
               if self.patch_points[i][j].enabled == 2 then
-                local output       = params:lookup_param(output_id)
-                local output_obj = mod_matrix:get_param_props(output)
-                local new_output_value = util.linlin(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
-                local pp_level = self.patch_points[i][j].level
+                local output           = params:lookup_param(output_id)
+                local output_obj       = mod_matrix:get_param_props(output)
+                
+                local new_output_value
+                
+                if output_obj.type == 3 then
+                  local mapper_index = util.linlin(input_obj.min,input_obj.max,0,1,input_obj.val)
+                  new_output_value = output.controlspec:map(mapper_index)
+                else
+                  new_output_value = util.linlin(input_obj.min,input_obj.max,output_obj.min,output_obj.max,input_obj.val)
+                end
+                
+                local pp_level         = self.patch_points[i][j].level
                 pp_level = mod_matrix.level_options[pp_level]
                 new_output_value = new_output_value * pp_level
                 new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
@@ -329,11 +392,10 @@ function mod_matrix:process_updated_param(ix,id,value)
               end
               --crow out
               if self.patch_points[i][j].crow_enabled == 2 then
-                local output = self.patch_points[i][j].crow_output
-                local volts = util.linlin(input_obj.min,input_obj.max,-5,10,input_obj.val)
-                local slew = self.patch_points[i][j].crow_slew/1000
-                -- slew = self.crow_slew_options[slew]
-                local pp_level = self.patch_points[i][j].crow_level
+                local output    = self.patch_points[i][j].crow_output
+                local volts     = util.linlin(input_obj.min,input_obj.max,-5,10,input_obj.val)
+                local slew      = self.patch_points[i][j].crow_slew/1000
+                local pp_level  = self.patch_points[i][j].crow_level
                 pp_level = mod_matrix.crow_level_options[pp_level]
                 volts = volts * pp_level
                 volts = util.clamp(volts,-5,10)
@@ -374,6 +436,12 @@ end
 --- mod matrix gui
 -------------------------------------------
 
+function mod_matrix:start_stop_scrolling()
+  if self.scrolling_input then 
+    self.scrolling_input:scr_start_stop_metro()
+    self.scrolling_output:scr_start_stop_metro()
+  end
+end
 ----------------------------
 -- gui sectors:
 --    2 = row/column selection
@@ -472,9 +540,41 @@ end
 function mod_matrix:display_params()
   local input = self.inputs[self.active_input]
   local output = self.outputs[self.active_output]
+
+  if self.prev_input == nil or (self.prev_input and self.prev_input ~= input) then
+    self.scrolling_input = scroll_text:new(self.lookup[input].name)
+    self.scrolling_input:init()
+  end
+  if self.prev_output == nil or (self.prev_output and self.prev_output ~= output) then
+    self.scrolling_output = scroll_text:new(self.lookup[output].name)
+    self.scrolling_output:init()
+  end
+
+  self.prev_input  = input
+  self.prev_output = output
   if self.lookup[input] and self.lookup[output] then
-    local input_text = "in: " .. self.lookup[input].name
-    local output_text = "out: " .. self.lookup[output].name
+    local input_text
+    local output_text
+    
+    if self.active_gui_sector == 2 then
+      input_text  = "in: "  .. self.lookup[input].name
+      output_text = "out: " .. self.lookup[output].name
+    else
+      input_text  = "in: "  .. self.scrolling_input.get_text()
+      output_text = "out: " .. self.scrolling_output.get_text()
+    end
+    
+    screen.level(0)
+    screen.move(15,60)
+    screen.rect(15,57,50,12)
+    screen.fill()
+    screen.stroke()
+
+    screen.move(60,60)
+    screen.rect(60,57,70,12)
+    screen.fill()
+    screen.stroke()
+  
 
     if self.active_gui_sector ~= 2 then
       screen.level(5)

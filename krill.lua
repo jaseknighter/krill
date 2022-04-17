@@ -62,6 +62,7 @@ vector = include("lib/vector")
 mod_matrix = include("lib/mod_matrix")
 save_load = include("lib/save_load")
 cellular_automata = include("lib/cellular_automata")
+scroll_text = include("lib/scroll_text")
 
 
 -- engine.name="AcidTest"
@@ -123,9 +124,10 @@ function init()
         local lb = lorenz.get_boundary()
         local lb_sample_min = lb[1]*lb[2]
         local lb_sample_max = lb[3]*lb[4]
-        local sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
-        sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,sample_val)
-        engine.set_lorenz_sample(sample_val + math.random()*(params:get("rise_time")/1000)+params:get("fall_time")/1000)
+        lorenz_sample_val = pixels[pixels.active].x_display * pixels[pixels.active].y_display
+        lorenz_sample_val = util.linlin(lb_sample_min,lb_sample_max,0,1,lorenz_sample_val)
+        engine.set_lorenz_sample(lorenz_sample_val)
+        -- engine.set_lorenz_sample(sample_val + math.random()*(params:get("rise_time")*1000)+params:get("fall_time")*1000)
       end
     end,
     division = 1/256, --1/16,
@@ -186,19 +188,10 @@ function init()
         local active = pixels[pixels.active]
         vuja_de:update_length()
         local rest = vuja_de_rest_sequins[i]() == 0
-        -- if rest==true then print("rest",rest) end
         if active and params:get("sequencing_mode") == 2 and rest==false then -- vuja de mode
           sound_controller:play_vuja_de_note(i)
         end
-        -- local jitter = params:get("vuja_de_jitter"..i)
-        -- local numerator   =   params:get("vuja_de_div_numerator"..i)
-        -- local divisor     =   params:get("vuja_de_div_denominator"..i)
-        -- if jitter ==0 and  vuja_de_patterns[i].division ~= numerator/divisor then
-        --   print("no jitter",i,vuja_de_patterns[i].division == numerator/divisor)
-        --   vuja_de_patterns[i].division = numerator/divisor          
-        -- end
-        -- if jitter ==0 and  vuja_de_patterns[i].division ~= numerator/divisor then
-        -- end
+
         local numerator   =   params:get("vuja_de_div_numerator"..i)
         local divisor     =   params:get("vuja_de_div_denominator"..i)
         local jitter      =   math.floor(params:get("vuja_de_jitter"..i))
@@ -207,14 +200,7 @@ function init()
           new_div = (numerator/divisor)+(math.random(0,jitter)/10000)
         elseif jitter<0 then
           new_div = (numerator/divisor)+(math.random(jitter,0)/10000)
-        -- elseif vuja_de_patterns[i].division and numerator/divisor ~= vuja_de_patterns[i].division then
-        --   krill_lattice.reset()
-        --   new_div = (numerator/divisor)+(math.random(jitter,0)/10000)
-        --   print("reset")
-        -- else
-        --   new_div = (numerator/divisor)
         end
-        -- print(jitter,new_div)
         if vuja_de_patterns[i].division then
           vuja_de_patterns[i].division = new_div
         end
@@ -254,7 +240,7 @@ function init()
   if params:get("autosave") == 2 then
     save_load.load_krill_data(folder_path.."autosave.krl")
   end  
-  params:set("internal_triger_type",2)
+  params:set("internal_trigger_type",2)
   
   initializing = false  clock.run(finish_init)
 end
@@ -282,16 +268,17 @@ function finish_init()
   params:set("rings_structure_base",0.25)
   params:set("rings_brightnes_base",0.75)
   params:set("rings_damping_base",0.25)
+  params:set("internal_trigger_type",3)
   clock.run(gui.update_menu_display)
   play_enabled = true
 
 
-  og_print = fn.clone_function(tab.print)
-  tab.print = function(x)
-    -- do something
-    print("custom print: ")
-    og_print(x)
-  end
+  -- og_print = fn.clone_function(tab.print)
+  -- tab.print = function(x)
+  --   -- do something
+  --   print("custom print: ")
+  --   og_print(x)
+  -- end
 end
 
 function init_polling()
@@ -306,12 +293,13 @@ function init_polling()
     -- sound_controller:play_krill_note(value)
 
 
-    -- if params:get("sequencing_mode") == 1 then
-    --   sound_controller:play_krill_note(value)
-    -- end
+    if params:get("sequencing_mode") == 1 then
+      clock.run(sound_controller.play_krill_note,value)
+      -- print("sound_controller:play_krill_note()", value)
+    end
 
     -- note_start = true
-    -- print("note_start_poll",rise,fall)l
+    -- print("note_start_poll",rise,fall)
   end)
 
   env_pos_poll = poll.set("env_pos_poll", function(value)
@@ -342,11 +330,15 @@ function init_polling()
 
   fall_poll = poll.set("fall_poll", function(value)
     -- print("fall done",value)
-    
+    engine.note_off(1)
     prev_fall = fall
     fall = value * params:get("env_scalar")/100
+    -- local rise_fall = rise/fall
+    -- print("rise_fall",rise_fall)
+
     if params:get("sequencing_mode") == 1 then
-      sound_controller:play_krill_note(value)
+      -- sound_controller:play_krill_note()
+      -- sound_controller:play_krill_note(rise_fall)
     else
       -- sound_controller:play_vuja_de_note()
     end
@@ -356,7 +348,8 @@ function init_polling()
   end)
 
   function play_engine(note)
-    engine.play_note(note,1)
+    -- engine.note_off()
+    engine.note_on(note,1)
   end
 
   -- pitch_poll:start()

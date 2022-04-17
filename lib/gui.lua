@@ -23,7 +23,7 @@ function gui.setup_menu_maps()
   end
 
 
-  local eng_params = {"rings_easter_egg","engine_mode","internal_triger_type","rings_pos",
+  local eng_params = {"rings_easter_egg","engine_mode","internal_trigger_type","rings_pos",
                 "rings_structure_base","rings_structure_range",
                 "rings_brightnes_base","rings_brightness_range",
                 "rings_damping_base","rings_damping_range",
@@ -157,7 +157,7 @@ function gui.set_gui_level(amt)
     end
     set_gui_level_initiated = false
     if params:get("grid_display") == 2 then
-      -- clock.run(gui.clear)
+      clock.run(gui.clear)
     end
   end
 end

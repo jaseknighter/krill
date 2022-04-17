@@ -1,11 +1,16 @@
 --------------------------
 -- encoders and keys
 --------------------------
+local last_page = 1
 function enc(n, d)
   clock.run(gui.update_menu_display)
   param_name = sub_menu_map[active_menu][active_sub_menu[active_menu]]
   if n== 1 and initializing == false and k1_active == true then
     page = util.clamp(page+d,1,2)
+    if (last_page == 2 and page == 1) or (last_page == 1 and page == 2) then
+      mod_matrix:start_stop_scrolling()
+    end
+    last_page = page
     screen.clear()
   elseif page == 1 and initializing == false and gui_level == 1 then
     if n==1 and k1_active == false then

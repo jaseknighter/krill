@@ -82,8 +82,6 @@ function sound_controller:get_active_sector()
     for j=1,#sound_controller.sectors[i],1 do
       local s = sound_controller.sectors[i][j]
       if x>s.x and x<s.x+s.w and y>s.y and y<s.y+s.h then
-        -- active_sector={i,j}
-        -- print(x,s.x,s.w,s.y,s.h)
         return {col=i,row=j}
       end
     end
@@ -91,13 +89,12 @@ function sound_controller:get_active_sector()
 
 end
 
-function sound_controller.play_note(note_tab,mode)
+function sound_controller.note_on(note_tab,mode)
   if initializing == false and play_enabled == true then
-    note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
+    -- note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
     if params:get("quantize") == 2 then          
       note_tab.pitch = fn.quantize(note_tab.pitch)
     end
-
     if mode==1 or (params:get("vjd_div_asn_engine1") == note_tab.div_id or params:get("vjd_div_asn_engine2") == note_tab.div_id) then
       play_engine(note_tab.pitch)
     end
@@ -122,20 +119,28 @@ function sound_controller.play_note(note_tab,mode)
 end
 
 
-function sound_controller:play_krill_note(value)
-  local notes_per_octave = fn.get_num_notes_per_octave()
-  local num_octaves = #sound_controller.sectors
-  local num_notes = notes_per_octave * num_octaves 
-  local note = math.floor(util.linlin(0,2,1,num_notes,value))
-  note = (note)+midi_pitch_offset - (notes_per_octave*3)
-  local note_tab = {
-    pitch = note,
-    level = params:get("env_max_level"),
-    mode = 1
-  }
+-- function sound_controller:play_krill_note()
 
-  sound_controller.play_note(note_tab,1)
-  -- sound_controller:play_note(note_tab)
+sound_controller.sleepy_timing = false
+function sound_controller.play_krill_note(value)
+  if sound_controller.sleepy_timing == false then
+    local sleepy_time = (((rise+fall)*(params:get("env_scalar")/100) * lorenz_sample_val)) * (math.random()) 
+    sound_controller.sleepy_timing=true
+    clock.sleep(0.05+sleepy_time)
+    local notes_per_octave = fn.get_num_notes_per_octave()
+    local num_octaves = #sound_controller.sectors
+    local num_notes = notes_per_octave * num_octaves 
+    local note = math.floor(util.linlin(0,2,1,num_notes,math.random()*2))
+    note = (note)+midi_pitch_offset - (notes_per_octave*3)
+    local note_tab = {
+      pitch = note,
+      level = params:get("env_max_level"),
+      mode = 1
+    }
+
+    sound_controller.note_on(note_tab,1)
+    sound_controller.sleepy_timing=false
+  end
 end
 
 function sound_controller:play_vuja_de_note(div_id)
@@ -159,7 +164,7 @@ function sound_controller:play_vuja_de_note(div_id)
 
   engine.engine_mode(mode)
 
-  sound_controller.play_note(note_tab,2)
+  sound_controller.note_on(note_tab,2)
 end
 
 return sound_controller

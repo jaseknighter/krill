@@ -541,9 +541,9 @@ function parameters.init()
       engine.switch_sequencing_mode(value)
       if sequencing_mode == 1 then
         -- engine.rise_fall(nil,nil)        
-        engine.play_note(notes[math.random(15)],2)
+        engine.note_on(notes[math.random(15)],2)
       else
-        -- engine.play_note(notes[math.random(15)],2)
+        -- engine.note_on(notes[math.random(15)],2)
         -- krell_rise = rise
         -- krell_fall = fall        
       end
@@ -664,7 +664,7 @@ function parameters.init()
     
     
   -- quantize notes
-  params:add_group("envelope params",7)
+  params:add_group("envelope params",8)
 
 
   params:add{
@@ -672,11 +672,12 @@ function parameters.init()
     
     controlspec = controlspec.new(0, 10, "lin", 0.1, ENV_MAX_LEVEL_DEFAULT, ""), 
     action=function(x) 
+      engine.env_level(x/10)
     end
   }
 
   params:add{
-    type="number", id = "env_scalar", name = "env sclr",min=25, max=2000, default = 100,
+    type="number", id = "env_scalar", name = "env sclr",min=100, max=2000, default = 100,
     action=function(x) 
       engine.env_scalar(x/100)
     end
@@ -686,18 +687,18 @@ function parameters.init()
     type="control", id = "rise_time", name = "rise (ms)",
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(x/100,0)
-      engine.rise_fall(x/100,params:get("fall_time")/100)
+      engine.rise_fall(x/1000,0)
+      engine.rise_fall(x/1000,params:get("fall_time")/1000)
     end
   }
 
   params:add{
     -- type="number", id = "fall_time", name = "fall (ms)",min=100, step="10", max=2000, default = 1000,
     type="control", id = "fall_time", name = "fall (ms)",
-    controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
+    controlspec = controlspec.new(100, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(0,x/100)
-      engine.rise_fall(params:get("rise_time")/100,x/100)
+      engine.rise_fall(0,x/1000)
+      engine.rise_fall(params:get("rise_time")/1000,x/1000)
     end
   }
 
@@ -708,6 +709,8 @@ function parameters.init()
     action = function(value) 
       engine.env_shape(value)
   end}
+
+  params:add_separator("::read only::")
 
   params:add{
     type = "control", id = "env_pos", name = "env pos", 
@@ -829,7 +832,7 @@ function parameters.init()
     action = function(value) 
       engine.trigger_mode(value-1)
       if value == 1 then
-        if params:get("internal_triger_type") < 3 then
+        if params:get("internal_trigger_type") < 3 then
             engine.internal_exciter(0)
         else
           engine.internal_exciter(1)
@@ -842,7 +845,7 @@ function parameters.init()
   params:hide("rings_triger_mode")
 
   params:add{
-    type = "option", id = "internal_triger_type", name = "trig type", 
+    type = "option", id = "internal_trigger_type", name = "trig type", 
     options = {"snare","bass","built-in", "external"},
     default = 1,
     action = function(value) 

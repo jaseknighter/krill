@@ -142,7 +142,7 @@ end
 
 
 -- scale/note/quantize functions
-SCALE_LENGTH_DEFAULT = 45 
+SCALE_LENGTH_DEFAULT = 60 
 ROOT_NOTE_DEFAULT = 33 --(A0)
 NOTE_OFFSET_DEFAULT = 33 --(A0)
 scale_names = {}
@@ -161,11 +161,12 @@ fn.build_scale = function()
   -- local scale_length = params:get("scale_length") and params:get("scale_length") or SCALE_LENGTH_DEFAULT
   -- for i = 1, num_to_add do
 
-  local scale_length = SCALE_LENGTH_DEFAULT
-  for i = 1, scale_length do
-    table.insert(notes, notes[scale_length])
+  -- local scale_length = SCALE_LENGTH_DEFAULT
+  -- for i = 1, scale_length do
+  --   table.insert(notes, notes[scale_length])
+    -- print("scale",i,)
     -- table.insert(notes, notes[SCALE_LENGTH_DEFAULT - num_to_add])
-  end
+  -- end
   -- engine.update_scale(table.unpack(notes))
 end
 
@@ -198,6 +199,7 @@ fn.quantize = function(note_num)
     else
       new_note_num = notes[#notes]
     end
+    print("nil note", new_note_num)
   end
   return new_note_num
 end
@@ -212,9 +214,10 @@ AUTOSAVE_DEFAULT=2
 -- 1 = never show grid. only show UI when using encoders
 -- 2 = show grid and UI when using encoders
 -- 3 = always show grid and UI
-UI_DISPLAY_DEFAULT=3
+UI_DISPLAY_DEFAULT=2
 k1_active = false
 k2_active = false
+k3_active = false
 page = 1
 CENTER_X = 84
 CENTER_Y = 32
