@@ -22,6 +22,24 @@ function parameters.init()
   --   offset.count = #offset_options
   -- end
 
+  --------------------------------
+  -- quant grid params
+  --------------------------------
+  params:add_separator("QUANT GRID")
+  -- params:add_group("lorenz",19)
+  params:add{type = "option", id = "grid_display", name = "grid display",
+    options = {"hide","show","always show"}, default = UI_DISPLAY_DEFAULT,
+    action = function(x)
+      if x == 1 then screen.clear() 
+      elseif x == 3 then gui_level = 1
+      end 
+  end}
+
+
+
+  --------------------------------
+  -- quant grid scales and notes
+  --------------------------------
   params:add_separator("SCALES")
   -- params:add_group("scales and notes",5)
 
@@ -74,6 +92,14 @@ function parameters.init()
   params:hide("note_offset")
 
   
+  -- quantize notes
+  params:add{
+    type = "option", id = "quantize", name = "quantize notes", 
+    options = {"off","on"},
+    default = 2,
+    action = function(value) 
+  end}
+    
   --------------------------------
   -- lorenz params
   --------------------------------
@@ -293,18 +319,108 @@ function parameters.init()
     end
   }
 
+    --------------------------------
+  -- lorenz x/y output params
   --------------------------------
-  -- quant grid params
-  --------------------------------
-  params:add_separator("QUANT GRID")
-  -- params:add_group("lorenz",19)
-  params:add{type = "option", id = "grid_display", name = "grid display",
-    options = {"hide","show","always show"}, default = UI_DISPLAY_DEFAULT,
-    action = function(x)
-      if x == 1 then screen.clear() 
-      elseif x == 3 then gui_level = 1
-      end 
-  end}
+
+
+  local lz_xy_min_action_x = function(x) 
+    local val = x
+    local current_max_value = params:get("lz_x_max")
+    if val > current_max_value then 
+      val = current_max_value
+      params:set("lz_x_min",val)
+    end
+  end
+  
+  local lz_min_cs = cs.new(-5, 10, 'lin', 0, 0, "")
+  local lz_max_cs = cs.new(-5, 10, 'lin', 0, 5, "")
+  local lz_xy_min_action_y = function(x) 
+    local val = x
+    local current_min_value = params:get("lz_x_min")
+    val = util.clamp(val, current_min_value,val)
+    if val < current_min_value then 
+      val = current_min_value
+      params:set("lz_x_max",val)
+    end
+  end
+  
+  local lz_xy_max_action_x = function(x) 
+    local val = x
+    local current_max_value = params:get("lz_y_max")
+    if val > current_max_value then 
+      val = current_max_value
+      params:set("lz_y_min",val)
+    end
+  end
+  
+  local lz_xy_max_action_y = function(x) 
+    local val = x
+    local current_min_value = params:get("lz_y_min")
+    val = util.clamp(val, current_min_value,val)
+    if val < current_min_value then 
+      val = current_min_value
+      params:set("lz_y_max",val)
+    end
+  end
+
+  local lz_division_cs = cs.new(10, 2000, 'exp', 0, 31.25, "",0.001)
+  local lz_division_action_x = function(x)
+    lorenz_output_pattern_x:set_division(x/1000)
+  end
+  
+  local lz_division_action_y = function(x)
+    lorenz_output_pattern_y:set_division(x/1000)
+  end
+
+  local lz_slew_cs = cs.new(0, 2000, 'lin', 0, 31.25, "",0.001)
+  local lz_slew_action_x = function(x)
+    -- lorenz_output_pattern_x:set_division(x)
+  end
+
+  local lz_slew_action_y = function(x)
+    -- lorenz_output_pattern_y:set_division(x)
+  end
+
+  local lz_xy_cs = cs.new(-5, 10, 'lin', 0, 0.01, "",0.001)
+
+  local lorenz_xy_output_param_data = {
+    -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
+    -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
+    {"control","lz_x_division","lz x division (ms)",lz_division_cs,lz_division_action_x},
+    {"control","lz_y_division","lz y division (ms)",lz_division_cs,lz_division_action_y},
+    {"control","lz_x_slew","lz x slew (ms)",lz_slew_cs,lz_slew_action_x},
+    {"control","lz_y_slew","lz y slew (ms)",lz_slew_cs,lz_slew_action_y},
+    {"control","lz_x_min","lz x min (volts)",lz_min_cs,lz_xy_min_action_x},
+    {"control","lz_x_max","lz x max (volts)",lz_max_cs,lz_xy_min_action_y},
+    {"control","lz_y_min","lz y min (volts)",lz_min_cs,lz_xy_max_action_x},
+    {"control","lz_y_max","lz y max (volts)",lz_max_cs,lz_xy_max_action_y},
+    {"control","lz_x","lorenz x",lz_xy_cs,nil},
+    {"control","lz_y","lorenz y",lz_xy_cs,nil},
+  }
+
+  params:add_group("lz x/y outputs",#lorenz_xy_output_param_data)
+
+  for i=1, #lorenz_xy_output_param_data,1 do
+    local p_data = lorenz_xy_output_param_data[i]
+    if p_data[1] == "number" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
+        action=p_data[7]
+      }          
+    elseif p_data[1] == "control" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3], controlspec=p_data[4], 
+        action=p_data[5]
+      }          
+    elseif p_data[1] == "option" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,options=p_data[4], default=p_data[5], 
+        action=p_data[6]
+      }          
+
+    end
+  end
 
   --------------------------------
   -- vuja de params
@@ -526,143 +642,11 @@ function parameters.init()
   
 
   --------------------------------
-  -- inputs/outputs/midi params
+  -- envelope params
   --------------------------------
   params:add_separator("")
-  params:add_separator("INPUTS/OUTPUTS")
+  params:add_separator("A/D ENVELOPE")
 
-  -- sequencing_mode
-  params:add{
-    type = "option", id = "sequencing_mode", name = "seq mode", 
-    options = {"krell","vuja de"},
-    default = 1,
-    action = function(value) 
-      sequencing_mode = value
-      engine.switch_sequencing_mode(value)
-      if sequencing_mode == 1 then
-        -- engine.rise_fall(nil,nil)        
-        engine.note_on(notes[math.random(15)],2)
-      else
-        -- engine.note_on(notes[math.random(15)],2)
-        -- krell_rise = rise
-        -- krell_fall = fall        
-      end
-      gui.setup_menu_maps()
-  end}
-  
-  --------------------------------
-  -- lorenz x/y output params
-  --------------------------------
-
-
-  local lz_xy_min_action_x = function(x) 
-    local val = x
-    local current_max_value = params:get("lz_x_max")
-    if val > current_max_value then 
-      val = current_max_value
-      params:set("lz_x_min",val)
-    end
-  end
-  
-  local lz_min_cs = cs.new(-5, 10, 'lin', 0, 0, "")
-  local lz_max_cs = cs.new(-5, 10, 'lin', 0, 5, "")
-  local lz_xy_min_action_y = function(x) 
-    local val = x
-    local current_min_value = params:get("lz_x_min")
-    val = util.clamp(val, current_min_value,val)
-    if val < current_min_value then 
-      val = current_min_value
-      params:set("lz_x_max",val)
-    end
-  end
-  
-  local lz_xy_max_action_x = function(x) 
-    local val = x
-    local current_max_value = params:get("lz_y_max")
-    if val > current_max_value then 
-      val = current_max_value
-      params:set("lz_y_min",val)
-    end
-  end
-  
-  local lz_xy_max_action_y = function(x) 
-    local val = x
-    local current_min_value = params:get("lz_y_min")
-    val = util.clamp(val, current_min_value,val)
-    if val < current_min_value then 
-      val = current_min_value
-      params:set("lz_y_max",val)
-    end
-  end
-
-  local lz_division_cs = cs.new(10, 2000, 'exp', 0, 31.25, "",0.001)
-  local lz_division_action_x = function(x)
-    lorenz_output_pattern_x:set_division(x/1000)
-  end
-  
-  local lz_division_action_y = function(x)
-    lorenz_output_pattern_y:set_division(x/1000)
-  end
-
-  local lz_slew_cs = cs.new(0, 2000, 'lin', 0, 31.25, "",0.001)
-  local lz_slew_action_x = function(x)
-    -- lorenz_output_pattern_x:set_division(x)
-  end
-
-  local lz_slew_action_y = function(x)
-    -- lorenz_output_pattern_y:set_division(x)
-  end
-
-  local lz_xy_cs = cs.new(-5, 10, 'lin', 0, 0.01, "",0.001)
-
-  local lorenz_xy_output_param_data = {
-    -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
-    -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
-    {"control","lz_x_division","lz x division (ms)",lz_division_cs,lz_division_action_x},
-    {"control","lz_y_division","lz y division (ms)",lz_division_cs,lz_division_action_y},
-    {"control","lz_x_slew","lz x slew (ms)",lz_slew_cs,lz_slew_action_x},
-    {"control","lz_y_slew","lz y slew (ms)",lz_slew_cs,lz_slew_action_y},
-    {"control","lz_x_min","lz x min (volts)",lz_min_cs,lz_xy_min_action_x},
-    {"control","lz_x_max","lz x max (volts)",lz_max_cs,lz_xy_min_action_y},
-    {"control","lz_y_min","lz y min (volts)",lz_min_cs,lz_xy_max_action_x},
-    {"control","lz_y_max","lz y max (volts)",lz_max_cs,lz_xy_max_action_y},
-    {"control","lz_x","lorenz x",lz_xy_cs,nil},
-    {"control","lz_y","lorenz y",lz_xy_cs,nil},
-  }
-
-  params:add_group("lz x/y outputs",#lorenz_xy_output_param_data)
-
-  for i=1, #lorenz_xy_output_param_data,1 do
-    local p_data = lorenz_xy_output_param_data[i]
-    if p_data[1] == "number" then
-      params:add{
-        type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
-        action=p_data[7]
-      }          
-    elseif p_data[1] == "control" then
-      params:add{
-        type=p_data[1], id = p_data[2], name=p_data[3], controlspec=p_data[4], 
-        action=p_data[5]
-      }          
-    elseif p_data[1] == "option" then
-      params:add{
-        type=p_data[1], id = p_data[2], name=p_data[3] ,options=p_data[4], default=p_data[5], 
-        action=p_data[6]
-      }          
-
-    end
-  end
-
-
-  -- quantize notes
-  params:add{
-    type = "option", id = "quantize", name = "quantize notes", 
-    options = {"off","on"},
-    default = 2,
-    action = function(value) 
-  end}
-    
-    
   -- quantize notes
   params:add_group("envelope params",8)
 
@@ -727,6 +711,32 @@ function parameters.init()
     action = function(value) 
       -- print("env level param",value)
   end}
+
+  --------------------------------
+  -- inputs/outputs/midi params
+  --------------------------------
+  params:add_separator("INPUTS/OUTPUTS")
+
+  -- sequencing_mode
+  params:add{
+    type = "option", id = "sequencing_mode", name = "seq mode", 
+    options = {"krell","vuja de"},
+    default = 1,
+    action = function(value) 
+      sequencing_mode = value
+      engine.switch_sequencing_mode(value)
+      if sequencing_mode == 1 then
+        -- engine.rise_fall(nil,nil)        
+        engine.note_on(notes[math.random(15)],2)
+      else
+        -- engine.note_on(notes[math.random(15)],2)
+        -- krell_rise = rise
+        -- krell_fall = fall        
+      end
+      gui.setup_menu_maps()
+  end}
+  
+
 
   --------------------------------
   -- engine (rings & karplus strong) params
