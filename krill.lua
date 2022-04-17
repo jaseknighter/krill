@@ -80,6 +80,8 @@ chaos_y={}
 
 initializing = true
 function init()
+  screen.clear()
+
   -- set sensitivity of the encoders
   norns.enc.sens(1,6)
   norns.enc.sens(2,6)

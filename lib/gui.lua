@@ -36,9 +36,12 @@ function gui.setup_menu_maps()
     eng_params,
   }
 
-
+  local vjd_seq_options = {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"}
+  for i=1,params:get("vuja_de_num_divs"),1 do
+    table.insert(vjd_seq_options,"vuja_pat_defaults"..i)
+  end
   gui.sub_menu_map_vuja_de = {
-    {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves","loop_length","vuja_de_prob"},
+    vjd_seq_options,
     -- gui.vjd_rests(),
     {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
     lrz_params,

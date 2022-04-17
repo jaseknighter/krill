@@ -434,7 +434,7 @@ function parameters.init()
 
   end}
 
-  params:add{type = "number", id = "vuja_de_prob", name = "vjd div",
+  params:add{type = "number", id = "vuja_de_prob", name = "vjd prob",
   min=-10, max=10, default=-5,
   action = function(x)
   end}
@@ -451,7 +451,7 @@ function parameters.init()
     -- end
   end}
 
-  params:add_group("division patterns",12+3+(VJD_MAX_DIVISIONS*3))
+  params:add_group("division patterns",12+3+(VJD_MAX_DIVISIONS*4))
   params:add_separator("assignments")
   params:add{type = "number", id = "vjd_div_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_engine2", name = "engine asn 2", min=1, max=3, default=2}
@@ -470,32 +470,44 @@ function parameters.init()
   params:add_separator("divisions")
 
 
-  local vjd_jitter_cs = cs.new(-100, 100, 'lin', 0, 1, "",1)
-
   for i=1,VJD_MAX_DIVISIONS,1 do
     -- params:add_separator("pattern "..i)
     params:add{ type = "option", id = "pat_lab"..i, name = "---------- division " .. i .. " ----------",  options = {" "}}
+    
+    params:add{type = "option", id = "vuja_pat_defaults"..i, name = "vjd div"..i,
+    options=VJD_PAT_DEFAULT_DIVS[i], default=4,
+    action = function(x)
+      local def_pat_div_param = params:lookup_param("vuja_pat_defaults"..i)
+      local pat_val       = def_pat_div_param.options[x]
+      local slash_loc     = string.find(pat_val,"/")
+      local numerator     = slash_loc == nil and pat_val or string.sub(pat_val,1,slash_loc-1)
+      local denominator   = slash_loc == nil and 1 or string.sub(pat_val,slash_loc+1)
+      
+      params:set("vuja_de_div_numerator"..i,   tonumber(numerator))
+      params:set("vuja_de_div_denominator"..i, tonumber(denominator))
+  end}
+
     params:add{type = "number", id = "vuja_de_div_numerator"..i, name = "vjd div num"..i,
       min=1, max=VJD_MAX_PATTERN_NUMERATOR, default=1,
       action = function(x)
+        gui.setup_menu_maps()
         vuja_de_patterns[i]:set_division(x/params:get("vuja_de_div_denominator"..i))
     end}
 
     params:add{type = "number", id = "vuja_de_div_denominator"..i, name = "vjd div den"..i,
       min=1, max=VJD_MAX_PATTERN_DENOMINATOR, default=1,
       action = function(x)
+        gui.setup_menu_maps()
         vuja_de_patterns[i]:set_division(params:get("vuja_de_div_numerator"..i)/x)
     end}
 
     params:add{type = "number", id = "vuja_de_jitter"..i, name = "vjd jitter"..i,
       min=-100,max=100,default=0,
-      -- controlspec=vjd_jitter_cs,
       action = function(x)
     end}
 
     params:add{type = "option", id = "vuja_de_oct_offset"..i, name = "vjd oct offset"..i,
       options={-4,-3,-2,-1,1,2,3,4}, default=5,
-      -- controlspec=vjd_jitter_cs,
       action = function(x)
     end}
 
@@ -789,7 +801,7 @@ function parameters.init()
     }
   
   
-    params:add_group("rings",#rings_param_data + 3)
+    params:add_group("rings",#rings_param_data + 4)
   
   params:add{
     type = "number", id = "rings_easter_egg", name = "egg mode", 
@@ -999,7 +1011,7 @@ params:add{type = "number", id = "play_midi_cc_lz_y_cc", name = "midi lz y cc",
   params:add_group("just friends",8)
   params:add{type = "option", id = "output_jf", name = "just friends",
     options = {"off","on"},
-    default = 2,
+    default = 1,
     action = function(value)
       if value > 1 then 
         -- crow.output[2].action = "{to(5,0),to(0,0.25)}"

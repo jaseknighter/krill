@@ -297,9 +297,9 @@ externals.jf_note_on = function(voice_id, note_tab, target)
       jf_pitch6 = fn.quantize(jf_pitch6-midi_pitch_offset)
     end
     
-    if jf_mode == 1 then -- note_on poly mode
-      crow.ii.jf.note_on((pitch-midi_pitch_offset)/12,level)
-    elseif jf_mode == 2 then -- play_voice mono mode
+    if jf_mode == 2 then -- note_on poly mode
+      crow.ii.jf.play_note((pitch-midi_pitch_offset)/12,level)
+    elseif jf_mode == 1 then -- play_voice mono mode
       local channel = channel
       crow.ii.jf.play_voice(channel,(pitch-midi_pitch_offset)/12,level)
     else -- portamento

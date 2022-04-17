@@ -231,11 +231,19 @@ NUM_OCTAVES_MAX = 14
 midi_pitch_offset = 60
 SCREEN_REFRESH_DENOMINATOR = 10
 vuja_de_patterns = {}
-VJD_MAX_DIVISIONS = 32
+VJD_MAX_DIVISIONS = 6
 VJD_MAX_PATTERN_NUMERATOR = 512
 VJD_MAX_PATTERN_DENOMINATOR = 512
 VDJ_PAT_DEFAULT_NUMERATOR = 1
 VDJ_PAT_DEFAULT_DENOMINATOR = 2
+VJD_PAT_DEFAULT_DIVS = {
+  {"1","1/2","1/4","1/8","1/16","1/32","1/64"},
+  {"1","1/2","1/4","1/8","1/16","1/32","1/64"},
+  {"1","1/2","1/4","1/8","1/16","1/32","1/64"},
+  {"1","1/2","1/4","1/8","1/16","1/32","1/64"},
+  {"1","1/2","1/4","1/8","1/16","1/32","1/64"},
+  {"1","1/2","1/4","1/8","1/16","1/32","1/64"},
+}
 slide="off"
 lz_x_val = 0 
 lz_y_val = 0 
