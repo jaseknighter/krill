@@ -537,17 +537,31 @@ function mod_matrix:update_matrix()
 
 end
 
+
+function mod_matrix.init_scrolling_text_input(self)
+  clock.sleep(0.2)
+  self.scrolling_input:init()
+end
+
+function mod_matrix.init_scrolling_text_output(self)
+  clock.sleep(0.2)
+  self.scrolling_output:init()
+end
+
 function mod_matrix:display_params()
   local input = self.inputs[self.active_input]
   local output = self.outputs[self.active_output]
 
   if self.prev_input == nil or (self.prev_input and self.prev_input ~= input) then
     self.scrolling_input = scroll_text:new(self.lookup[input].name)
-    self.scrolling_input:init()
+    if self.scrolling_input_init_clock and self.scrolling_input_init_clock > 0 then clock.cancel(self.scrolling_input_init_clock) end
+    self.scrolling_input_init_clock = clock.run(mod_matrix.init_scrolling_text_input,self)
   end
+  
   if self.prev_output == nil or (self.prev_output and self.prev_output ~= output) then
     self.scrolling_output = scroll_text:new(self.lookup[output].name)
-    self.scrolling_output:init()
+    if self.scrolling_output_init_clock and self.scrolling_output_init_clock > 0 then clock.cancel(self.scrolling_output_init_clock) end
+    self.scrolling_output_init_clock = clock.run(mod_matrix.init_scrolling_text_output,self)
   end
 
   self.prev_input  = input

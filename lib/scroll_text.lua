@@ -14,13 +14,19 @@ function scroll_text:new(text_to_scroll)
   -- local st.scr_max_length_col4 = 9 -- reduce value to force scrolling of midi type values
   st.text_to_scroll = #text_to_scroll <= st.scr_max_length and  text_to_scroll or "> " .. text_to_scroll .. " "
 
+  if #st.text_to_scroll > st.scr_max_length then
+    st.scr_step_metro = metro.init()
+  end
 
   function st:init()
     --startup scrolling metro
-    if #self.text_to_scroll > self.scr_max_length then
-      self.scr_step_metro = metro.init()
-      self.scr_step_metro.event = self.scroll
-      self:scr_start_stop_metro()
+    if self.scr_step_metro then
+      if #self.text_to_scroll > self.scr_max_length then
+        self.scr_step_metro.event = self.scroll
+        self:scr_start_stop_metro()
+      end
+    -- elseif #self.text_to_scroll > self.scr_max_length then
+    --   print("self.scr_step_metro not found", self.scr_step_metro)
     end
   end
 
