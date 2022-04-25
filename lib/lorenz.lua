@@ -215,7 +215,7 @@ lorenz.update = function()
 
   local x = (lorenz.x_map) 
   local y = (lorenz.y_map) 
-
+  
   -- screen.level(3)
   -- screen.aa(0)
   if lorenz.x_map~=0 and lorenz.y_map ~= 0 then

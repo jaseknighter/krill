@@ -21,18 +21,25 @@ mod_matrix.selecting_param = "in"
 mod_matrix.active_pp_option=1
 mod_matrix.active_crow_pp_option=1
 mod_matrix.active_midi_pp_option=1
--- mod_matrix.default_pp_option_selections={1,6,1,1}
-mod_matrix.default_pp_option_selections={1,101}
+-- mod_matrix.default_pp_option_selections={1,101,1}  -- set level (2nd value) to 1
+mod_matrix.default_pp_option_selections={1,11,1}      -- set level (2nd value) to 0.1
 mod_matrix.enabled_options={"off","on"}
 mod_matrix.level_options={}
+mod_matrix.level_range_options={}
 
 mod_matrix.input_labels = {"a","b","c","d","e"}
 mod_matrix.output_labels = {1,2,3,4,5,6,7}
 
 mod_matrix.pressing = false
+mod_matrix.setting_scrolling_input = false
+mod_matrix.setting_scrolling_output = false
 
 for i=0,1000 do
   table.insert(mod_matrix.level_options,i*0.01)
+end
+
+for i=0,1000 do
+  table.insert(mod_matrix.level_range_options,i*0.01)
 end
 
 -- mod_matrix.self_mod_options = {"none","inv","rect"}
@@ -40,13 +47,9 @@ end
 
 -- crow output options
 mod_matrix.active_crow_output_option=1
-mod_matrix.default_crow_option_selections={1,3,101,1} -- crow enabled, crow output, crow_level, crow_slew
+mod_matrix.default_crow_option_selections={1,3,1} -- crow enabled, crow output, crow_slew
 mod_matrix.crow_enabled_options={"off","on"}
 mod_matrix.crow_output_options={1,2,3,4}
-mod_matrix.crow_level_options={}
-for i=0,1000 do
-  table.insert(mod_matrix.crow_level_options,i*0.01)
-end
 
 mod_matrix.crow_slew_options={}
 for i=0,2000 do
@@ -55,7 +58,7 @@ end
 
 -- midi output options
 mod_matrix.active_midi_output_option=1
-mod_matrix.default_midi_option_selections={1,1,1,101} -- midi enabled, midi cc, midi channel, midi level
+mod_matrix.default_midi_option_selections={1,1,1} -- midi enabled, midi cc, midi channel
 mod_matrix.midi_cc_enabled_options={"off","on"}
 mod_matrix.midi_cc_options={}
 for i=1,127 do
@@ -65,11 +68,6 @@ mod_matrix.midi_channel_options={}
 for i=1,16 do
   table.insert(mod_matrix.midi_channel_options,i)
 end
-mod_matrix.midi_level_options={}
-for i=0,1000 do
-  table.insert(mod_matrix.midi_level_options,i*0.01)
-end
-
 
 --tables to be saved/recalled (for save_load.lua)
 mod_matrix.inputs={}
@@ -77,9 +75,33 @@ mod_matrix.outputs={}
 mod_matrix.patch_points={}
 
 
+
+
+------------------------
+--lfo setup
+------------------------
+
+
+-- for lib/hnds
+mod_matrix.lfo = include("lib/lfo")
+
+mod_matrix.lfo_types = {"sine", "square", "s+h"}
+mod_matrix.lfo_index = nil
+
+
+
+
+
+
+------------------------
+-- mod_matrix init
+------------------------
+
 function mod_matrix:init()
+  mod_matrix.lfo.init()
   mod_matrix:enrich_param_actions()
 end
+ 
 
 function mod_matrix:enrich_param_actions()
   for p_id, p_ix in pairs(params.lookup) do
@@ -155,7 +177,7 @@ function mod_matrix.enc(n, d)
           input =  util.wrap(input+d,1,#mod_matrix.lookup)
         end
         mod_matrix.inputs[mod_matrix.active_input] = input
-        for i=1,#mod_matrix.input_labels do
+        for i=1,#mod_matrix.output_labels do
           if mod_matrix.patch_points[mod_matrix.active_input][i] then
             mod_matrix.patch_points[mod_matrix.active_input][i].enabled = 1
           end
@@ -190,9 +212,9 @@ function mod_matrix.enc(n, d)
           output =  util.wrap(output+d,1,#mod_matrix.lookup)
         end
         mod_matrix.outputs[mod_matrix.active_output] = output
-        for i=1,#mod_matrix.output_labels do
-          if mod_matrix.patch_points[mod_matrix.active_output][i] then
-            mod_matrix.patch_points[mod_matrix.active_output].enabled = 1
+        for i=1,#mod_matrix.input_labels do
+          if mod_matrix.patch_points[i][mod_matrix.active_output] then
+            mod_matrix.patch_points[i][mod_matrix.active_output].enabled = 1
           end
         end
       end
@@ -206,7 +228,8 @@ function mod_matrix.enc(n, d)
           mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].enabled = util.clamp(pp_values.enabled+d,1,#mod_matrix.enabled_options)
         elseif option_num == 2 then
           mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].level = util.clamp(pp_values.level+d,1,#mod_matrix.level_options)
-        -- elseif option_num == 3 then
+        elseif option_num == 3 then
+          mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].level_range = util.clamp(pp_values.level_range+d,1,#mod_matrix.level_range_options)
         --   mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].self_mod = util.clamp(pp_values.self_mod+d,1,#mod_matrix.self_mod_options)
         -- elseif option_num == 4 then
         --   mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].relative_mod = util.clamp(pp_values.relative_mod+d,1,#mod_matrix.relative_mod_options)
@@ -219,8 +242,6 @@ function mod_matrix.enc(n, d)
         elseif option_num == 2 then
           mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_output = util.clamp(pp_values.crow_output+d,1,#mod_matrix.crow_output_options)
         elseif option_num == 3 then
-          mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_level = util.clamp(pp_values.crow_level+d,1,#mod_matrix.crow_level_options)
-        elseif option_num == 4 then
           mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].crow_slew = util.clamp(pp_values.crow_slew+d,1,#mod_matrix.crow_slew_options)
         end
       elseif mod_matrix.active_gui_sector == 5 then -- midi options
@@ -232,8 +253,6 @@ function mod_matrix.enc(n, d)
           mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_cc = util.clamp(pp_values.midi_cc+d,1,#mod_matrix.midi_cc_options)
         elseif option_num == 3 then
           mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_channel = util.clamp(pp_values.midi_channel+d,1,#mod_matrix.midi_channel_options)
-        elseif option_num == 4 then
-          mod_matrix.patch_points[mod_matrix.active_input][mod_matrix.active_output].midi_level = util.clamp(pp_values.midi_level+d,1,#mod_matrix.midi_level_options)
         end
       end
     end
@@ -380,7 +399,11 @@ function mod_matrix:process_updated_param(ix,id,value)
                 end
                 
                 local pp_level         = self.patch_points[i][j].level
-                pp_level = mod_matrix.level_options[pp_level]
+                pp_level               = mod_matrix.level_options[pp_level]
+                local pp_level_range   = self.patch_points[i][j].level_range
+                pp_level_range         = mod_matrix.level_options[pp_level_range]
+                local random_range     = util.linlin(0,1,-1,1,math.random())*pp_level_range
+                pp_level = pp_level + random_range
                 new_output_value = new_output_value * pp_level
                 new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
                 if output_obj.type == 1 then
@@ -395,8 +418,8 @@ function mod_matrix:process_updated_param(ix,id,value)
                 local output    = self.patch_points[i][j].crow_output
                 local volts     = util.linlin(input_obj.min,input_obj.max,-5,10,input_obj.val)
                 local slew      = self.patch_points[i][j].crow_slew/1000
-                local pp_level  = self.patch_points[i][j].crow_level
-                pp_level = mod_matrix.crow_level_options[pp_level]
+                local pp_level  = self.patch_points[i][j].level
+                pp_level = mod_matrix.level_options[pp_level]
                 volts = volts * pp_level
                 volts = util.clamp(volts,-5,10)
                 mod_matrix.crow_output(output, volts, slew)
@@ -407,8 +430,8 @@ function mod_matrix:process_updated_param(ix,id,value)
                 local cc = self.patch_points[i][j].midi_cc
                 local midi_channel = self.patch_points[i][j].midi_channel
                 local cc_val = util.linlin(input_obj.min,input_obj.max,1,127,input_obj.val)
-                local pp_level = self.patch_points[i][j].midi_level
-                pp_level = mod_matrix.midi_level_options[pp_level]
+                local pp_level = self.patch_points[i][j].level
+                pp_level = mod_matrix.level_options[pp_level]
                 local cc_val = cc_val * pp_level
                 externals.play_midi_cc_mod_matrix(cc,cc_val,midi_channel)
               end
@@ -425,8 +448,8 @@ end
 --- mod matrix crow output
 -------------------------------------------
 function mod_matrix.crow_output(output, volts,slew)
-  if params:get("output_crow"..output)~=8 then
-    params:set("output_crow"..output,8) 
+  if params:get("output_crow"..output)~=10 then
+    params:set("output_crow"..output,10) 
   end
   crow.output[output].volts = volts 
   crow.output[output].slew = slew 
@@ -498,13 +521,15 @@ function mod_matrix:update_matrix()
   
   if pp == nil or (crow_enabled == nil or midi_cc_enabled == nil) then
     -- main patch point options
-    local enabled  = mod_matrix.default_pp_option_selections[1]
-    local level  = mod_matrix.default_pp_option_selections[2]
+    local enabled     = mod_matrix.default_pp_option_selections[1]
+    local level       = mod_matrix.default_pp_option_selections[2]
+    local level_range = mod_matrix.default_pp_option_selections[3]
     -- local self_mod  = mod_matrix.default_pp_option_selections[3]
     -- local relative_mod  = mod_matrix.default_pp_option_selections[4]
     self.patch_points[self.active_input][self.active_output] = {
-      enabled        =    enabled,    -- options: off, on
-      level          =    level,      -- options: 0,1/4,1/2,1,2,10
+      enabled        =    enabled,          -- options: off, on
+      level          =    level,            
+      level_range    =    level_range,      
       -- self_mod       =    self_mod,       -- options: none,invert,rectify
       -- relative_mod   =    relative_mod,   -- options: none, and, or
     }
@@ -514,23 +539,19 @@ function mod_matrix:update_matrix()
     -- crow patch point options
     local enabled  = mod_matrix.default_crow_option_selections[1]
     local output  = mod_matrix.default_crow_option_selections[2]
-    local level  = mod_matrix.default_crow_option_selections[3]
-    local slew  = mod_matrix.default_crow_option_selections[4]
+    local slew  = mod_matrix.default_crow_option_selections[3]
     self.patch_points[self.active_input][self.active_output].crow_enabled  =   enabled
     self.patch_points[self.active_input][self.active_output].crow_output   =   output
-    self.patch_points[self.active_input][self.active_output].crow_level    =   level
     self.patch_points[self.active_input][self.active_output].crow_slew     =   slew
     
     -- midi patch point options
     local enabled   = mod_matrix.default_midi_option_selections[1]
     local cc        = mod_matrix.default_midi_option_selections[2]
     local channel   = mod_matrix.default_midi_option_selections[3]
-    local level     = mod_matrix.default_midi_option_selections[4]
     
     self.patch_points[self.active_input][self.active_output].midi_cc_enabled  =   enabled
     self.patch_points[self.active_input][self.active_output].midi_cc          =   cc
     self.patch_points[self.active_input][self.active_output].midi_channel     =   channel
-    self.patch_points[self.active_input][self.active_output].midi_level       =   level
   end
 
     
@@ -538,13 +559,15 @@ function mod_matrix:update_matrix()
 end
 
 
-function mod_matrix.init_scrolling_text_input(self)
+function mod_matrix.init_scrolling_text_input(self,input)
   clock.sleep(0.2)
+  self.scrolling_input = scroll_text:new(self.lookup[input].name)    
   self.scrolling_input:init()
 end
 
-function mod_matrix.init_scrolling_text_output(self)
+function mod_matrix.init_scrolling_text_output(self,output)
   clock.sleep(0.2)
+  self.scrolling_output = scroll_text:new(self.lookup[output].name)    
   self.scrolling_output:init()
 end
 
@@ -553,27 +576,25 @@ function mod_matrix:display_params()
   local output = self.outputs[self.active_output]
 
   if self.prev_input == nil or (self.prev_input and self.prev_input ~= input) then
-    self.scrolling_input = scroll_text:new(self.lookup[input].name)
     if self.scrolling_input_init_clock and self.scrolling_input_init_clock > 0 then clock.cancel(self.scrolling_input_init_clock) end
-    self.scrolling_input_init_clock = clock.run(mod_matrix.init_scrolling_text_input,self)
+    self.scrolling_input_init_clock = clock.run(mod_matrix.init_scrolling_text_input,self,input)
   end
   
   if self.prev_output == nil or (self.prev_output and self.prev_output ~= output) then
-    self.scrolling_output = scroll_text:new(self.lookup[output].name)
     if self.scrolling_output_init_clock and self.scrolling_output_init_clock > 0 then clock.cancel(self.scrolling_output_init_clock) end
-    self.scrolling_output_init_clock = clock.run(mod_matrix.init_scrolling_text_output,self)
+    self.scrolling_output_init_clock = clock.run(mod_matrix.init_scrolling_text_output,self,output)
   end
-
+    
   self.prev_input  = input
   self.prev_output = output
   if self.lookup[input] and self.lookup[output] then
-    local input_text
-    local output_text
+    local input_text  = ""
+    local output_text = ""
     
     if self.active_gui_sector == 2 then
       input_text  = "in: "  .. self.lookup[input].name
       output_text = "out: " .. self.lookup[output].name
-    else
+    elseif self.scrolling_input and self.scrolling_output then
       input_text  = "in: "  .. self.scrolling_input.get_text()
       output_text = "out: " .. self.scrolling_output.get_text()
     end
@@ -719,6 +740,7 @@ function mod_matrix:display_patch_point_options()
     if self.active_gui_sector < 4 then
       local enabled   = self.enabled_options[self.patch_points[self.active_input][self.active_output].enabled]
       local level     = self.level_options[self.patch_points[self.active_input][self.active_output].level]
+      local level_range     = self.level_options[self.patch_points[self.active_input][self.active_output].level_range]
       -- local self_mod      = self.self_mod_options[self.patch_points[self.active_input][self.active_output].self_mod]
       -- local relative_mod  = self.relative_mod_options[self.patch_points[self.active_input][self.active_output].relative_mod]
 
@@ -730,10 +752,10 @@ function mod_matrix:display_patch_point_options()
       screen.level(mod_matrix.active_pp_option == 2 and 15 or 5)
       screen.text("lvl: " .. level)
       screen.stroke()
-      -- screen.move(8,40)
-      -- screen.level(mod_matrix.active_pp_option == 3 and 15 or 5)
-      -- screen.text("sm: " .. self_mod)
-      -- screen.stroke()
+      screen.move(8,40)
+      screen.level(mod_matrix.active_pp_option == 3 and 15 or 5)
+      screen.text("lvlr: " .. level_range)
+      screen.stroke()
       -- screen.move(8,48)
       -- screen.level(mod_matrix.active_pp_option == 4 and 15 or 5)
       -- screen.text("rm: " .. relative_mod)
@@ -741,8 +763,6 @@ function mod_matrix:display_patch_point_options()
     elseif self.active_gui_sector == 4 then -- crow gui
       local enabled   = self.crow_enabled_options[self.patch_points[self.active_input][self.active_output].crow_enabled]
       local output    = self.crow_output_options[self.patch_points[self.active_input][self.active_output].crow_output]
-      local level     = self.crow_level_options[self.patch_points[self.active_input][self.active_output].crow_level]
-      level = fn.round_decimals(level, 3)
       local slew     = self.crow_slew_options[self.patch_points[self.active_input][self.active_output].crow_slew]
       screen.move(8,24)
       screen.level(mod_matrix.active_crow_pp_option == 1 and 15 or 5)
@@ -753,10 +773,6 @@ function mod_matrix:display_patch_point_options()
       screen.text("out: " .. output)
       screen.stroke()
       screen.move(8,40)
-      screen.level(mod_matrix.active_crow_pp_option == 3 and 15 or 5)
-      screen.text("lvl: " .. level)
-      screen.stroke()
-      screen.move(8,48)
       screen.level(mod_matrix.active_crow_pp_option == 4 and 15 or 5)
       screen.text("slew: " .. slew)
       screen.stroke()
@@ -764,7 +780,6 @@ function mod_matrix:display_patch_point_options()
       local enabled   = self.midi_cc_enabled_options[self.patch_points[self.active_input][self.active_output].midi_cc_enabled]
       local cc        = self.midi_cc_options[self.patch_points[self.active_input][self.active_output].midi_cc]
       local channel   = self.midi_channel_options[self.patch_points[self.active_input][self.active_output].midi_channel]
-      local level     = self.midi_level_options[self.patch_points[self.active_input][self.active_output].midi_level]
       screen.move(8,24)
       screen.level(mod_matrix.active_midi_pp_option == 1 and 15 or 5)
       screen.text("enbl: " .. enabled)
@@ -776,10 +791,6 @@ function mod_matrix:display_patch_point_options()
       screen.move(8,40)
       screen.level(mod_matrix.active_midi_pp_option == 3 and 15 or 5)
       screen.text("ch: " .. channel)
-      screen.stroke()
-      screen.move(8,48)
-      screen.level(mod_matrix.active_midi_pp_option == 4 and 15 or 5)
-      screen.text("lvl: " .. level)
       screen.stroke()
     end
   end

@@ -1,6 +1,7 @@
 local gui = {}
 
-local lz_ix = 1
+local squiggle_ix = 1
+local squiggle_width = 15
 local lb = lorenz.boundary
 
 function gui.setup_menu_maps()
@@ -28,11 +29,22 @@ function gui.setup_menu_maps()
                 "rings_brightnes_base","rings_brightness_range",
                 "rings_damping_base","rings_damping_range",
                 "rings_poly"}
+
+  local lfo_params = {}
+  for i=1,2,1 do
+    
+    table.insert(lfo_params,i .. "lfo")
+    table.insert(lfo_params,i .. "lfo_shape")
+    table.insert(lfo_params,i .. "lfo_depth")
+    table.insert(lfo_params,i .."offset")
+    table.insert(lfo_params,i .. "lfo_freq")
+  end
     
   gui.sub_menu_map_krell = {
     {"sequencing_mode","env_scalar","rise_time","fall_time","env_max_level","env_shape","num_octaves"},
     {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
     lrz_params,
+    lfo_params,
     eng_params,
   }
 
@@ -45,14 +57,14 @@ function gui.setup_menu_maps()
     -- gui.vjd_rests(),
     {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
     lrz_params,
+    lfo_params,
     eng_params,
   }
 
+  menu_map = {"seq","scr","lrz","lfo","eng"}
   if sequencing_mode == 1 then
-    menu_map = {"seq","scr","lrz","eng"}
     sub_menu_map = gui.sub_menu_map_krell
   else
-    menu_map = {"seq","scr","lrz","eng"}
     -- menu_map = {"seq","rst","scr","lrz","res"}
     sub_menu_map = gui.sub_menu_map_vuja_de
   end
@@ -227,57 +239,31 @@ function gui:display_lorenz()
   screen.move((lb[1]-5)/2,45)
   screen.font_size(10)
   screen.text_center(active_sub_menu_value)
-  -- print("active_sub_menu_value",active_sub_menu_value)
-  --[[
-    "x_input","y_input","x_offset","y_offset","x_scale","y_scale"
-  ]]
 
-  -- screen.aa(0)
-  -- draw right menu
-  -- screen.level(math.floor(gui_level*(active_menu == 4 and 10 or 3)))
-  -- screen.move(105,lb[2]+8)
-  -- screen.font_size(8)
-  -- screen.text(menu_map[4])
-
-  -- screen.level(math.floor(gui_level*(active_menu == 5 and 10 or 3)))
-  -- screen.move(118,lb[2]+8)
-  -- screen.font_size(8)
-  -- screen.text(menu_map[5])
-
-  -- draw right xy squggles
-  
-  -- if active_menu <= 5 then
+  -- draw squggles
   screen.level(10)
-  -- screen.rect(106,20,22,15)
-  -- screen.stroke()
-  if pixels[pixels.active] then
-    local x = pixels[pixels.active].x_display
-    local y = pixels[pixels.active].y_display
-        
-    
-    gui.draw_lorenz_coords(106,20,20,15,x,"x")
-    -- gui.draw_lorenz_coords(106,20,22-2,10-2,lorenz.x_map)
-    screen.stroke()
-    -- screen.rect(106,40,22,15)
-    -- screen.stroke()
-    gui.draw_lorenz_coords(106,40,22-2,15-2,y,"y")
-    -- gui.draw_lorenz_coords(106,40,22-2,10-2,y)
-    -- gui.draw_lorenz_coords(106,40,22-2,10-2,lorenz.y_map)
-    screen.stroke()
+  if pixels[pixels.active] and UI_DISPLAY_SQUIGGLES == 2 then
+    -- draw lorenz x/y squiggles 
+    local lz_x_display = pixels[pixels.active].x_display
+    local lz_y_display = pixels[pixels.active].y_display
+    gui.draw_squiggles(105,0,19,10,lz_x_display,"lzx",squiggle_ix)
+    gui.draw_squiggles(105,16,19,10,lz_y_display,"lzy",squiggle_ix)
+
+    -- draw lfo squiggles
+    if mod_matrix.lfo[1].slope then
+      gui.draw_squiggles(105,32,19,10,mod_matrix.lfo[1].slope,"lfo1",squiggle_ix)
+      gui.draw_squiggles(105,49,19,10-2,mod_matrix.lfo[2].slope,"lfo2",squiggle_ix)  
+    end
   end
-  -- else
-  --   screen.level(0)
-  --   -- screen.rect(106,18,22,60)
-  --   screen.fill()
-  --   screen.stroke()
+
 
     
   -- end
 
-  lz_ix = lz_ix+1
-  if lz_ix > 20 then
+  squiggle_ix = squiggle_ix+1
+  if squiggle_ix > squiggle_width then
     -- screen.clear()
-    lz_ix = 1
+    squiggle_ix = 1
   else
     -- screen.clear()
   end 
@@ -291,33 +277,39 @@ function gui:display_lorenz()
   lorenz.display(true)
 end
 
-function gui.draw_lorenz_coords(lx,ly,lw,lh,y,dim)
-  -- local x1 = lb[1]
-  -- local x2 = lb[1]+lb[3]
-  local dims = sound_controller:get_dimensions()
+function gui.draw_squiggles(lx,ly,lw,lh,squiggle_y,squiggle_type,ix)
+  local sc_dims = sound_controller:get_dimensions()
 
-  local x1 = dims.x
-  local x2 = dims.x+dims.w
-  local y1 = dims.y
-  local y2 = dims.y+dims.h
-  -- if ly < 40 then print(y_loc,x1,x2,ly,ly+lh,y_loc+((x1+x2)/2)) end
-  -- if ly > 20 then print(y_loc,x1,x2,ly,ly+lh,y_loc) end
-  -- local y1 = util.linlin(x1,x2,ly,ly+lh,y_loc+((x1+x2)/2))
+  local x1 = sc_dims.x
+  local x2 = sc_dims.x+sc_dims.w
+  local y1 = sc_dims.y
+  local y2 = sc_dims.y+sc_dims.h
   local y_loc
-  if dim == "x" then
-    y_loc = util.linlin(x1,x2,ly,ly+lh,y)
-    lz_x = util.linlin(x1,x2,0,1,y)
+  if squiggle_type == "lzx" then
+    y_loc = util.linlin(x1,x2,ly,ly+lh,squiggle_y)
+  elseif squiggle_type == "lzy" then
+    y_loc = util.linlin(y1,y2,ly,ly+lh,squiggle_y)
   else
-    y_loc = util.linlin(y1,y2,ly,ly+lh,y)
-    lz_y = util.linlin(y1,y2,0,1,y)
-    -- print(x1,x2,y1,y2,y,y_loc,lz_y)
+    y_loc = util.linlin(0,1,ly,ly+lh,squiggle_y)
   end 
   y_loc = math.floor(y_loc)
   screen.level(0)
-  screen.rect(lx+lz_ix,ly,1,lh+1)
+  screen.rect(lx+ix,ly-2,1,lh+4)
   screen.stroke()
   screen.level(10)
-  screen.pixel(lx+lz_ix,y_loc)    
+  screen.pixel(lx+ix,y_loc)    
+  -- draw label
+  screen.aa(0)
+  screen.move(x2,ly+lh+4)
+  -- screen.move(105,lb[2]+8)
+  screen.stroke()
+  screen.level(math.floor(gui_level*3))
+  -- screen.level(10)
+  screen.font_size(8)
+  -- screen.text(squiggle_type)
+  screen.text_rotate(x2+lw,ly,squiggle_type,90)
+  screen.stroke()
+  
 end
 
 

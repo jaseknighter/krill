@@ -133,7 +133,7 @@ externals.play_midi_cc_lz_xy = function(source,volts)
   local output_midi_y = params:get("play_midi_cc_lz_y")
   local cc_val = math.floor(util.linlin(-5,10,1,127,volts))
   if source == "x" and output_midi_x == 2 then -- lz x output
-    local slew = params:get("lz_x_slew")/1000
+    -- local slew = params:get("lz_x_slew")/1000
     local cc = params:get("play_midi_cc_lz_x_cc")
     local ch = params:get("play_midi_cc_lz_x_chan")
     ch = ch > 0 and ch or nil
@@ -142,9 +142,33 @@ externals.play_midi_cc_lz_xy = function(source,volts)
     end
     -- print("x",cc_val)
   elseif source == "y" and output_midi_y == 2 then -- lz y output
-    local slew = params:get("lz_y_slew")/1000
+    -- local slew = params:get("lz_y_slew")/1000
     local cc = params:get("play_midi_cc_lz_y_cc")
     local ch = params:get("play_midi_cc_lz_y_chan")
+    ch = ch > 0 and ch or nil
+    if midi_out_device then
+      midi_out_device:cc (cc, cc_val, ch)
+    end
+  end
+end
+
+externals.play_midi_cc_lfos = function(source,volts)
+  local play_midi_lfo1 = params:get("1play_midi_lfo_cc")
+  local play_midi_lfo2 = params:get("2play_midi_lfo_cc")
+  local cc_val = math.floor(util.linlin(-5,10,1,127,volts))
+  if source == "1lfo" and play_midi_lfo1 == 2 then -- lz x output
+    -- local slew = params:get("lz_x_slew")/1000
+    local cc = params:get("1midi_lfo_cc")
+    local ch = params:get("1midi_lfo_chan")
+    ch = ch > 0 and ch or nil
+    if midi_out_device then  
+      midi_out_device:cc (cc, cc_val, ch)
+    end
+    -- print("x",cc_val)
+  elseif source == "2lfo" and play_midi_lfo2 == 2 then -- lz y output
+    -- local slew = params:get("lz_y_slew")/1000
+    local cc = params:get("2midi_lfo_cc")
+    local ch = params:get("2midi_lfo_chan")
     ch = ch > 0 and ch or nil
     if midi_out_device then
       midi_out_device:cc (cc, cc_val, ch)
@@ -257,6 +281,21 @@ externals.play_crow_lz_xy = function(source,volts)
       crow.output[i]() 
     elseif source == "y" and output_crow == 7 then -- lz y output
       crow.output[i].slew = params:get("lz_y_slew")/1000
+      crow.output[i].volts = volts 
+      crow.output[i]() 
+    end
+  end
+end
+
+externals.play_crow_lfos = function(source,volts)
+  for i=1,4,1 do
+    local output_crow = params:get("output_crow"..i)
+    if source == "1lfo" and output_crow == 8 then -- lfo1 output
+      crow.output[i].slew = params:get("1lfo_slew")/1000
+      crow.output[i].volts = volts 
+      crow.output[i]() 
+    elseif source == "2lfo" and output_crow == 9 then -- lfo2 output
+      crow.output[i].slew = params:get("2lfo_slew")/1000
       crow.output[i].volts = volts 
       crow.output[i]() 
     end

@@ -6,6 +6,9 @@
 -- _norns.screen_export_png("/home/we/dust/krill"..screenshot..".png")
 
 --[[
+
+lfo's thanks to justmat (otis)
+
 engine utilizing v7b1's port of MIRings: https://github.com/v7b1/mi-UGens
 
 notes about installing https://github.com/madskjeldgaard/portedplugins
@@ -81,6 +84,7 @@ chaos_y={}
 initializing = true
 function init()
   screen.clear()
+  screen.update()
 
   -- set sensitivity of the encoders
   norns.enc.sens(1,6)
@@ -170,6 +174,29 @@ function init()
     division = 1/64,-- 1/256, --1/16,
     enabled = true
   }
+
+  lfo_output_patterns = krill_lattice:new_pattern{
+    action = function(t) 
+      if pixels[pixels.active] then
+        local lfo_slope1 = mod_matrix.lfo[1].slope
+        local lfo_slope2 = mod_matrix.lfo[2].slope
+
+        local lfo1_volts_min = params:get("1lfo_volts_min")
+        local lfo1_volts_max = params:get("1lfo_volts_max")
+        local lfo2_volts_min = params:get("2lfo_volts_min")
+        local lfo2_volts_max = params:get("2lfo_volts_max")
+
+        local lfo_val1 = util.linlin(-1,1,lfo1_volts_min,lfo1_volts_max,lfo_slope1)
+        local lfo_val2 = util.linlin(-1,1,lfo2_volts_min,lfo2_volts_max,lfo_slope2)
+        ext.play_crow_lfos("1lfo", lfo_val1)
+        ext.play_midi_cc_lfos("1lfo", mod_matrix.lfo[1].slope)
+        ext.play_crow_lfos("2lfo", lfo_val2)
+        ext.play_midi_cc_lfos("2lfo", mod_matrix.lfo[2].slope)
+      end
+    end,
+    division = 1/64,-- 1/256, --1/16,
+    enabled = true
+  }
   
   vuja_de_rest_patterns = {}
   vuja_de_rest_sequins = {}
@@ -242,7 +269,6 @@ function init()
   if params:get("autosave") == 2 then
     save_load.load_krill_data(folder_path.."autosave.krl")
   end  
-  params:set("internal_trigger_type",2)
   
   initializing = false  clock.run(finish_init)
 end
@@ -266,11 +292,16 @@ function finish_init()
   params:set("fall_time",150)
 
   params:set("rings_pos",1)
-  params:set("rings_structure_base",0.25)
-  params:set("rings_structure_base",0.25)
-  params:set("rings_brightnes_base",0.75)
+  -- params:set("rings_structure_base",0.25)
+  params:set("rings_brightnes_base",0.25)
   params:set("rings_damping_base",0.25)
-  params:set("internal_trigger_type",3)
+  params:set("rings_poly",1)
+  params:set("internal_trigger_type",2)
+  params:set("internal_trigger_type",1)
+  params:set("vuja_pat_defaults1",5)
+
+  params:set("1lfo_freq",1)
+
   clock.run(gui.update_menu_display)
   play_enabled = true
 
@@ -352,6 +383,11 @@ function init_polling()
   function play_engine(note)
     -- engine.note_off()
     engine.note_on(note,1)
+  end
+
+  function adjust_engine_pitch(note)
+    -- engine.note_off()
+    engine.adjust_engine_pitch(note)
   end
 
   -- pitch_poll:start()

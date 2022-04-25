@@ -1,5 +1,30 @@
 local parameters = {}
 
+function parameters.add_bulk_params(bulk_data)
+  for i=1, #bulk_data,1 do
+    local p_data = bulk_data[i]
+    if p_data[1] == "separator" then
+      params:add_separator(p_data[2])
+    elseif p_data[1] == "number" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
+        action=p_data[7]
+      }          
+    elseif p_data[1] == "control" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3], controlspec=p_data[4], 
+        action=p_data[5]
+      }          
+    elseif p_data[1] == "option" then
+      params:add{
+        type=p_data[1], id = p_data[2], name=p_data[3] ,options=p_data[4], default=p_data[5], 
+        action=p_data[6]
+      }          
+
+    end
+  end
+end
+
 function parameters.init()
 
   --------------------------------
@@ -40,19 +65,10 @@ function parameters.init()
   --------------------------------
   -- quant grid scales and notes
   --------------------------------
-  params:add_separator("SCALES")
+  params:add_separator("SCALES+NOTES")
   -- params:add_group("scales and notes",5)
 
   
-  params:add{type = "number", id = "num_octaves", name = "num octs", min=1,max=NUM_OCTAVES_MAX,default=NUM_OCTAVES_DEFAULT,
-    action = function(val) 
-      fn.build_scale() 
-      sound_controller:init(val,fn.get_num_notes_per_octave())
-      screen.clear()
-      -- parameters.play_random_note_offset()
-      -- local sl = params:lookup_param("scale_length")
-      -- sl.maxval = fn.get_num_notes_per_octave() * val
-  end}
 
   -- params:add{type = "number", id = "scale_length", name = "scale length",
   --   min = 1, max = max_notes, default = ROOT_NOTE_DEFAULT, 
@@ -100,9 +116,23 @@ function parameters.init()
     action = function(value) 
   end}
     
+  params:add{type = "number", id = "num_octaves", name = "num octs", min=1,max=NUM_OCTAVES_MAX,default=NUM_OCTAVES_DEFAULT,
+    action = function(val) 
+      fn.build_scale() 
+      sound_controller:init(val,fn.get_num_notes_per_octave())
+      screen.clear()
+      -- parameters.play_random_note_offset()
+      -- local sl = params:lookup_param("scale_length")
+      -- sl.maxval = fn.get_num_notes_per_octave() * val
+  end}
+
+  params:add_separator("::read only::")
+  params:add_control("active_note","active note", controlspec.new(1, 127, "lin", 0.0001, 0.00001, ""))
+
   --------------------------------
   -- lorenz params
   --------------------------------
+  params:add_separator("")
   params:add_separator("LORENZ")
   params:add_group("lorenz view",7)
   -- params:add{
@@ -319,112 +349,22 @@ function parameters.init()
     end
   }
 
-    --------------------------------
-  -- lorenz x/y output params
-  --------------------------------
-
-
-  local lz_xy_min_action_x = function(x) 
-    local val = x
-    local current_max_value = params:get("lz_x_max")
-    if val > current_max_value then 
-      val = current_max_value
-      params:set("lz_x_min",val)
-    end
-  end
-  
-  local lz_min_cs = cs.new(-5, 10, 'lin', 0, 0, "")
-  local lz_max_cs = cs.new(-5, 10, 'lin', 0, 5, "")
-  local lz_xy_min_action_y = function(x) 
-    local val = x
-    local current_min_value = params:get("lz_x_min")
-    val = util.clamp(val, current_min_value,val)
-    if val < current_min_value then 
-      val = current_min_value
-      params:set("lz_x_max",val)
-    end
-  end
-  
-  local lz_xy_max_action_x = function(x) 
-    local val = x
-    local current_max_value = params:get("lz_y_max")
-    if val > current_max_value then 
-      val = current_max_value
-      params:set("lz_y_min",val)
-    end
-  end
-  
-  local lz_xy_max_action_y = function(x) 
-    local val = x
-    local current_min_value = params:get("lz_y_min")
-    val = util.clamp(val, current_min_value,val)
-    if val < current_min_value then 
-      val = current_min_value
-      params:set("lz_y_max",val)
-    end
-  end
-
-  local lz_division_cs = cs.new(10, 2000, 'exp', 0, 31.25, "",0.001)
-  local lz_division_action_x = function(x)
-    lorenz_output_pattern_x:set_division(x/1000)
-  end
-  
-  local lz_division_action_y = function(x)
-    lorenz_output_pattern_y:set_division(x/1000)
-  end
-
-  local lz_slew_cs = cs.new(0, 2000, 'lin', 0, 31.25, "",0.001)
-  local lz_slew_action_x = function(x)
-    -- lorenz_output_pattern_x:set_division(x)
-  end
-
-  local lz_slew_action_y = function(x)
-    -- lorenz_output_pattern_y:set_division(x)
-  end
-
+    
   local lz_xy_cs = cs.new(-5, 10, 'lin', 0, 0.01, "",0.001)
 
-  local lorenz_xy_output_param_data = {
-    -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
-    -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
-    {"control","lz_x_division","lz x division (ms)",lz_division_cs,lz_division_action_x},
-    {"control","lz_y_division","lz y division (ms)",lz_division_cs,lz_division_action_y},
-    {"control","lz_x_slew","lz x slew (ms)",lz_slew_cs,lz_slew_action_x},
-    {"control","lz_y_slew","lz y slew (ms)",lz_slew_cs,lz_slew_action_y},
-    {"control","lz_x_min","lz x min (volts)",lz_min_cs,lz_xy_min_action_x},
-    {"control","lz_x_max","lz x max (volts)",lz_max_cs,lz_xy_min_action_y},
-    {"control","lz_y_min","lz y min (volts)",lz_min_cs,lz_xy_max_action_x},
-    {"control","lz_y_max","lz y max (volts)",lz_max_cs,lz_xy_max_action_y},
+  local lorenz_xy_data = {
+    {"separator","::read only::"},
     {"control","lz_x","lorenz x",lz_xy_cs,nil},
     {"control","lz_y","lorenz y",lz_xy_cs,nil},
   }
 
-  params:add_group("lz x/y outputs",#lorenz_xy_output_param_data)
+  parameters.add_bulk_params(lorenz_xy_data)
 
-  for i=1, #lorenz_xy_output_param_data,1 do
-    local p_data = lorenz_xy_output_param_data[i]
-    if p_data[1] == "number" then
-      params:add{
-        type=p_data[1], id = p_data[2], name=p_data[3] ,min=p_data[4], max=p_data[5], default = p_data[6],
-        action=p_data[7]
-      }          
-    elseif p_data[1] == "control" then
-      params:add{
-        type=p_data[1], id = p_data[2], name=p_data[3], controlspec=p_data[4], 
-        action=p_data[5]
-      }          
-    elseif p_data[1] == "option" then
-      params:add{
-        type=p_data[1], id = p_data[2], name=p_data[3] ,options=p_data[4], default=p_data[5], 
-        action=p_data[6]
-      }          
-
-    end
-  end
-
+  
   --------------------------------
   -- vuja de params
   --------------------------------
+  params:add_separator("")
   params:add_separator("VUJA DE")
   -- params:add_group("lorenz",19)
 
@@ -525,6 +465,7 @@ function parameters.init()
       params:hide("vuja_de_oct_offset"..i)
       params:hide("vuja_de_engine_mode"..i)
       params:hide("pat_lab"..i)
+      params:hide("vuja_pat_defaults"..i)
       
     end
       
@@ -537,6 +478,7 @@ function parameters.init()
         params:hide("vuja_de_div_numerator"..i)
         params:hide("vuja_de_div_denominator"..i)
         params:hide("pat_lab"..i)
+        params:hide("vuja_pat_defaults"..i)
         params:hide("vuja_de_jitter"..i)
         params:hide("vuja_de_oct_offset"..i)
         params:hide("vuja_de_engine_mode"..i)
@@ -544,6 +486,7 @@ function parameters.init()
         params:show("vuja_de_div_numerator"..i)
         params:show("vuja_de_div_denominator"..i)    
         params:show("pat_lab"..i)    
+        params:show("vuja_pat_defaults"..i)    
         params:show("vuja_de_jitter"..i)
         params:show("vuja_de_oct_offset"..i)
         params:show("vuja_de_engine_mode"..i)
@@ -652,14 +595,128 @@ function parameters.init()
     end
   end
   
+  --------------------------------
+  -- modulation:  lfos + lorenz x/y output params
+  --------------------------------
+
+
+  local lz_xy_min_action_x = function(x) 
+    local val = x
+    local current_max_value = params:get("lz_x_max")
+    if val > current_max_value then 
+      val = current_max_value
+      params:set("lz_x_min",val)
+    end
+  end
+  
+  local lz_min_cs = cs.new(-5, 10, 'lin', 0, 0, "")
+  local lz_max_cs = cs.new(-5, 10, 'lin', 0, 5, "")
+  local lz_xy_min_action_y = function(x) 
+    local val = x
+    local current_min_value = params:get("lz_x_min")
+    val = util.clamp(val, current_min_value,val)
+    if val < current_min_value then 
+      val = current_min_value
+      params:set("lz_x_max",val)
+    end
+  end
+  
+  local lz_xy_max_action_x = function(x) 
+    local val = x
+    local current_max_value = params:get("lz_y_max")
+    if val > current_max_value then 
+      val = current_max_value
+      params:set("lz_y_min",val)
+    end
+  end
+  
+  local lz_xy_max_action_y = function(x) 
+    local val = x
+    local current_min_value = params:get("lz_y_min")
+    val = util.clamp(val, current_min_value,val)
+    if val < current_min_value then 
+      val = current_min_value
+      params:set("lz_y_max",val)
+    end
+  end
+
+  local lz_division_cs = cs.new(10, 2000, 'exp', 0, 31.25, "",0.001)
+  local lz_division_action_x = function(x)
+    lorenz_output_pattern_x:set_division(x/1000)
+  end
+  
+  local lz_division_action_y = function(x)
+    lorenz_output_pattern_y:set_division(x/1000)
+  end
+
+  local lz_slew_cs = cs.new(0, 2000, 'lin', 0, 31.25, "",0.001)
+  local lz_slew_action_x = function(x)
+    -- lorenz_output_pattern_x:set_division(x)
+  end
+
+  local lz_slew_action_y = function(x)
+    -- lorenz_output_pattern_y:set_division(x)
+  end
+
+
+  local lorenz_xy_output_param_data = {
+    -- {"option","lz_x_quantize","lz x quantize",{"no","yes",1}},
+    -- {"option","lz_y_quantize","lz y quantize",{"no","yes",1}},
+    -- {"control","lz_x_division","lz x division (ms)",lz_division_cs,lz_division_action_x},
+    -- {"control","lz_y_division","lz y division (ms)",lz_division_cs,lz_division_action_y},
+    {"separator","::crow settings::"},
+    {"control","lz_x_slew","lz x slew (ms)",lz_slew_cs,lz_slew_action_x},
+    {"control","lz_y_slew","lz y slew (ms)",lz_slew_cs,lz_slew_action_y},
+    {"control","lz_x_min","lz x min (volts)",lz_min_cs,lz_xy_min_action_x},
+    {"control","lz_x_max","lz x max (volts)",lz_max_cs,lz_xy_min_action_y},
+    {"control","lz_y_min","lz y min (volts)",lz_min_cs,lz_xy_max_action_x},
+    {"control","lz_y_max","lz y max (volts)",lz_max_cs,lz_xy_max_action_y},
+    {"separator","::midi settings::"},
+    {"option","play_midi_cc_lz_x","midi lz cc x out",{"off","on"},1},
+    {"option","play_midi_cc_lz_y","midi lz cc y out",{"off","on"},1},
+    {"number","play_midi_cc_lz_x_cc","midi lz x cc",0,127,MIDI_LZ_X_CC},
+    {"number","play_midi_cc_lz_y_cc","midi lz y cc",0,127,MIDI_LZ_Y_CC},
+    {"number","play_midi_cc_lz_x_chan","midi lz x chan",0,16,1},
+    {"number","play_midi_cc_lz_y_chan","midi lz y chan",0,16,2},
+  }
+
+  params:add_separator("")
+  params:add_separator("MODULATION")
+  mod_matrix.lfo.setup_params()
+  params:add_group("lorenz x/y outputs",#lorenz_xy_output_param_data)
+  parameters.add_bulk_params(lorenz_xy_output_param_data)
+
+
+  --------------------------------
+  -- inputs/outputs/midi params
+  --------------------------------
+  params:add_separator("")
+  params:add_separator("INPUTS/OUTPUTS")
+
+  -- sequencing_mode
+  params:add{
+    type = "option", id = "sequencing_mode", name = "seq mode", 
+    options = {"krell","vuja de"},
+    default = 1,
+    action = function(value) 
+      sequencing_mode = value
+      engine.switch_sequencing_mode(value)
+      if sequencing_mode == 1 then
+        -- engine.rise_fall(nil,nil)        
+        engine.note_on(notes[math.random(15)],2)
+      else
+        -- engine.note_on(notes[math.random(15)],2)
+        -- krell_rise = rise
+        -- krell_fall = fall        
+      end
+      gui.setup_menu_maps()
+  end}
+  
+
 
   --------------------------------
   -- envelope params
   --------------------------------
-  params:add_separator("")
-  params:add_separator("A/D ENVELOPE")
-
-  -- quantize notes
   params:add_group("envelope params",8)
 
 
@@ -725,32 +782,6 @@ function parameters.init()
   end}
 
   --------------------------------
-  -- inputs/outputs/midi params
-  --------------------------------
-  params:add_separator("INPUTS/OUTPUTS")
-
-  -- sequencing_mode
-  params:add{
-    type = "option", id = "sequencing_mode", name = "seq mode", 
-    options = {"krell","vuja de"},
-    default = 1,
-    action = function(value) 
-      sequencing_mode = value
-      engine.switch_sequencing_mode(value)
-      if sequencing_mode == 1 then
-        -- engine.rise_fall(nil,nil)        
-        engine.note_on(notes[math.random(15)],2)
-      else
-        -- engine.note_on(notes[math.random(15)],2)
-        -- krell_rise = rise
-        -- krell_fall = fall        
-      end
-      gui.setup_menu_maps()
-  end}
-  
-
-
-  --------------------------------
   -- engine (rings & karplus strong) params
   --------------------------------
   function parameters.set_engine_params(param_data)
@@ -788,21 +819,24 @@ function parameters.init()
     end
   end
 
-    --rings params
-    local rings_param_data = {
-      {"taper","rings_pos","pos",0,1,0.05},
-      {"taper","rings_structure_base","str",0,1,0.2,"rings_structure"},
-      {"taper","rings_structure_range","str rng",0,1,0,"rings_structure"},
-      {"taper","rings_brightnes_base","brt",0,1,0.3,"rings_brightness"},
-      {"taper","rings_brightness_range","brt rng",0,1,0,"rings_brightness"},
-      {"taper","rings_damping_base","dmp",0,1,0.675,"rings_damping"},
-      {"taper","rings_damping_range","dmp rng",0,1,0,"rings_damping"},
-      {"number","rings_poly","poly",1,4,1},
-    }
+  --rings params
+  local rings_param_data = {
+    {"taper","rings_pos","pos",0,1,0.05},
+    {"taper","rings_structure_base","str",0,1,0.2,"rings_structure"},
+    {"taper","rings_structure_range","str rng",0,1,0,"rings_structure"},
+    {"taper","rings_brightnes_base","brt",0,1,0.3,"rings_brightness"},
+    {"taper","rings_brightness_range","brt rng",0,1,0,"rings_brightness"},
+    {"taper","rings_damping_base","dmp",0,1,0.675,"rings_damping"},
+    {"taper","rings_damping_range","dmp rng",0,1,0,"rings_damping"},
+    {"number","rings_poly","poly",1,4,1},
+  }
+
   
+  params:add_group("rings",#rings_param_data + 6)
   
-    params:add_group("rings",#rings_param_data + 4)
-  
+  params:add_number("frequency_slew","frequency slew (ms)", 0, 2000, 0)
+  params:set_action("frequency_slew", function(value) engine.frequency_slew(value/1000) end)
+
   params:add{
     type = "number", id = "rings_easter_egg", name = "egg mode", 
     min=0,max=1,default=0,
@@ -868,14 +902,14 @@ function parameters.init()
 
   params:add{
     type = "option", id = "internal_trigger_type", name = "trig type", 
-    options = {"snare","bass","built-in", "external"},
+    options = {"built-in", "snare","bass", "external"},
     default = 1,
     action = function(value) 
-      if value < 3 then
+      if value > 1 and value < 4 then
         engine.trigger_type(value-1)
         engine.internal_exciter(0)
         params:set("rings_triger_mode",1)
-      elseif value == 3 then
+      elseif value == 1 then
         engine.internal_exciter(1)
         params:set("rings_triger_mode",1)
       else
@@ -886,7 +920,7 @@ function parameters.init()
 
   parameters.set_engine_params(rings_param_data)
   
-  params:add_group("midi",9)
+  params:add_group("midi",3)
 
 
   -- params:add_separator("midi in")
@@ -926,37 +960,6 @@ function parameters.init()
       midi_out_device = midi.connect(value-1) 
     end
   }
-
-  params:add{type = "option", id = "play_midi_cc_lz_x", name = "midi lz cc x out",
-    options = {"off","on"},
-    default = 1,
-  }
-  params:add{type = "option", id = "play_midi_cc_lz_y", name = "midi lz cc y out",
-    options = {"off","on"},
-    default = 1,
-  }
-
-  params:add{type = "number", id = "play_midi_cc_lz_x_cc", name = "midi lz x cc",
-  min=0,max=127,default=100,
-  action=function() end
-}
-
-params:add{type = "number", id = "play_midi_cc_lz_y_cc", name = "midi lz y cc",
-  min=0,max=127,default=101,
-  action=function() end
-}
-
-
-  params:add{type = "number", id = "play_midi_cc_lz_x_chan", name = "midi lz x chan",
-    min=0,max=16,default=1,
-    action=function() end
-  }
-
-  params:add{type = "number", id = "play_midi_cc_lz_y_chan", name = "midi lz y chan",
-    min=0,max=16,default=2,
-    action=function() end
-  }
-
   
   midi_helper.get_midi_devices()
 
@@ -1000,7 +1003,7 @@ params:add{type = "number", id = "play_midi_cc_lz_y_cc", name = "midi lz y cc",
     params:add{type = "option", id = "output_crow"..i, name = "crow out ".. i .." mode",
       -- options = {"off","on"},
       -- options = {"off","on"},
-      options = {"off","lz note","envelope","trigger","gate","lz x voltage", "lz y voltage", "mod matrix"},
+      options = {"off","lz note","envelope","trigger","gate","lz x voltage", "lz y voltage", "1lfo", "2lfo", "mod_matrix"},
 
       default = c_default,
       action = function(value)

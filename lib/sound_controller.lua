@@ -95,6 +95,9 @@ function sound_controller.note_on(note_tab,mode)
     if params:get("quantize") == 2 then          
       note_tab.pitch = fn.quantize(note_tab.pitch)
     end
+    
+    params:set("active_note",note_tab.pitch)
+    
     if mode==1 or (params:get("vjd_div_asn_engine1") == note_tab.div_id or params:get("vjd_div_asn_engine2") == note_tab.div_id) then
       play_engine(note_tab.pitch)
     end

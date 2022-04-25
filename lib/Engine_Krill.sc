@@ -47,7 +47,7 @@ Engine_Krill : CroneEngine {
 			sh1=1,sh2=1,
 			sequencing_mode=1, trigger_mode=1, trigger_type=1, engine_mode=1,
 			logExpBuffer,
-			frequency,
+			frequency, frequency_slew=0,
 			exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
 			// rings args
 			retrigger_fall=0,rise_phase=0, 
@@ -98,11 +98,11 @@ Engine_Krill : CroneEngine {
 			));
 
 			exciter = ((1-trigger_mode) * exciter) + SoundIn.ar([0,1],mul:trigger_mode);
-			
+			frequency_slew.poll;
 			sig = MiRings.ar(
 				in: exciter, trig: trig, 
 				//  pit: Latch.kr(WhiteNoise.kr(), trig).range(30, 60).round, 
-					pit: pitch, 
+					pit: Lag.kr(pitch,frequency_slew), 
 					struct: SinOsc.kr(rings_structure_min, rings_structure_max*pi).unipolar * rings_structure_max, 
 					bright: SinOsc.kr(rings_brightness_min, rings_brightness_max*pi).unipolar * rings_brightness_max,
 					bright: SinOsc.kr(rings_damping_min, rings_damping_max*pi).unipolar * rings_damping_max,
@@ -221,71 +221,26 @@ Engine_Krill : CroneEngine {
 		// create a synth voice
 		this.addCommand("note_on","ff",{ arg msg;
 			var frequency=msg[1];
+			// PMono(
+			// 		\type, \set,    												// This tells it we'll be setting parameters of an existing node...
+			// 		\instrument, krillVoice,    						// ...this tells it whose parameters we'll be setting
+			// // 		\args, #[\frequency,\gate\,\trigger],  	// and this tells it which parameters to set
+			// 		\frequency,frequency,
+			// ).play;
 			krillVoice.set(\frequency,frequency);
 			krillVoice.set(\trig,0);
 			krillVoice.set(\gate,0);
 			krillVoice.set(\trig,1);
 			krillVoice.set(\gate,1);
-
-			// var voicesToRemove, newVoice;
-      // var env;
-      // var envSig, envBuf;
-      // var newEnv, envLength;
-			// context.server.makeBundle(nil, {
-			// 	newVoice = (id: id, theSynth: Synth("KrillSynth",
-			// 	[
-			// 		\rise,rise,
-			// 		\fall,fall,
-			// 		\logExp,1,
-			// 		\plugged,0,
-			// 		\env_scalar,env_scalar,
-			// 		\env_shape,env_shape,
-			// 		\frequency,frequency,			
-			// 		\rise_time,rise_time,		
-			// 		\fall_time,fall_time,
-			// 		\engine_mode,engine_mode,
-			// 		\trigger_mode,trigger_mode,
-			// 		\trigger_type,trigger_type,
-			// 		\exciter_decay_min,exciter_decay_min,
-			// 		\exciter_decay_max,exciter_decay_max,
-			// 		//rings args
-			// 		\rings_pos,rings_pos,
-			// 		\rings_structure_min,rings_structure_min,
-			// 		\rings_structure_max,rings_structure_max,
-			// 		\rings_brightness_min,rings_brightness_min,
-			// 		\rings_brightness_max,rings_brightness_max,
-			// 		\rings_damping_min,rings_damping_min,
-			// 		\rings_damping_max,rings_damping_max,
-			// 		\rings_easter_egg,rings_easter_egg,
-			// 		\rings_poly,rings_poly,
-			// 		\internal_exciter,internal_exciter,
-			// 	],
-			// 		target: voiceGroup).onFree({ 
-			// 			voiceList.remove(newVoice); 
-			// 		})
-			// 	);
-			// 	voiceList.addFirst(newVoice);
-
-			// 	// set krillVoice to the most recent voice instantiated
-			// 	krillVoice = voiceList.detect({ arg item, i; item.id == id; });
-			// 	id = id+1;
-			// });
-
-				// Free the existing voice if it exists
-				// if((voiceList.size > 0 ), {
-				// 	voiceList.do{ arg v,i; 
-				// 		// v.theSynth.set(\t_trig, 1);
-				// 		if (i >= maxNumVoices){
-				// 			v.theSynth.set(\gate, 0);
-				// 			v.theSynth.free;
-				// 		}
-				// 	};
-				// });
 		});
 
 		this.addCommand("note_off","f",{ arg msg;
 			krillVoice.set(\trig,0);
 			krillVoice.set(\gate,0);
+		});
+
+		this.addCommand("frequency_slew","f",{ arg msg;
+			krillVoice.set(\frequency_slew,msg[1]);
 		});
 
 		this.addCommand("set_lorenz_sample","f",{ arg msg;

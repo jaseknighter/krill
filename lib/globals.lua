@@ -199,7 +199,6 @@ fn.quantize = function(note_num)
     else
       new_note_num = notes[#notes]
     end
-    print("nil note", new_note_num)
   end
   return new_note_num
 end
@@ -215,6 +214,8 @@ AUTOSAVE_DEFAULT=2
 -- 2 = show grid and UI when using encoders
 -- 3 = always show grid and UI
 UI_DISPLAY_DEFAULT=2
+UI_DISPLAY_SQUIGGLES=2
+
 k1_active = false
 k2_active = false
 k3_active = false
@@ -254,3 +255,7 @@ menu_map = {}
 sub_menu_map = {}
 midi_devices = {"-----"}
 play_enabled = false
+MIDI_LZ_X_CC = 100
+MIDI_LZ_Y_CC = 101
+MIDI_LFO_CC_DEFAULT = 101 
+MIDI_LFO_CHANNEL_DEFAULT = 103
