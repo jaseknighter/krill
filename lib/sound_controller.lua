@@ -156,16 +156,16 @@ function sound_controller:play_vuja_de_note(div_id)
     div_id = div_id
   }
 
-  local mode
-  if params:get("vuja_de_engine_mode"..div_id) == 1 then 
-    mode = params:get("engine_mode")
-  elseif params:get("vuja_de_engine_mode"..div_id) == 2 then 
-    mode = 1
-  else
-    mode = 2
-  end
-
-  engine.engine_mode(mode)
+  -- local mode
+  -- if params:get("vuja_de_engine_mode"..div_id) == 1 then 
+  --   mode = params:get("engine_mode")
+  --   engine.engine_mode(mode-1)
+  -- elseif params:get("vuja_de_engine_mode"..div_id) == 2 then 
+  --   mode = 1
+  -- else
+  --   mode = 2
+  -- end
+  -- engine.engine_mode(mode-1)
 
   sound_controller.note_on(note_tab,2)
 end

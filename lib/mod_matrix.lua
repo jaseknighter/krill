@@ -83,7 +83,7 @@ mod_matrix.patch_points={}
 
 
 -- for lib/hnds
-mod_matrix.lfo = include("lib/lfo")
+mod_matrix.lfo = include("lib/hnds")
 
 mod_matrix.lfo_types = {"sine", "square", "s+h"}
 mod_matrix.lfo_index = nil
@@ -168,7 +168,8 @@ function mod_matrix.enc(n, d)
             local input_name = mod_matrix.lookup[input].name
             input =  util.wrap(input+d,1,#mod_matrix.lookup)
             input_name = mod_matrix.lookup[input].name
-            if string.find(input_name,"%-%-") ~= nil or string.find(input_name,">>") ~= nil then
+            -- if string.find(input_name,"%-%-") ~= nil or string.find(input_name,">>") ~= nil then
+            if string.find(input_name,">>") ~= nil then
               print("input separator: ",input_name)
               found_separator_sub_menu = true
             end
@@ -203,7 +204,8 @@ function mod_matrix.enc(n, d)
             local output_name = mod_matrix.lookup[output].name
             output =  util.wrap(output+d,1,#mod_matrix.lookup)
             output_name = mod_matrix.lookup[output].name
-            if string.find(output_name,"%-%-") ~= nil or string.find(output_name,">>") ~= nil then
+            if string.find(output_name,">>") ~= nil then
+            -- if string.find(output_name,"%-%-") ~= nil or string.find(output_name,">>") ~= nil then
               print("output separator: ",output_name)
               found_separator_sub_menu = true
             end
@@ -213,7 +215,7 @@ function mod_matrix.enc(n, d)
         end
         mod_matrix.outputs[mod_matrix.active_output] = output
         for i=1,#mod_matrix.input_labels do
-          if mod_matrix.patch_points[i][mod_matrix.active_output] then
+          if mod_matrix.patch_points[i] and mod_matrix.patch_points[i][mod_matrix.active_output] then
             mod_matrix.patch_points[i][mod_matrix.active_output].enabled = 1
           end
         end
@@ -561,14 +563,20 @@ end
 
 function mod_matrix.init_scrolling_text_input(self,input)
   clock.sleep(0.2)
+  if self.scrolling_input then
+    self.scrolling_input.free_metro()
+  end
   self.scrolling_input = scroll_text:new(self.lookup[input].name)    
-  self.scrolling_input:init()
+  self.scrolling_input.init()
 end
 
 function mod_matrix.init_scrolling_text_output(self,output)
   clock.sleep(0.2)
+  if self.scrolling_output then
+    self.scrolling_output.free_metro()
+  end
   self.scrolling_output = scroll_text:new(self.lookup[output].name)    
-  self.scrolling_output:init()
+  self.scrolling_output.init()
 end
 
 function mod_matrix:display_params()

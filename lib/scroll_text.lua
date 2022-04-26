@@ -14,19 +14,25 @@ function scroll_text:new(text_to_scroll)
     st.scr_step_metro = metro.init()
   end
 
-  function st:init()
+  function st.init()
     --startup scrolling metro
-    if self.scr_step_metro then
-      if #self.text_to_scroll > self.scr_max_length then
-        self.scr_step_metro.event = self.scroll
-        self:scr_start_stop_metro()
+    if st.scr_step_metro then
+      if #st.text_to_scroll > st.scr_max_length then
+        st.scr_step_metro.event = st.scroll
+        st:scr_start_stop_metro()
       end
-    -- elseif #self.text_to_scroll > self.scr_max_length then
-    --   print("self.scr_step_metro not found", self.scr_step_metro)
+    elseif #st.text_to_scroll > st.scr_max_length then
+      print("ERROR: st.scr_step_metro not found, reinit", st.scr_step_metro)
     end
   end
 
-  function st:get_text()
+  function st.free_metro()
+    if st.scr_step_metro and st.scr_step_metro.id then
+      metro.free(st.scr_step_metro.id)
+    end
+  end
+  
+  function st.get_text()
     return st.text_to_scroll
   end
 

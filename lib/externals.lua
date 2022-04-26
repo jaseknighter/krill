@@ -68,10 +68,11 @@ externals.note_on = function(voice_id, note_tab, target,mode)
     if type(note_tab) == "table" and note_tab.pitch then
       note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
       if params:get("quantize") == 2 then          
-        note_tab.pitch = fn.quantize(note_tab.pitch+7) 
+        note_tab.pitch = fn.quantize(note_tab.pitch) 
+        -- note_tab.pitch = fn.quantize(note_tab.pitch+7) 
         -- note_tab.pitch = fn.quantize(note_tab.pitch+14) 
+        -- print(note_tab.pitch)
       end
-      -- print(note_tab.pitch)
     end
     -- if mode == 1 or (params:get("vjd_div_asn_midi1") == note_tab.div_id or params:get("vjd_div_asn_midi2") == note_tab.div_id) then
     if target == "midi" and (mode == 1 or (params:get("vjd_div_asn_midi1") == note_tab.div_id or params:get("vjd_div_asn_midi2") == note_tab.div_id)) then

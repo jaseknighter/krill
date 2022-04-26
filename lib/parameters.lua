@@ -391,8 +391,9 @@ function parameters.init()
     -- end
   end}
 
-  params:add_group("division patterns",12+3+(VJD_MAX_DIVISIONS*4))
-  params:add_separator("assignments")
+  -- params:add_group("division patterns",12+3+(VJD_MAX_DIVISIONS*4))
+  params:add_group("div pat assignments",12)
+  -- params:add_separator("assignments")
   params:add{type = "number", id = "vjd_div_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_engine2", name = "engine asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_midi1", name = "midi asn 1", min=1, max=3, default=1}
@@ -406,11 +407,13 @@ function parameters.init()
   params:add{type = "number", id = "vjd_div_asn_wdelkarp1", name = "wdelkarp asn 1", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=2}
   
-  params:add_separator("")
-  params:add_separator("divisions")
+  -- params:add_separator("")
+  -- params:add_separator("divisions")
 
 
   for i=1,VJD_MAX_DIVISIONS,1 do
+      params:add_group("division pattern"..i,6)
+
     -- params:add_separator("pattern "..i)
     params:add{ type = "option", id = "pat_lab"..i, name = "---------- division " .. i .. " ----------",  options = {" "}}
     
@@ -451,45 +454,27 @@ function parameters.init()
       action = function(x)
     end}
 
-    params:add{
-      type = "option", id = "vuja_de_engine_mode"..i, name = "vjd eng mode"..i, 
-      options = {"def","res","str"},
-      default = 1,
-      action = function(value) 
-    end}
+    -- params:add{
+    --   type = "option", id = "vuja_de_engine_mode"..i, name = "vjd eng mode"..i, 
+    --   options = {"res","sstr","mstr","fm","sstrq","strr"},
+    --   default = 1,
+    --   action = function(value) 
+    -- end}
   
     if i>3 then
-      params:hide("vuja_de_div_numerator"..i)
-      params:hide("vuja_de_div_denominator"..i)
-      params:hide("vuja_de_jitter"..i)
-      params:hide("vuja_de_oct_offset"..i)
-      params:hide("vuja_de_engine_mode"..i)
-      params:hide("pat_lab"..i)
-      params:hide("vuja_pat_defaults"..i)
-      
+      params:hide("division pattern"..i)
     end
-      
   end
 
   function parameters.set_pats(num_divs)   
-    print("set divs") 
+    print("set divs",num_divs) 
     for i=1,VJD_MAX_DIVISIONS,1 do
       if i>num_divs then
-        params:hide("vuja_de_div_numerator"..i)
-        params:hide("vuja_de_div_denominator"..i)
-        params:hide("pat_lab"..i)
-        params:hide("vuja_pat_defaults"..i)
-        params:hide("vuja_de_jitter"..i)
-        params:hide("vuja_de_oct_offset"..i)
-        params:hide("vuja_de_engine_mode"..i)
+        params:hide("division pattern"..i)
+        params:hide("rest patterns"..i)
       else
-        params:show("vuja_de_div_numerator"..i)
-        params:show("vuja_de_div_denominator"..i)    
-        params:show("pat_lab"..i)    
-        params:show("vuja_pat_defaults"..i)    
-        params:show("vuja_de_jitter"..i)
-        params:show("vuja_de_oct_offset"..i)
-        params:show("vuja_de_engine_mode"..i)
+        params:show("division pattern"..i)
+        params:show("rest patterns"..i)
       end
     end
 
@@ -558,40 +543,54 @@ function parameters.init()
     vjd_div_asn_wdelkarp2.max = num_divs
   end
 
-
-  -- params:add{type = "number", id = "rest_pats_per_div", name = "rest pats per div"..i.." rest pat",
-  --   min=1, max=8, default=1,
-  --   action = function(x)
-  --     _menu.rebuild_params()
-  -- end}
-
-  -- local rppd = params:get("rest_pats_per_div")
-  local rppd = 1
   parameters.rest_pattern_formatters = {}
 
-  params:add_group("rest patterns",(VJD_MAX_DIVISIONS)*rppd)
   for i=1,VJD_MAX_DIVISIONS do
-    local rest_formatter = function(x)
-      -- tab.print(x)
-      local ca_id = x.value
-      local ca_rs = vuja_de_rest_patterns[i].get_ruleset()
-      local ca_rs_string = vuja_de_rest_patterns[i].get_ruleset_string(ca_rs)
-      return ca_rs_string .. " ("..ca_id ..")"
-    end
-    parameters.rest_pattern_formatters[i] = rest_formatter  
+    params:add_group("rest patterns"..i,7)
 
-    params:add{type = "number", id = "vuja_de_rest"..i, name = "vjd "..i.." rest pat",
-      min=0, max=255, default=255,
-      formatter=parameters.rest_pattern_formatters[i],
-      action = function(x)
-        local rs = vuja_de_rest_patterns[i].set_ruleset(x)
-        vuja_de_rest_sequins[i] = Sequins{table.unpack(rs)}
-    end}  
-  
+    params:add_number("active_rest_pat"..i,"active rest pat"..i,1,3,1)
+    params:set_action("active_rest_pat"..i,function(value) vuja_de_rest_sequins[i].active_rest_pattern = value end)
+
+    params:add{type = "number", id = "vuja_de_rest_step"..i, name = "vjd rest step"..i,
+    min=1, max=8, default=1,
+    action = function(x)
+      for j=1,3,1 do
+        vuja_de_rest_sequins[i][j]:step(x)
+      end
+  end} 
+
+    parameters.rest_pattern_formatters[i] = {}
+    for j=1,3,1 do
+      local rest_formatter = function(x)
+        -- tab.print(x)
+        local ca_id = x.value
+        local ca_rs = vuja_de_rest_patterns[i][j].get_ruleset()
+        local ca_rs_string = vuja_de_rest_patterns[i][j].get_ruleset_string(ca_rs)
+        return ca_rs_string .. " ("..ca_id ..")"
+      end
+      parameters.rest_pattern_formatters[i][j] = rest_formatter  
+
+      params:add{type = "number", id = "vuja_de_rest"..i.."-"..j, name = "vjd rest pat"..i.."-"..j,
+        min=0, max=255, default=255,
+        formatter=parameters.rest_pattern_formatters[i][j],
+        action = function(x)
+          local rs = vuja_de_rest_patterns[i][j].set_ruleset(x)
+          vuja_de_rest_sequins[i][j] = Sequins{table.unpack(rs)}
+      end}  
+
+    end
+    params:add_separator("::read only::")
+    params:add{
+      type = "option", id = "vjd rest active"..i, name = "vjd rest active"..i, 
+      options = {"false","true"},
+      default = 1,
+      action = function(value) 
+    end}
+
     if i>params:get("vuja_de_num_divs") then
-      params:hide("vuja_de_rest"..i)
+      params:hide("rest patterns"..i)
     else
-      params:show("vuja_de_rest"..i)
+      params:show("rest patterns"..i)
     end
   end
   
@@ -735,12 +734,13 @@ function parameters.init()
       engine.env_scalar(x/100)
     end
   }
+  
   params:add{
     -- type="number", id = "rise_time", name = "rise (ms)",min=100, step="10", max=2000, default = 100,
     type="control", id = "rise_time", name = "rise (ms)",
     controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(x/1000,0)
+      -- engine.rise_fall(x/1000,0)
       engine.rise_fall(x/1000,params:get("fall_time")/1000)
     end
   }
@@ -750,7 +750,7 @@ function parameters.init()
     type="control", id = "fall_time", name = "fall (ms)",
     controlspec = controlspec.new(100, 2000, "lin", 1, 100, ""), 
     action=function(x) 
-      engine.rise_fall(0,x/1000)
+      -- engine.rise_fall(0,x/1000)
       engine.rise_fall(params:get("rise_time")/1000,x/1000)
     end
   }
@@ -824,7 +824,7 @@ function parameters.init()
     {"taper","rings_pos","pos",0,1,0.05},
     {"taper","rings_structure_base","str",0,1,0.2,"rings_structure"},
     {"taper","rings_structure_range","str rng",0,1,0,"rings_structure"},
-    {"taper","rings_brightnes_base","brt",0,1,0.3,"rings_brightness"},
+    {"taper","rings_brightness_base","brt",0,1,0.3,"rings_brightness"},
     {"taper","rings_brightness_range","brt rng",0,1,0,"rings_brightness"},
     {"taper","rings_damping_base","dmp",0,1,0.675,"rings_damping"},
     {"taper","rings_damping_range","dmp rng",0,1,0,"rings_damping"},
@@ -834,9 +834,23 @@ function parameters.init()
   
   params:add_group("rings",#rings_param_data + 6)
   
-  params:add_number("frequency_slew","frequency slew (ms)", 0, 2000, 0)
-  params:set_action("frequency_slew", function(value) engine.frequency_slew(value/1000) end)
-
+  params:add_number("frequency_slew","freq slew", 0, 2000, 0)
+  params:set_action("frequency_slew", function(value) 
+    if params:get("enable_frequency_slew") then 
+      engine.frequency_slew(value/1000) 
+    else
+      engine.frequency_slew(0) 
+    end
+  end)
+  params:add_option("enable_frequency_slew","fslw enbl", {"off","on"}, 2)
+  params:set_action("enable_frequency_slew", function(value) 
+    if value == 2 then 
+      engine.frequency_slew(params:get("frequency_slew")/1000) 
+    else
+      engine.frequency_slew(0) 
+    end
+  end)
+  
   params:add{
     type = "number", id = "rings_easter_egg", name = "egg mode", 
     min=0,max=1,default=0,
@@ -888,12 +902,23 @@ function parameters.init()
     action = function(value) 
       engine.trigger_mode(value-1)
       if value == 1 then
-        if params:get("internal_trigger_type") < 3 then
+        if params:get("internal_trigger_type") == 1 then
+            engine.internal_exciter(1)
+            print("internal 1")
+          else
+            print("internal 0")
             engine.internal_exciter(0)
-        else
-          engine.internal_exciter(1)
-        end
+          end
+        -- if params:get("internal_trigger_type") < 3 then
+        --     engine.internal_exciter(0)
+        --     print("internal 0")
+        --   else
+        --     print("internal 1")
+        --     engine.internal_exciter(1)
+        --   end
+        -- else
       else
+        print("internal 0")
         engine.internal_exciter(0)
       end
   end}
@@ -902,20 +927,29 @@ function parameters.init()
 
   params:add{
     type = "option", id = "internal_trigger_type", name = "trig type", 
-    options = {"built-in", "snare","bass", "external"},
+    options = {"internal", "external"},
+    -- options = {"built-in", "snare","bass", "external"},
     default = 1,
     action = function(value) 
-      if value > 1 and value < 4 then
-        engine.trigger_type(value-1)
-        engine.internal_exciter(0)
-        params:set("rings_triger_mode",1)
-      elseif value == 1 then
-        engine.internal_exciter(1)
+      if value == 1 then
+        -- engine.trigger_type(1)
+        -- engine.internal_exciter(1)
         params:set("rings_triger_mode",1)
       else
         params:set("rings_triger_mode",2)
-        engine.internal_exciter(0)
+        -- engine.internal_exciter(0)
       end
+      -- if value > 1 and value < 4 then
+      --   engine.trigger_type(value-1)
+      --   engine.internal_exciter(0)
+      --   params:set("rings_triger_mode",1)
+      -- elseif value == 1 then
+      --   engine.internal_exciter(1)
+      --   params:set("rings_triger_mode",1)
+      -- else
+      --   params:set("rings_triger_mode",2)
+      --   engine.internal_exciter(0)
+      -- end
   end}
 
   parameters.set_engine_params(rings_param_data)

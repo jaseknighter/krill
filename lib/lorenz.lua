@@ -21,15 +21,15 @@ function pixels.update(display)
     pixels[i]:update(display)
   end
   for i=1,#pixels,1 do
-    if pixels[i] and pixels[i].remove == true and display == true then
-      if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
+    if pixels[i] and pixels[i].remove == true  then
+      if display == true and (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then
         local x = math.floor(pixels[i].last_x)
         local y = math.floor(pixels[i].last_y)
         if (x and y) then
           screen.poke(x-1,y-1,2,2,blank_pixel)
         end
-        table.remove(pixels,i)
       end
+      table.remove(pixels,i)
     elseif pixels[i] and pixels[i].remove == false then
       local lb = lorenz.get_boundary()
       if (pixels[i].last_x>lb[1] and pixels[i].last_x<lb[1]+lb[3] and pixels[i].last_y>lb[2] and pixels[i].last_y<lb[2]+lb[4]) then

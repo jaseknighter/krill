@@ -203,20 +203,26 @@ function init()
   -- vuja_de_rest_patterns[1].get_ruleset_id()
   -- vuja_de_rest_patterns[1].get_ruleset(vuja_de_rest_patterns[1].ruleset)
   for i=1,VJD_MAX_DIVISIONS,1 do
-    vuja_de_rest_patterns[i] = cellular_automata:new()
-    vuja_de_rest_patterns[i].generate()
+    vuja_de_rest_patterns[i] = {}
+    vuja_de_rest_sequins[i] = {}
+    vuja_de_rest_sequins[i].active_rest_pattern = 1
+    for j=1,3,1 do
+      vuja_de_rest_patterns[i][j] = cellular_automata:new()
+      vuja_de_rest_patterns[i][j].generate()
 
-    local rs = vuja_de_rest_patterns[1].get_ruleset()
-    vuja_de_rest_sequins[i] = Sequins{table.unpack(rs)}
+      -- local rs = vuja_de_rest_patterns[1].get_ruleset()
+      local rs = vuja_de_rest_patterns[i][j].get_ruleset()
+      vuja_de_rest_sequins[i][j] = Sequins{table.unpack(rs)}
+      
+    end
     vuja_de_patterns[i]= krill_lattice:new_pattern{
       action = function(t) 
-        -- local rs_id = vuja_de_rest_patterns[1].get_ruleset_id()
-        -- local rs = vuja_de_rest_patterns[1].get_ruleset()
-
+        local active_rest_pat = vuja_de_rest_sequins[i].active_rest_pattern
         -- play note from quant grid
         local active = pixels[pixels.active]
         vuja_de:update_length()
-        local rest = vuja_de_rest_sequins[i]() == 0
+        local rest = vuja_de_rest_sequins[i][active_rest_pat]() == 0
+        params:set("vjd rest active"..i, rest == true and 2 or 1)
         if active and params:get("sequencing_mode") == 2 and rest==false then -- vuja de mode
           sound_controller:play_vuja_de_note(i)
         end
@@ -275,7 +281,6 @@ end
 
 function finish_init()
   clock.sleep(1)
-
   vuja_de_patterns[1]:start()
   vuja_de_patterns[2]:start()
   vuja_de_patterns[3]:start()
@@ -291,14 +296,19 @@ function finish_init()
   params:set("rise_time",10)
   params:set("fall_time",150)
 
-  params:set("rings_pos",1)
-  -- params:set("rings_structure_base",0.25)
-  params:set("rings_brightnes_base",0.25)
+  params:set("engine_mode",2)
+  params:set("rings_pos",0.5)
+  params:set("rings_structure_base",0.5)
+  params:set("rings_structure_range",0.5)
+  params:set("rings_brightness_base",0.75)
   params:set("rings_damping_base",0.25)
-  params:set("rings_poly",1)
+  params:set("rings_damping_range",0.6)
+  params:set("rings_poly",4)
   params:set("internal_trigger_type",2)
   params:set("internal_trigger_type",1)
-  params:set("vuja_pat_defaults1",5)
+  params:set("vuja_pat_defaults1",4)
+  params:set("rise_time",250)
+  params:set("fall_time",500)
 
   params:set("1lfo_freq",1)
 

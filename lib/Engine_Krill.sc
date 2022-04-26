@@ -1,27 +1,20 @@
 // Engine_Krill
-// TODO: figure out why the function looping creates a synth regardless of the parm value (0 or 1)
 
 Engine_Krill : CroneEngine {
 	// <Krill>
-	// classvar maxNumVoices = 1;
-	// var voiceGroup;
-  // var voiceList;
 	var krillVoice;
-	// var id=0;
 	var envPosPoll,envPosPollFunc;
 	var envLevelPoll,envLevelPollFunc;
 	var risePoll,risePollFunc;
 	var fallPoll,fallPollFunc;
 	var nextNotePoll,nextNotePollFunc;
-	// var pitchPoll,pitchPollFunc;
-	// var noteStartPoll;
+	var frequency_slew=0;
 	var sh1=1, sh2=1;
 	var rise=0.05, fall=0.5, rise_time=0.05, fall_time=0.5, env_scalar=1;
 	var env_shape=0,env_level=1;
 	var lorenz_sample = 1;
 	var minRiseFall = 0.005;
 	var sequencing_mode, trigger_mode, trigger_type, engine_mode;
-	// var krillSynth;
 
 	//rings vars
 	var exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
@@ -35,8 +28,6 @@ Engine_Krill : CroneEngine {
 
 	alloc {
 
-		// var scale = Scale.choose.postln;
-    
 		SynthDef(\KrillSynth,{ 
       arg outBus=0, logExp=0.5,loop=1,plugged=0,
 			out,
@@ -48,8 +39,8 @@ Engine_Krill : CroneEngine {
 			sequencing_mode=1, trigger_mode=1, trigger_type=1, engine_mode=1,
 			logExpBuffer,
 			frequency, frequency_slew=0,
-			exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
 			// rings args
+			exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
 			retrigger_fall=0,rise_phase=0, 
 			rings_pos=0.05,rings_easter_egg=0, rings_poly=1,
 			rings_structure_min=0.2,rings_structure_max=0.2,
@@ -64,17 +55,12 @@ Engine_Krill : CroneEngine {
 			fall_done=0;
 			var exciter;
 			var modeNum=1,cosFreq=0.75;
-																			
-			// 
+
 			rise_phase = Sweep.kr(trig, 1);
 
 			retrigger_fall = rise_phase > (rise+fall) * env_scalar;
 
-			// rise_phase = Sweep.kr(trig, rise * env_scalar);
-			// rise_phase = Decay.kr(Impulse.kr(trig), rise * env_scalar);
 			env_phase = rise_phase >= (rise * env_scalar);
-			// env_phase = rise_phase - 1 <= 0;
-			// env_phase = rise_phase <= 0.001;
 			rise_rate =  1/(rise * env_scalar);
 			fall_rate =  1/(fall * env_scalar);
 			env_rate = Select.kr(env_phase, [rise_rate, fall_rate]);
@@ -85,48 +71,41 @@ Engine_Krill : CroneEngine {
 			rise_fall_env_gen = IEnvGen.kr(rise_fall_env, env_pos); 
 			env_changed = Changed.kr(env_phase);
 			fall_done = (rise_fall_env_gen <= 0.001) * (env_phase > 0);
-
-			// ([rise_phase, env_phase, rise_fall_env_gen, fall_done, env_changed,retrigger_fall]).poll;
 			
 			pitch = frequency;
 
-			exciter = (1-trigger_type) * AnalogSnareDrum.ar(
-				trig, decay: (rise+fall)*env_scalar,
-			);
-			exciter = exciter + (trigger_type * AnalogBassDrum.ar(
-					trig, decay: (rise)*env_scalar, freq: pitch.midicps, accent: 1, attackfm: 1
-			));
+			exciter = (trigger_mode) + SoundIn.ar([0,1],mul:trigger_mode);
 
-			exciter = ((1-trigger_mode) * exciter) + SoundIn.ar([0,1],mul:trigger_mode);
-			frequency_slew.poll;
 			sig = MiRings.ar(
 				in: exciter, trig: trig, 
+				// in: exciter, trig: trig, 
 				//  pit: Latch.kr(WhiteNoise.kr(), trig).range(30, 60).round, 
+					// pit: pitch, 
 					pit: Lag.kr(pitch,frequency_slew), 
 					struct: SinOsc.kr(rings_structure_min, rings_structure_max*pi).unipolar * rings_structure_max, 
 					bright: SinOsc.kr(rings_brightness_min, rings_brightness_max*pi).unipolar * rings_brightness_max,
-					bright: SinOsc.kr(rings_damping_min, rings_damping_max*pi).unipolar * rings_damping_max,
+					damp: SinOsc.kr(rings_damping_min, rings_damping_max*pi).unipolar * rings_damping_max,
 					// struct: TRand.kr(rings_structure_min, rings_structure_max),
 					// bright: TRand.kr(rings_brightness_min, rings_brightness_max),
 					// damp: TRand.kr(rings_damping_min,rings_damping_max, trig), 
 					pos: rings_pos, 
+					// model: engine_mode, poly: rings_poly, intern_exciter: 1, easteregg: rings_easter_egg, bypass: 0, mul: 1.0, add: 0);
 					model: engine_mode, poly: rings_poly, intern_exciter: internal_exciter, easteregg: rings_easter_egg, bypass: 0, mul: 1.0, add: 0);
 
 
-			// out = LFSaw.ar(pitch.midicps, 2, -1);
-			// out = 	VAKorg35.ar(out, freq: pitch.midicps, res:rise, overdrive: rise.unipolar, type:0);
+			// sig = LFSaw.ar(Lag.kr(pitch.midicps,frequency_slew), 2, -1);
+			// sig = LFSaw.ar(pitch.midicps, 2, -1);
+			// sig = 	VAKorg35.ar(sig, freq: pitch.midicps, res:rise, overdrive: rise.unipolar, type:0);
 
 			amp_env_gen = EnvGen.ar(rise_fall_env, gate);
 			sig = LeakDC.ar((sig * amp_env_gen * amp).tanh/2.7);
 
-			// SendReply.kr(Impulse.kr(10), '/triggerPitchPoll', pitch.midicps);
 			SendReply.kr(Impulse.kr(50), '/triggerEnvPosPoll', env_pos);
 			SendReply.kr(Impulse.kr(50), '/triggerEnvLevelPoll', rise_fall_env_gen);
 
 			SendReply.kr(env_changed * env_phase, '/triggerRiseDonePoll', env_phase);
 			SendReply.kr(fall_done, '/triggerFallDonePoll', fall_done);
 			SendReply.kr(fall_done, '/triggerFallDonePoll', retrigger_fall);
-			
 			Out.ar(out, sig.dup);
 		}).add;
 		
@@ -135,23 +114,17 @@ Engine_Krill : CroneEngine {
 		
 		krillVoice = Synth.new(\KrillSynth,[
 			\out, context.out_b.index,
-			\trig, 0, 
-			\gate, 0, 
+			\trig,0, 
+			\gate,0, 
 		],
 		context.xg);
 		
 		context.server.sync;
 
     /////////////////////////////////
-		// add polling
+		// polling
     /////////////////////////////////
 
-    // trigger Polls
-    // pitchPollFunc = OSCFunc({
-    //   arg msg;
-		// 	// ("pitchpoll"+msg[3]).postln;
-		// 	pitchPoll.update(msg[3]);
-    // }, path: '/triggerPitchPoll', srcID: context.server.addr);
 
     envPosPollFunc = OSCFunc({
       arg msg;
@@ -214,22 +187,22 @@ Engine_Krill : CroneEngine {
     fallPoll = this.addPoll(name: "fall_poll", periodic: false);
     
     ///////////////////////////////////
-		// add norns commands
+		// norns commands
     ///////////////////////////////////
 
 		//////////////////////////////////////////
 		// create a synth voice
 		this.addCommand("note_on","ff",{ arg msg;
 			var frequency=msg[1];
-			// PMono(
-			// 		\type, \set,    												// This tells it we'll be setting parameters of an existing node...
-			// 		\instrument, krillVoice,    						// ...this tells it whose parameters we'll be setting
-			// // 		\args, #[\frequency,\gate\,\trigger],  	// and this tells it which parameters to set
-			// 		\frequency,frequency,
-			// ).play;
-			krillVoice.set(\frequency,frequency);
 			krillVoice.set(\trig,0);
 			krillVoice.set(\gate,0);
+			krillVoice.set(\frequency_slew,frequency_slew);
+			krillVoice.set(\trigger_mode,trigger_mode);
+			krillVoice.set(\internal_exciter,internal_exciter);
+			krillVoice.set(\frequency,frequency);
+			krillVoice.set(\env_scalar,env_scalar);
+			krillVoice.set(\rise,rise);
+			krillVoice.set(\fall,fall);
 			krillVoice.set(\trig,1);
 			krillVoice.set(\gate,1);
 		});
@@ -240,7 +213,8 @@ Engine_Krill : CroneEngine {
 		});
 
 		this.addCommand("frequency_slew","f",{ arg msg;
-			krillVoice.set(\frequency_slew,msg[1]);
+			// krillVoice.set(\frequency_slew,msg[1]);
+			frequency_slew = msg[1];
 		});
 
 		this.addCommand("set_lorenz_sample","f",{ arg msg;
@@ -254,12 +228,12 @@ Engine_Krill : CroneEngine {
 		this.addCommand("rise_fall","ff",{ arg msg;
 			if (msg[1] > 0){
 				rise_time = msg[1];
-				krillVoice.set(\rise,rise)
+				// krillVoice.set(\rise,rise)
 			};			
 
 			if (msg[2] > 0){
 				fall_time = msg[2];
-				krillVoice.set(\fall,fall)
+				// krillVoice.set(\fall,fall)
 			};
 
 
@@ -273,12 +247,11 @@ Engine_Krill : CroneEngine {
 			};
 			// krillVoice.set(\trig,0);
 			// krillVoice.set(\gate,0);
-
     });
 	  
 		this.addCommand("env_scalar","f",{ arg msg;
 			env_scalar = msg[1];
-			krillVoice.set(\env_scalar,env_scalar);
+			// krillVoice.set(\env_scalar,env_scalar);
 			// krillVoice.set(\trig,0);
 			// krillVoice.set(\gate,0);
 
@@ -287,8 +260,8 @@ Engine_Krill : CroneEngine {
 		this.addCommand("switch_sequencing_mode","f",{ arg msg;
 			sequencing_mode = msg[1];
 			krillVoice.set(\sequencing_mode,sequencing_mode);
-			krillVoice.set(\trig,0);
-			krillVoice.set(\gate,0);
+			// krillVoice.set(\trig,0);
+			// krillVoice.set(\gate,0);
 
 		});
 
@@ -309,7 +282,9 @@ Engine_Krill : CroneEngine {
 		this.addCommand("engine_mode","f",{ arg msg;
 			engine_mode = msg[1];
 			// (["set eng mode", engine_mode]).postln;
-			krillVoice.set(\engine_mode,engine_mode)
+			krillVoice.set(\trig, 0);
+			krillVoice.set(\gate, 0);
+			krillVoice.set(\engine_mode,engine_mode);
 		});
 
 		this.addCommand("trigger_type","f",{ arg msg;
@@ -319,7 +294,8 @@ Engine_Krill : CroneEngine {
 
 		this.addCommand("trigger_mode","f",{ arg msg;
 			trigger_mode = msg[1];
-			krillVoice.set(\trigger_mode,trigger_mode)
+			trigger_mode.postln;
+			// krillVoice.set(\trigger_mode,trigger_mode)
 		});
 
 		this.addCommand("exciter_decay_min","f",{ arg msg;
@@ -379,7 +355,7 @@ Engine_Krill : CroneEngine {
 
 		this.addCommand("internal_exciter","f",{ arg msg;
 			internal_exciter = msg[1];
-			krillVoice.set(\internal_exciter,internal_exciter)
+			// krillVoice.set(\internal_exciter,internal_exciter)
 		});
 
 	}

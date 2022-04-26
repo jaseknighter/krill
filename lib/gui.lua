@@ -24,9 +24,9 @@ function gui.setup_menu_maps()
   end
 
 
-  local eng_params = {"rings_easter_egg","engine_mode","internal_trigger_type","rings_pos",
+  local eng_params = {"rings_easter_egg","engine_mode","internal_trigger_type","frequency_slew","enable_frequency_slew","rings_pos",
                 "rings_structure_base","rings_structure_range",
-                "rings_brightnes_base","rings_brightness_range",
+                "rings_brightness_base","rings_brightness_range",
                 "rings_damping_base","rings_damping_range",
                 "rings_poly"}
 
