@@ -198,32 +198,32 @@ function init()
     enabled = true
   }
   
-  vuja_de_rest_patterns = {}
-  vuja_de_rest_sequins = {}
-  -- vuja_de_rest_patterns[1].get_ruleset_id()
-  -- vuja_de_rest_patterns[1].get_ruleset(vuja_de_rest_patterns[1].ruleset)
+  vuja_de_rthm_patterns = {}
+  vuja_de_rthm_sequins = {}
+  -- vuja_de_rthm_patterns[1].get_ruleset_id()
+  -- vuja_de_rthm_patterns[1].get_ruleset(vuja_de_rthm_patterns[1].ruleset)
   for i=1,VJD_MAX_DIVISIONS,1 do
-    vuja_de_rest_patterns[i] = {}
-    vuja_de_rest_sequins[i] = {}
-    vuja_de_rest_sequins[i].active_rest_pattern = 1
+    vuja_de_rthm_patterns[i] = {}
+    vuja_de_rthm_sequins[i] = {}
+    vuja_de_rthm_sequins[i].active_rthm_pattern = 1
     for j=1,3,1 do
-      vuja_de_rest_patterns[i][j] = cellular_automata:new()
-      vuja_de_rest_patterns[i][j].generate()
+      vuja_de_rthm_patterns[i][j] = cellular_automata:new()
+      vuja_de_rthm_patterns[i][j].generate()
 
-      -- local rs = vuja_de_rest_patterns[1].get_ruleset()
-      local rs = vuja_de_rest_patterns[i][j].get_ruleset()
-      vuja_de_rest_sequins[i][j] = Sequins{table.unpack(rs)}
+      -- local rs = vuja_de_rthm_patterns[1].get_ruleset()
+      local rs = vuja_de_rthm_patterns[i][j].get_ruleset()
+      vuja_de_rthm_sequins[i][j] = Sequins{table.unpack(rs)}
       
     end
     vuja_de_patterns[i]= krill_lattice:new_pattern{
       action = function(t) 
-        local active_rest_pat = vuja_de_rest_sequins[i].active_rest_pattern
+        local active_rthm_pat = vuja_de_rthm_sequins[i].active_rthm_pattern
         -- play note from quant grid
         local active = pixels[pixels.active]
         vuja_de:update_length()
-        local rest = vuja_de_rest_sequins[i][active_rest_pat]() == 0
-        params:set("vjd rest active"..i, rest == true and 2 or 1)
-        if active and params:get("sequencing_mode") == 2 and rest==false then -- vuja de mode
+        local rthm = vuja_de_rthm_sequins[i][active_rthm_pat]() == 0
+        params:set("vjd rthm active"..i, rthm == true and 2 or 1)
+        if active and params:get("sequencing_mode") == 2 and rthm==false then -- vuja de mode
           sound_controller:play_vuja_de_note(i)
         end
 

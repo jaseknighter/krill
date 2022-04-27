@@ -19,7 +19,7 @@ function gui.setup_menu_maps()
     end  
   end
 
-  function gui.vjd_rests()
+  function gui.vjd_rthms()
     return {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"}
   end
 
@@ -54,7 +54,7 @@ function gui.setup_menu_maps()
   end
   gui.sub_menu_map_vuja_de = {
     vjd_seq_options,
-    -- gui.vjd_rests(),
+    -- gui.vjd_rthms(),
     {"x_input","y_input","x_offset","y_offset","x_scale","y_scale"},
     lrz_params,
     lfo_params,
@@ -141,7 +141,7 @@ function gui.update_menu_display()
         active_sub_menu_value = fn.round_decimals (active_sub_menu_value, 3, "down")
       end
     else
-      print("vjd_rests")
+      print("vjd_rthms")
     end
     gui.updating_menu_display = false
   end

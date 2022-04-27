@@ -471,10 +471,10 @@ function parameters.init()
     for i=1,VJD_MAX_DIVISIONS,1 do
       if i>num_divs then
         params:hide("division pattern"..i)
-        params:hide("rest patterns"..i)
+        params:hide("rthm patterns"..i)
       else
         params:show("division pattern"..i)
-        params:show("rest patterns"..i)
+        params:show("rthm patterns"..i)
       end
     end
 
@@ -543,54 +543,54 @@ function parameters.init()
     vjd_div_asn_wdelkarp2.max = num_divs
   end
 
-  parameters.rest_pattern_formatters = {}
+  parameters.rythm_pattern_formatters = {}
 
   for i=1,VJD_MAX_DIVISIONS do
-    params:add_group("rest patterns"..i,7)
+    params:add_group("rthm patterns"..i,7)
 
-    params:add_number("active_rest_pat"..i,"active rest pat"..i,1,3,1)
-    params:set_action("active_rest_pat"..i,function(value) vuja_de_rest_sequins[i].active_rest_pattern = value end)
+    params:add_number("active_rthm_pat"..i,"active rthm pat"..i,1,3,1)
+    params:set_action("active_rthm_pat"..i,function(value) vuja_de_rthm_sequins[i].active_rthm_pattern = value end)
 
-    params:add{type = "number", id = "vuja_de_rest_step"..i, name = "vjd rest step"..i,
+    params:add{type = "number", id = "vuja_de_rthm_step"..i, name = "vjd rthm step"..i,
     min=1, max=8, default=1,
     action = function(x)
       for j=1,3,1 do
-        vuja_de_rest_sequins[i][j]:step(x)
+        vuja_de_rthm_sequins[i][j]:step(x)
       end
   end} 
 
-    parameters.rest_pattern_formatters[i] = {}
+    parameters.rythm_pattern_formatters[i] = {}
     for j=1,3,1 do
-      local rest_formatter = function(x)
+      local rythm_formatter = function(x)
         -- tab.print(x)
         local ca_id = x.value
-        local ca_rs = vuja_de_rest_patterns[i][j].get_ruleset()
-        local ca_rs_string = vuja_de_rest_patterns[i][j].get_ruleset_string(ca_rs)
+        local ca_rs = vuja_de_rthm_patterns[i][j].get_ruleset()
+        local ca_rs_string = vuja_de_rthm_patterns[i][j].get_ruleset_string(ca_rs)
         return ca_rs_string .. " ("..ca_id ..")"
       end
-      parameters.rest_pattern_formatters[i][j] = rest_formatter  
+      parameters.rythm_pattern_formatters[i][j] = rythm_formatter  
 
-      params:add{type = "number", id = "vuja_de_rest"..i.."-"..j, name = "vjd rest pat"..i.."-"..j,
+      params:add{type = "number", id = "vuja_de_rest"..i.."-"..j, name = "vjd rthm pat"..i.."-"..j,
         min=0, max=255, default=255,
-        formatter=parameters.rest_pattern_formatters[i][j],
+        formatter=parameters.rythm_pattern_formatters[i][j],
         action = function(x)
-          local rs = vuja_de_rest_patterns[i][j].set_ruleset(x)
-          vuja_de_rest_sequins[i][j] = Sequins{table.unpack(rs)}
+          local rs = vuja_de_rthm_patterns[i][j].set_ruleset(x)
+          vuja_de_rthm_sequins[i][j] = Sequins{table.unpack(rs)}
       end}  
 
     end
     params:add_separator("::read only::")
     params:add{
-      type = "option", id = "vjd rest active"..i, name = "vjd rest active"..i, 
+      type = "option", id = "vjd rthm active"..i, name = "vjd rthm active"..i, 
       options = {"false","true"},
       default = 1,
       action = function(value) 
     end}
 
     if i>params:get("vuja_de_num_divs") then
-      params:hide("rest patterns"..i)
+      params:hide("rthm patterns"..i)
     else
-      params:show("rest patterns"..i)
+      params:show("rthm patterns"..i)
     end
   end
   
@@ -1061,8 +1061,8 @@ function parameters.init()
     end
   }
 
-  params:add{type = "option", id = "jf_mode", name = "just friends mode",
-    options = {"mono","poly","port"},
+  params:add{type = "option", id = "jf_mode", name = "jf mode",
+    options = {"mono","poly","portamento"},
     default = 1,
     action = function(value)
       -- if value == 2 then 
@@ -1076,7 +1076,7 @@ function parameters.init()
     end
   }
 
-
+  params:add_separator("portamento pitch intervals")
   params:add { type = "number", id = "jf_pitch_interval1", name = "pitch interval 1", min=-24, max=24, default = 0, 
   -- controlspec = controlspec.new(-5, 5, "lin", 0, 0, "v"), 
     action = function(val) 
