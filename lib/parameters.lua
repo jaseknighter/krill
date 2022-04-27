@@ -738,7 +738,7 @@ function parameters.init()
   params:add{
     -- type="number", id = "rise_time", name = "rise (ms)",min=100, step="10", max=2000, default = 100,
     type="control", id = "rise_time", name = "rise (ms)",
-    controlspec = controlspec.new(1, 2000, "lin", 1, 100, ""), 
+    controlspec = controlspec.new(10, 2000, "lin", 1, 100, ""), 
     action=function(x) 
       -- engine.rise_fall(x/1000,0)
       engine.rise_fall(x/1000,params:get("fall_time")/1000)

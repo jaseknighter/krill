@@ -89,6 +89,11 @@ function sound_controller:get_active_sector()
 
 end
 
+function sound_controller.play_engine(note)
+  -- engine.note_off()
+  engine.note_on(note,1)
+end
+
 function sound_controller.note_on(note_tab,mode)
   if initializing == false and play_enabled == true then
     -- note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
@@ -99,7 +104,7 @@ function sound_controller.note_on(note_tab,mode)
     params:set("active_note",note_tab.pitch)
     
     if mode==1 or (params:get("vjd_div_asn_engine1") == note_tab.div_id or params:get("vjd_div_asn_engine2") == note_tab.div_id) then
-      play_engine(note_tab.pitch)
+      sound_controller.play_engine(note_tab.pitch)
     end
 
     if params:get("output_midi") == 2 then
@@ -121,8 +126,6 @@ function sound_controller.note_on(note_tab,mode)
   end
 end
 
-
--- function sound_controller:play_krill_note()
 
 sound_controller.sleepy_timing = false
 function sound_controller.play_krill_note(value)

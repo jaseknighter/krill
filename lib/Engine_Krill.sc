@@ -41,7 +41,8 @@ Engine_Krill : CroneEngine {
 			frequency, frequency_slew=0,
 			// rings args
 			exciter_decay_min=0.1,exciter_decay_max=0.5, internal_exciter=0,
-			retrigger_fall=0,rise_phase=0, 
+			// retrigger_fall=0,
+			rise_phase=0, 
 			rings_pos=0.05,rings_easter_egg=0, rings_poly=1,
 			rings_structure_min=0.2,rings_structure_max=0.2,
 			rings_brightness_min=0.01,rings_brightness_max=0.01, rings_damping_min=0.5,rings_damping_max=0.5;
@@ -58,7 +59,7 @@ Engine_Krill : CroneEngine {
 
 			rise_phase = Sweep.kr(trig, 1);
 
-			retrigger_fall = rise_phase > (rise+fall) * env_scalar;
+			// retrigger_fall = rise_phase > (rise+fall) * env_scalar;
 
 			env_phase = rise_phase >= (rise * env_scalar);
 			rise_rate =  1/(rise * env_scalar);
@@ -105,7 +106,7 @@ Engine_Krill : CroneEngine {
 
 			SendReply.kr(env_changed * env_phase, '/triggerRiseDonePoll', env_phase);
 			SendReply.kr(fall_done, '/triggerFallDonePoll', fall_done);
-			SendReply.kr(fall_done, '/triggerFallDonePoll', retrigger_fall);
+			// SendReply.kr(fall_done, '/triggerFallDonePoll', retrigger_fall);
 			Out.ar(out, sig.dup);
 		}).add;
 		
@@ -170,7 +171,7 @@ Engine_Krill : CroneEngine {
 			// ("fall done" + rise + "/" + fall).postln;
 			// krillVoice.set(\trig,0);
 			// krillVoice.set(\gate,0);
-			krillVoice.set(\retrigger_fall,0);
+			// krillVoice.set(\retrigger_fall,0);
 			krillVoice.set(\rise_phase,0);
 			
 
@@ -194,6 +195,8 @@ Engine_Krill : CroneEngine {
 		// create a synth voice
 		this.addCommand("note_on","ff",{ arg msg;
 			var frequency=msg[1];
+			// krillVoice.set(\retrigger_fall,0);
+			// krillVoice.set(\rise_phase,0);
 			krillVoice.set(\trig,0);
 			krillVoice.set(\gate,0);
 			krillVoice.set(\frequency_slew,frequency_slew);

@@ -390,10 +390,6 @@ function init_polling()
     -- crow.output[2].execute()
   end)
 
-  function play_engine(note)
-    -- engine.note_off()
-    engine.note_on(note,1)
-  end
 
   function adjust_engine_pitch(note)
     -- engine.note_off()
