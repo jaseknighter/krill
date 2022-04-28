@@ -349,18 +349,7 @@ function parameters.init()
     end
   }
 
-    
-  local lz_xy_cs = cs.new(-5, 10, 'lin', 0, 0.01, "",0.001)
-
-  local lorenz_xy_data = {
-    {"separator","::read only::"},
-    {"control","lz_x","lorenz x",lz_xy_cs,nil},
-    {"control","lz_y","lorenz y",lz_xy_cs,nil},
-  }
-
-  parameters.add_bulk_params(lorenz_xy_data)
-
-  
+      
   --------------------------------
   -- vuja de params
   --------------------------------
@@ -682,8 +671,18 @@ function parameters.init()
   params:add_separator("")
   params:add_separator("MODULATION")
   mod_matrix.lfo.setup_params()
-  params:add_group("lorenz x/y outputs",#lorenz_xy_output_param_data)
+  params:add_group("lorenz x/y outputs",#lorenz_xy_output_param_data + 3)
   parameters.add_bulk_params(lorenz_xy_output_param_data)
+
+  local lz_xy_cs = cs.new(-5, 10, 'lin', 0, 0.01, "",0.001)
+  local lorenz_xy_data = {
+    {"separator","::read only::"},
+    {"control","lz_x","lorenz x",lz_xy_cs,nil},
+    {"control","lz_y","lorenz y",lz_xy_cs,nil},
+  }
+
+  parameters.add_bulk_params(lorenz_xy_data)
+
 
 
   --------------------------------
