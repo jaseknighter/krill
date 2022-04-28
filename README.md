@@ -1,49 +1,239 @@
 # krill
+a lorenz system sequencer and mod matrix running @okyeron's UGen linux port of Mutable Instruments Rings for monome norns.
 
-**installation**
+for beginner scripters: i've put some notes at the end of this documentation that covers some of the coding techniques used in this script. i hope that folks interested in learning more about norns coding will find these somewhat random notes helpful.
+
+## requirements
+
+* norns (required)
+* crow, W/, just friends, midi (optional)
+* audio input to excite the MIRings engine (optional)
+
+## installation
 
 the install process requires 3 steps to properly install!
 
 1. open maiden and below the "matron" tab, enter:
 `;install https://github.com/jaseknighter/krill`
-2. in the same "matron" tab install the plugins with this command:
-`os.execute("cd /tmp && wget https://github.com/schollz/tapedeck/releases/download/PortedPlugins/PortedPlugins.tar.gz && tar -xvzf PortedPlugins.tar.gz && rm PortedPlugins.tar.gz && sudo rsync -avrP PortedPlugins /home/we/.local/share/SuperCollider/Extensions/")`
+2. in the same "matron" tab install the MIRings UGen with this command (see *note* below):
+`version = "mi-UGens-linux-v.03"; url = "https://github.com/okyeron/mi-UGens/raW/master/linux-norns-binaries/"..version ..".tar"; os.execute("wget -T 180 -q -P /tmp/ " .. url .. " && tar -xvf /tmp/"..version..".tar -C /tmp && cp -r /tmp/"..version.."/* /home/we/.local/share/SuperCollider/Extensions/ && rm -r /tmp/"..version.." && rm -r /tmp/"..version..".tar")`
+
 3. restart your norns.
 
-**view switching**
+*note: you may skip step 2 above if the MIRings UGen was previously installed with either @okyeron's [MI-UGens for Norns](https://llllllll.co/t/mi-ugens-for-norns/31781) or @21echoes [Pedalboard](https://llllllll.co/t/pedalboard-chainable-fx-for-norns/31119) scripts.
 
-k1+e1: switch back and forth between the *krill sequencer* and *mod matrix*
+## about the script
+the idea for the script and its name came from @mattallison who asked if i could put together a script based on [Todd Barton's Krell patch] (https://vimeo.com/48382205). originally, i was thinking of making something like a krell acid patch, using @infinitedigits [acid test engine](https://llllllll.co/t/acid-test/52201), but eventually i replaced the acid engine with @okyeron's MIRings UGen.
 
-**krill sequencer**
+this script's use of a chaotic lorenz system algorithm (vs using more random values)  differentiates it from the classic Krell patch, which (in theory at least) creates modulations that lie in a space between random and predictable, whereas the classic Krell patch's use of random voltages makes it's sounds more random and less predictable.  
 
-e1: top-level menu
-e2: sub-menu
-e3: change sub-menu values
 
-there are two sequencer modes:
+###credits
+obvious credit is due to @mattallison for the original concept and script name. i am deeply grateful to him and @SPIKE for working with me over many hours and days testing and discussing the script. 
 
-*krell* 
+additional thanks and credits go out to:
 
-modelled after Todd Barton's Krell script
+* @galapagoose for publishing a lorenz algorithm in lua as part of the [crow bowery](https://github.com/monome/bowery/blob/3dd5c520c6ea401db5e1b01e0bddae396da4ed53/lorenz.lua)
+* @okyeron for creating a linux version of Volker Bohm's (@geplanteobsoleszenz) MI Modules for SuperCollider
+* @geplanteobsoleszenz for porting the modules to SuperCollider
+* @midouest for developing a [really splendid SuperCollider envelope](https://llllllll.co/t/supercollider-tips-q-a/3185/371) that captures rise and fall as individual events
+* @justmat for creating lua lfo's which i borrowed from his [otis script](https://github.com/justmat/otis)
 
-*vuja de* 
 
-modelled after MI Marbles
 
-**rings engine**
 
-params to change the built-in rings are found in the PARAMETERS `rings` sub-menu.
+## documentation
 
-**lorenz algorithm x/y outputs**
+the krill script has two basic views:
 
-params to change the x/y outputs are found in the PARAMETERS `lz x/y outputs` sub-menu. these outputs may be sent to midi or crow (see the *midi* and *crow* PARAMETER sub-menus for details)
+* sequencer view
+* mod matrix view
 
-**mod matrix**
+use k1+e1 to switch back and forth between the views
+
+### sequencer
+sequencer view is divided into three UI sections (from left to right):
+
+1. controls 
+2. lorenz system visualization
+3. lorenz x/y and lfos
+
+when the script is first loaded, just the second and third UI sections are visible. when an encoder is turned, the first section becomes temporarily  visible, along with a grid overlaying the lorenz system visualization.
+
+to make the grid overlay and UI controls section always visible, there is a PARAMETER called `grid display` in the main norns params menu (PARAMETERS>EDIT)that can be set to `always show`. 
+
+all of the UI controls found in the sequencer view are also found in the main norns params menu.
+
+### sequencer controls
+* e1: main menu selector
+* e2: sub-menu selector
+* e3: sub-menu value selector
+
+#### sequencer menu/submenu options
+there are 5 menus on the sequencer screen:
+
+* *seq* (sequencer controls)
+* *scr* (screen controls)
+* *lrz* (lorenz controls)
+* *lfo* (lfo controls)
+* *eng* (MIRings engine controls)
+
+##### *seq* (sequencer controls)
+the notes generated by the krill script are based on the underlying lorenz system algorithm. notes are selected by visualizing the algorithm and overlaying a grid on top of the visualization. this grid is subdivided by note/octave to determine pitch, which is sent to the internal krill SuperCollider engine and/or the other supported outputs (midi, crow, Just Friends, and W/).
+
+there are two sequencer modes: *krell* and *vuja de*
+
+the krell sequencer is modelled after Todd Barton's Krell script. the vuja de sequencer is modelled after MI Marbles eurorack module. new notes are generated in the krell mode based on the rise and fall of an envelope built into the krell script's SuperCollider engine.
+
+both sequencer modes share a number of params visible in the main UI's *seq* menu:
+
+* *seq mode* (sequencing mode): switch between the two sequencing modes
+* *env sclr* (envelope scalar): scale the rise and fall time of the SuperCollider engine's envelope proportionally
+* *rise(ms)* (rise time): envelope rise time
+* *fall (ms)* (fall time): envelope fall time
+* *env level* (envelope level): envelope amplitude
+* *env shp* (envelope shape): envelope shape (smaller values create pluckier envelopes)
+* *num octs* (# octaves): the number of octaves available to sequence
+
+***vuja de* specific controls**
+the vuja de sequencer is structured as a set of 1-6 patterns built using the norns [lattice](https://monome.org/docs/norns/reference/lib/lattice) and [sequins](https://monome.org/docs/norns/reference/lib/sequins) modules. 
+
+there are three controls on the main UI's *seq* menu specific to the vuja de sequencer: 
+** *loop len* ** (loop length)
+the length of each pattern (1-8 steps)
+
+** *vuja_de_prob* ** (vuja de probability)
+the probability that a new note will be selected for the active step
+
+** *vjd div[1-6]* ** (vuja de pattern divisions)
+sets a default division of the 1-6 enabled patterns. by default each pattern has the same set of default divisions: 1,1/2,1/4,1/8,1/16,1/32,1/64
+
+these default divisions can be modified for each of the 6 available patterns by editing a static variable found in `/lib/globals.lua` called `VJD_PAT_DEFAULT_DIVS`. custom divisions may also be set while the script is running (see *division patterns* in the **sequencer param listing** below)
+
+**additional sequencer params**
+there are additional params for the sequencer that may be found in the main norns PARAMETERS>EDIT menu: 
+
+** *SCALES+NOTES* section **
+param settings related to scale, quantization, and number of octaves. this section of the params menu also displays the active note of the sequencer 
+
+** *VUJA DE* section** 
+*vjd num divs* *: sets the number of active patterns (1-6)
+
+*** *div pat assignments* sub-menu ***
+the outputs available to the script (krill SuperCollider engine, midi, crow, W/, and Just Friends) may be assigned to up to two of the vuja de division patterns. 
+
+*** *division pattern[1-6]* sub-menu ***
+* *vjd divX*: same as the *vjd div[1-6]* referenced above
+* *vjd div numX*: sets a custom numerator for the pattern's division
+* *vjd div denX*: sets a custom denominator for the pattern's division
+* *vjd jitterX*: sets a positive or negative jitter to the pattern division
+* *vjd oct offset*: offsets the octave of the notes played by this pattern
+
+*** *rthm patterns[1-6]* sub-menu ***
+each pattern contains three rhythms that are defined as 8-step cellular automata patterns
+
+* *active rthm patX*: sets which of the three rhythm patterns are active
+* *vjd rthm stepX*: change the step size of the rhythm patterns from default 1 to 8
+* *vjd rthm patX-X*: sets the 3 rhythms to one of 256 patterns
+* *vjd rthm activeX*: indicates whether the selected rhythm is active. note, this "read only" param will only indicate a selected rhythm is active if the sequence mode (*seq mode*) is set to *vuja de*.
+
+##### *scr* (lorenz system visualization controls)
+the *scr* (screen) sub-menu's params control how the lorenz system is displayed, which effects sequence generation:
+
+** *x input* and *y input* **
+the lorenz system algorithm outputs three values: *first*, *second* and *third*. the *x input* and *y input* params are used to assign two of the three lorenz system output values to x/y coordinates and visualize the algorithm. changing the x input and y input assignments will change the shape of the visualization.
+
+as mentioned above, a grid is placed on top of the lorenz system visualization which is subdivided by note and octave to set the pitch each time the sequencer plays a note.
+
+** *x offset* and *y offset* **
+the *x offset* and *y offset* params move the lorenz system visualization horizontally and vertically relative to the note/octave grid. this changes the pitches generated by the krill and vija de sequencers. setting these parameters to lower values will tend to lower the pitch of the notes and setting them to higher values will tend to increase the pitch of the notes.
+
+** *x scale* and *y scale* **
+*x scale* and *y scale* changes the width and height of the lorenz system visualization. 
+
+an increase to the x scale will tend to generate pitches across more notes and a decrease will tend to generate pitches of across fewer notes.
+
+an increase to the y scale will tend to generate pitches across more octaves and a decrease will tend to generate pitches of across fewer octaves.
+
+the *scr* params described above are found in the main norns PARAMETERS>EDIT menu under the *LORENZ* menu separator in the *lorenz view* sub-menu.
+
+**lorenz x/y outputs**
+controls for sending lorenz x/y values to crow and midi  are found in the main norns PARAMETERS>EDIT menu under the *MODULATION* menu separator in the *lorenz x/y outputs* sub-menu. in this sub-menu the current x/y values are also displayed.
+
+
+##### *lrz* (lorenz system algorithm controls)
+the *lrz* (lorenz system algorithm) sub-menu's params set a number of the lorenz system's parameters, effecting how it behaves and gets displayed, which subsequently effects sequence generation. 
+
+the *lz speed* param changes how fast the algorithm changes. the other params will effect the algorthm in other ways that i don't really understand well enough to describe, but they are worth exploring and are generally "safe" to use (unlike some of the other params mentioned below).
+
+**additional *lrz* (lorenz algorithm) params**
+the *lrz* params described above are found in the main norns PARAMETERS>EDIT menu under the *LORENZ* menu separator in the *lorenz params* sub-menu.
+
+there are additional params related to the lorenz system algorithm in the *lorenz params* and *lorenz weights* sub-menus. these additional paramschange a variety of settings for the lorenz system algorithm. 
+
+*USE CAUTION* when changing the params in these two sub-menus as unexpected results may occur that sometimes cause the lorenz system algorithm visualization to disappear and when this happens the sequencer tends to stop playing, requiring a restart of the script. 
+
+** 
+
+
+##### *lfo* (lfo controls)
+the *lfo* sub-menu's params control two lfos:
+
+* *lfo*: turns the lfo on and off
+* *shape*: sets the lfo to a sine shape, a square shape, or a Sample and Hold random value generator
+* *depth*: scales the values generated by the lfo
+* *offset*: offsets the values generatored by the lfo
+* *freq*: sets the speed of the lfo
+
+**additional *lfo* params**
+the *lfo* params described above are found in the main norns PARAMETERS>EDIT menu under the *MODULATION* menu separator along with parameters to set how lfo values are sent to crow and midi.
+
+the crow parameters in this sub-menu set slew and params to scale the lfos output values to a min and max voltage.
+
+the midi parameters in this sub-menu set the cc and channel values to be used with the lfo as well as turn the midi version of the lfo on and off.
+
+finally, the read-only *lfo value* param displays the current value of the lfo.
+
+##### *eng* (MI Rings SuperCollider engine controls)
+the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
+
+* *egg mode*: setting egg mode to 1 enables the Rings easter egg, inspired by the Roland RS-09 and disasterpeace
+* *eng mode* (normal): sets the resonator model to one of 6 modes: 
+  ** *res*: resonator
+  ** *sstr*: sympathetic string
+  ** *mstr*: modulated/inharmonic string
+  ** *fm*: 2-op fm voice
+  ** *sstrq*: sympathetic string quantized
+  ** *strr*: string and reverb
+* *eng mode* (egg mode): sets the 'model' to one of 6 modes: 
+  ** *for*: formant
+  ** *chor*: chorus
+  ** *rev*: reverb
+  ** *for2*: formant 2
+  ** *ens*: ensemble
+  ** *rev2*: chorus 2
+* *trig type*: sets excitation signal to *internal* or *external.* if set to external, an audio signal is required from the norns audio input jack(s)
+* *freq slew*: sets a slew value for the pitch of notes played by the SuperCollider engine
+* *fslw enbl* (frequency slew enable): enables/disables frequency slew
+* *pos* (position): specifies the position where the model's structure is excited
+* *str* (structure base): with the modal and non-linear string models, controls the inharmonicity of the spectrum (which directly impacts the perceived “material”); with the sympathetic strings model, controls the intervals between strings.
+* *str rng*: sets a range that the value of the structure base param above will modulate around 
+* *brt* (brightness base): specifies the brightness and richness of the spectrum
+* *brt rng*: sets a range that the value of the brightness base param above will modulate around
+* *dmp* (damping): controls the damping rate of the sound, from 100ms to 10s
+* *dmp rng*: sets a range that the value of the damping base param above will modulate around. 
+* *poly* (polyphony): number of simultaneous voices (1 -- 4) - this also influences the number of partials generated per voice. more voices mean less partials.
+
+the *eng* params described above are also found in the main norns PARAMETERS>EDIT menu in the *rings* sub-menu. 
+
+note: the above parameter descriptions are copied with gratitude from @geplanteobsoleszenz SuperCollider help documentation.
+
+### mod matrix
 
 * alt+k1: switch to/from mod_matrix 
 * e1: switch between the 3 mod matrix menus:
-  1. row/col: use e2/e3 to change the selected row/column
-  2. in/out: use e2/e3 to change the input/output for the selected row/column. 
+  1. roW/col: use e2/e3 to change the selected roW/column
+  2. in/out: use e2/e3 to change the input/output for the selected roW/column. 
   3. pp opt: use e2 to select the four options: enbl (enable), lvl (level), sm (self mods), rm (relative mods). use e3 to change the value of the selected pp opt. *pp opt* stands for *patchpoint options*. note, only the first pp opt (enbl) enables/disables the patch point. the other three options aren't hooked up yet. also,  k2/k3 disables/enables the patchpoint from all of the three mod matrix menus. 
 
 mod matrix notes
@@ -61,8 +251,15 @@ mod matrix notes
   * a value with dashes at the front and end (e.g. "--LORENZ--") indicates a param separator.
   * a value with carrots at the front and end (e.g. "<\<lorenz view>>") indicates a param sub-menu.
 
-**DATA MANAGEMENT**
+### DATA MANAGEMENT
 
 the *krill data* sub-menu at the end of the PARAMETERS menu has all the options for saving, loading, deleting mod_matrix settings. this sub-menu is also where you can enable/disable autosave. 
 
 there is a global parameter in the `globals.lua` file called `AUTOSAVE_DEFAULT`. setting it to 2 means autosave is on by default. setting it to one means autosave is off by default.
+
+## feature roadmap
+* bug fixes and UI usability improvements
+* vuja de set loop length and probability separately for each pattern
+* publish the mod matrix as a mod that other scripts can use
+
+## notes on the code (for aspiring scripters)

@@ -1,4 +1,8 @@
 // Engine_Krill
+// Implementation of MiRings UGen as norns engine
+// Jonathan Snyder @jaseknighter
+//
+// Mi-Ugens by volker böhm, 2020 - https://vboehm.net
 
 Engine_Krill : CroneEngine {
 	// <Krill>
