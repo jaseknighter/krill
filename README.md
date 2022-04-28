@@ -113,15 +113,19 @@ sets a default division of the 1-6 enabled patterns. by default each pattern has
 these default divisions can be modified for each of the 6 available patterns by editing a static variable found in `/lib/globals.lua` called `VJD_PAT_DEFAULT_DIVS`. custom divisions may also be set while the script is running (see *division patterns* in the **sequencer param listing** below)
 
 **additional sequencer params**
+
 there are additional params for the sequencer that may be found in the main norns PARAMETERS>EDIT menu: 
 
-** *SCALES+NOTES* section **
+***SCALES+NOTES* section**
+
 param settings related to scale, quantization, and number of octaves. this section of the params menu also displays the active note of the sequencer 
 
-** *VUJA DE* section** 
+***VUJA DE* section** 
+
 *vjd num divs* *: sets the number of active patterns (1-6)
 
-*** *div pat assignments* sub-menu ***
+****div pat assignments* sub-menu***
+
 the outputs available to the script (krill SuperCollider engine, midi, crow, W/, and Just Friends) may be assigned to up to two of the vuja de division patterns. 
 
 *** *division pattern[1-6]* sub-menu ***
