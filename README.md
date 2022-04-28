@@ -96,7 +96,7 @@ both sequencer modes share a number of params visible in the main UI's *seq* men
 * *env shp* (envelope shape): envelope shape (smaller values create pluckier envelopes)
 * *num octs* (# octaves): the number of octaves available to sequence
 
-** *vuja de* specific controls**
+***vuja de* specific controls**
 
 the vuja de sequencer is structured as a set of 1-6 patterns built using the norns [lattice](https://monome.org/docs/norns/reference/lib/lattice) and [sequins](https://monome.org/docs/norns/reference/lib/sequins) modules. 
 
