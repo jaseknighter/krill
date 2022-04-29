@@ -167,7 +167,7 @@ note: when the script is first loaded, just the second and third UI sections are
   *USE CAUTION* when changing the params in these two sub-menus as unexpected results may occur that sometimes cause the lorenz system algorithm visualization to disappear and when this happens the sequencer tends to stop playing, requiring a restart of the script. 
 
 ##### *lfo* (lfo controls)
-  the *lfo* sub-menu's params control two lfos:
+    the *lfo* sub-menu's params control two lfos:
 
   * *lfo*: turns the lfo on and off
   * *shape*: sets the lfo to a sine shape, a square shape, or a Sample and Hold random value generator
@@ -185,38 +185,40 @@ note: when the script is first loaded, just the second and third UI sections are
   finally, the read-only *lfo value* param displays the current value of the lfo.
 
 ##### *eng* (MI Rings SuperCollider engine controls)
-  the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
+    the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
 
-  * *egg mode*: setting egg mode to 1 enables the Rings easter egg, inspired by the Roland RS-09 and disasterpeace
-  * *eng mode* (normal): sets the resonator model to one of 6 modes: 
-    ** *res*: resonator
-    ** *sstr*: sympathetic string
-    ** *mstr*: modulated/inharmonic string
-    ** *fm*: 2-op fm voice
-    ** *sstrq*: sympathetic string quantized
-    ** *strr*: string and reverb
-  * *eng mode* (egg mode): sets the 'model' to one of 6 modes: 
-    ** *for*: formant
-    ** *chor*: chorus
-    ** *rev*: reverb
-    ** *for2*: formant 2
-    ** *ens*: ensemble
-    ** *rev2*: chorus 2
-  * *trig type*: sets excitation signal to *internal* or *external.* if set to external, an audio signal is required from the norns audio input jack(s)
+  * mode controls
+    * *egg mode*: setting egg mode to 1 enables the Rings easter egg, inspired by the Roland RS-09 and disasterpeace
+    * *eng mode*: sets the resonator model to one of 6 modes: 
+      ** *res*: resonator
+      ** *sstr*: sympathetic string
+      ** *mstr*: modulated/inharmonic string
+      ** *fm*: 2-op fm voice
+      ** *sstrq*: sympathetic string quantized
+      ** *strr*: string and reverb
+    * *eng mode* (egg mode): sets the 'model' to one of 6 modes: 
+      ** *for*: formant
+      ** *chor*: chorus
+      ** *rev*: reverb
+      ** *for2*: formant 2
+      ** *ens*: ensemble
+      ** *rev2*: chorus 2
+      * *trig type*: sets excitation signal to *internal* or *external.* if set to external, an audio signal is required from the norns audio input jack(s)
   * *freq slew*: sets a slew value for the pitch of notes played by the SuperCollider engine
   * *fslw enbl* (frequency slew enable): enables/disables frequency slew
-  * *pos* (position): specifies the position where the model's structure is excited
-  * *str* (structure base): with the modal and non-linear string models, controls the inharmonicity of the spectrum (which directly impacts the perceived “material”); with the sympathetic strings model, controls the intervals between strings.
-  * *str rng*: sets a range that the value of the structure base param above will modulate around 
-  * *brt* (brightness base): specifies the brightness and richness of the spectrum
-  * *brt rng*: sets a range that the value of the brightness base param above will modulate around
-  * *dmp* (damping): controls the damping rate of the sound, from 100ms to 10s
-  * *dmp rng*: sets a range that the value of the damping base param above will modulate around. 
-  * *poly* (polyphony): number of simultaneous voices (1 -- 4) - this also influences the number of partials generated per voice. more voices mean less partials.
+  * model controls
+    * *pos* (position): specifies the position where the model's structure is excited
+    * *str* (structure base): with the modal and non-linear string models, controls the inharmonicity of the spectrum (which directly impacts the perceived “material”); with the sympathetic strings model, controls the intervals between strings.
+    * *str rng*: sets a range that the value of the structure base param above will modulate around 
+    * *brt* (brightness base): specifies the brightness and richness of the spectrum
+    * *brt rng*: sets a range that the value of the brightness base param above will modulate around
+    * *dmp* (damping): controls the damping rate of the sound, from 100ms to 10s
+    * *dmp rng*: sets a range that the value of the damping base param above will modulate around. 
+    * *poly* (polyphony): number of simultaneous voices (1 -- 4) - this also influences the number of partials generated per voice. more voices mean less partials.
 
-  the *eng* params described above are also found in the main norns PARAMETERS>EDIT menu in the *rings* sub-menu. 
+    the *eng* params described above are also found in the main norns PARAMETERS>EDIT menu in the *rings* sub-menu. 
 
-  note: the above parameter descriptions are copied with gratitude from @geplanteobsoleszenz SuperCollider help documentation.
+    the above parameter descriptions are copied with gratitude from @geplanteobsoleszenz SuperCollider help documentation.
 
 ### mod matrix
 
