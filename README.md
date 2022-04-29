@@ -131,7 +131,7 @@ note: when the script is first loaded, just the second and third UI sections are
      * *vjd rthm activeX*: indicates whether the selected rhythm is active. note, this "read only" param will only indicate a selected rhythm is active if the sequence mode (*seq mode*) is set to *vuja de*.
 
 ##### *scr* (lorenz system visualization controls)
-    the *scr* (screen) sub-menu's params control how the lorenz system is displayed, which effects sequence generation:
+  the *scr* (screen) sub-menu's params control how the lorenz system is displayed, which effects sequence generation:
 
 - *x/y input***
   the lorenz system algorithm outputs three values: *first*, *second* and *third*. the *x input* and *y input* params are used to assign two of the three lorenz system output values to x/y coordinates and visualize the algorithm. changing the x input and y input assignments will change the shape of the visualization.
@@ -155,9 +155,9 @@ note: when the script is first loaded, just the second and third UI sections are
 
 
 ##### *lrz* (lorenz system algorithm controls)
-    the *lrz* (lorenz system algorithm) sub-menu's params set a number of the lorenz system's parameters, effecting how it behaves and gets displayed, which subsequently effects sequence generation. 
+  the *lrz* (lorenz system algorithm) sub-menu's params set a number of the lorenz system's parameters, effecting how it behaves and gets displayed, which subsequently effects sequence generation. 
 
-    the *lz speed* param changes how fast the algorithm changes. the other params will effect the algorthm in other ways that i don't really understand well enough to describe, but they are worth exploring and are generally "safe" to use (unlike some of the other params mentioned below).
+  the *lz speed* param changes how fast the algorithm changes. the other params will effect the algorthm in other ways that i don't really understand well enough to describe, but they are worth exploring and are generally "safe" to use (unlike some of the other params mentioned below).
 
 - **additional *lrz* (lorenz algorithm) params**
   the *lrz* params described above are found in the main norns PARAMETERS>EDIT menu under the *LORENZ* menu separator in the *lorenz params* sub-menu.
@@ -167,7 +167,7 @@ note: when the script is first loaded, just the second and third UI sections are
   *USE CAUTION* when changing the params in these two sub-menus as unexpected results may occur that sometimes cause the lorenz system algorithm visualization to disappear and when this happens the sequencer tends to stop playing, requiring a restart of the script. 
 
 ##### *lfo* (lfo controls)
-    the *lfo* sub-menu's params control two lfos:
+  the *lfo* sub-menu's params control two lfos:
 
   * *lfo*: turns the lfo on and off
   * *shape*: sets the lfo to a sine shape, a square shape, or a Sample and Hold random value generator
@@ -185,7 +185,7 @@ note: when the script is first loaded, just the second and third UI sections are
   finally, the read-only *lfo value* param displays the current value of the lfo.
 
 ##### *eng* (MI Rings SuperCollider engine controls)
-    the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
+  the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
 
   * mode controls
     * *egg mode*: setting egg mode to 1 enables the Rings easter egg, inspired by the Roland RS-09 and disasterpeace
@@ -235,12 +235,12 @@ it is divided into four UI sections:
 the mod matrix has 5 menus (e1 navigates between them):
 
 #### *row/col* (patchpoint navigator)
-  - e2/e3 navigates the patchpoint matrix. a dot will appear in the center of the patchpoints to show the row and column that is currently selected.
+  e2/e3 navigates the patchpoint matrix. a dot will appear in the center of the patchpoints to show the row and column that is currently selected.
 
   note: when other menus are active, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
 
 #### *in/out* (input/output selection)
-  - e2/e3 selects the input/output for the selected patchpoint matrix row/column
+  e2/e3 selects the input/output for the selected patchpoint matrix row/column
 
   k1+e2 and k+e3 just display parameter folders names for fast navigation
 
