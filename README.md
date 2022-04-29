@@ -19,6 +19,7 @@ the install process requires 3 steps to properly install!
 1. open maiden and below the "matron" tab, enter:
 
 `;install https://github.com/jaseknighter/krill`
+
 2. in the same "matron" tab install the MIRings UGen with this command (see *note* below):
 
 `version = "mi-UGens-linux-v.03"; url = "https://github.com/okyeron/mi-UGens/raW/master/linux-norns-binaries/"..version ..".tar"; os.execute("wget -T 180 -q -P /tmp/ " .. url .. " && tar -xvf /tmp/"..version..".tar -C /tmp && cp -r /tmp/"..version.."/* /home/we/.local/share/SuperCollider/Extensions/ && rm -r /tmp/"..version.." && rm -r /tmp/"..version..".tar")`
