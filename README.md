@@ -99,16 +99,11 @@ note: when the script is first loaded, just the second and third UI sections are
 
   in addition to the seven parameters listed above, there are three additional controls on the main UI's *seq* menu specific to the vuja de sequencer: 
 
-    *loop len* ** (loop length)
-    the length of each pattern (1-8 steps)
+  8. *loop len* ** (loop length): the length of each pattern (1-8 steps)
+  9. *vuja_de_prob* ** (vuja de probability): the probability that a new note will be selected for the active step
+  10. *vjd div[1-6]* ** (vuja de pattern divisions): sets a default division of the 1-6 enabled patterns. by default each pattern has the same set of default divisions: 1,1/2,1/4,1/8,1/16,1/32,1/64
 
-    *vuja_de_prob* ** (vuja de probability)
-    the probability that a new note will be selected for the active step
-
-    *vjd div[1-6]* ** (vuja de pattern divisions)
-    sets a default division of the 1-6 enabled patterns. by default each pattern has the same set of default divisions: 1,1/2,1/4,1/8,1/16,1/32,1/64
-
-    these default divisions can be modified for each of the 6 available patterns by editing a static variable found in `/lib/globals.lua` called `VJD_PAT_DEFAULT_DIVS`. custom divisions may also be set while the script is running (see *division patterns* in the **sequencer param listing** below)
+  note: the default divisions (*vjd div[1-6]*) can be modified for each of the 6 available patterns by editing a static variable found in `/lib/globals.lua` called `VJD_PAT_DEFAULT_DIVS`. custom divisions may also be set while the script is running (see *division patterns* in the **sequencer param listing** below)
 
 - other sequencer params
 
