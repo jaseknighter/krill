@@ -29,9 +29,9 @@
      showgrid="false"
      units="px"
      width="586.344px"
-     inkscape:zoom="0.44931003"
-     inkscape:cx="596.4701"
-     inkscape:cy="272.64025"
+     inkscape:zoom="0.73"
+     inkscape:cx="400"
+     inkscape:cy="299.31507"
      inkscape:window-width="1293"
      inkscape:window-height="847"
      inkscape:window-x="54"
@@ -467,36 +467,6 @@
        inkscape:export-ydpi="300" />
     <rect
        style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
-       id="rect206-7-55"
-       width="5.1190281"
-       height="4.8476763"
-       x="125.4969"
-       y="66.979218"
-       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
-    <rect
-       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
-       id="rect206-7-0"
-       width="5.1175985"
-       height="4.8476763"
-       x="136.09035"
-       y="66.979218"
-       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
-    <rect
-       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
-       id="rect206-7-55-4"
-       width="5.1190281"
-       height="4.8476763"
-       x="146.66359"
-       y="66.979218"
-       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
-    <rect
-       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
        id="rect206-7-5"
        width="2.4238219"
        height="5.368165"
@@ -538,9 +508,59 @@
     <rect
        style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
        id="rect206-7-0-9"
-       width="5.1175985"
+       width="2.5813253"
+       height="4.8476763"
+       x="167.31122"
+       y="66.979218"
+       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <rect
+       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect206-7-0-9-8"
+       width="2.5813253"
        height="4.8476763"
        x="156.72787"
+       y="66.979218"
+       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <rect
+       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect206-7-0-9-5"
+       width="2.5813253"
+       height="4.8476763"
+       x="146.14453"
+       y="66.979218"
+       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <rect
+       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect206-7-0-9-8-7"
+       width="2.5813253"
+       height="4.8476763"
+       x="135.56119"
+       y="66.979218"
+       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <rect
+       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect206-7-0-9-8-7-2"
+       width="2.5813253"
+       height="4.8476763"
+       x="125.50702"
+       y="66.979218"
+       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <rect
+       style="display:inline;vector-effect:non-scaling-stroke;fill:#494949;fill-opacity:1;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect206-7-0-9-8-7-2-1"
+       width="2.5813253"
+       height="4.8476763"
+       x="104.34035"
        y="66.979218"
        inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
        inkscape:export-xdpi="300"
