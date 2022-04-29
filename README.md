@@ -57,7 +57,7 @@ the krill script has two basic views:
 * sequencer view
 * mod matrix view
 
-use k1+e1 to switch back and forth between the views
+*use k1+e1 to switch back and forth between the views*
 
 ### sequencer
 <img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-0-start_w_grid.png" width="500" />
@@ -223,24 +223,46 @@ note: when the script is first loaded, just the second and third UI sections are
 
 ### mod matrix
 <img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0.png" width="500" />
+the mod matrix view is divided into four UI sections:
+
+1. menu name
+2. control parameters
+3. input output labels and values
+4. patchpoints
 
 
-* alt+k1: switch to/from mod_matrix 
-* e1: switch between the 3 mod matrix menus:
-  1. roW/col: use e2/e3 to change the selected roW/column
-  2. in/out: use e2/e3 to change the input/output for the selected roW/column. 
-  3. pp opt: use e2 to select the four options: enbl (enable), lvl (level), sm (self mods), rm (relative mods). use e3 to change the value of the selected pp opt. *pp opt* stands for *patchpoint options*. note, only the first pp opt (enbl) enables/disables the patch point. the other three options aren't hooked up yet. also,  k2/k3 disables/enables the patchpoint from all of the three mod matrix menus. 
+#### mod matrix menu options
+the mod matrix allows any parameter to be used to modulate any other parameter
 
-mod matrix notes
-* changing a patchpoint's  input or output will disable the patchpoint for safety. since the k3 button enables the patchpoint from any of the 3 menus, it is easy to reenable the patchpoint quickly when switching to a new input/output.
-* the patchpoint circles give you a visual understanding of the state of each patchpoint:
-  * dimly lit shape means disabled
-  * medium lit shape means patchpoint is selected for editing
-  * brightly lit shape means patchpoint is enabled
-  * empty circle: no input/output defined for the patchpoint
-  * left half of circle filled: input defined for the patchpoint
-  * right half of circle filled: output defined for the patchpoint
-  *  circle completely filled: input and output defined for the patchpoint
+e1 navigates between the 5 menus
+
+there are 5 menus on the sequencer screen:
+
+1. *row/col* (patchpoint navigator)
+  e2/e3 navigates the patchpoint matrix. a dot will appear in the center of the patchpoints to show the row and column that is currently selected.
+
+  note: when other menus are selected k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
+
+2. *in/out* (input/output selection)
+  e2/e3 selects the input/output for the selected patchpoint matrix row/column
+
+  k1+e2 and k+e3 just display parameter folders names for fast navigation
+
+  matrix rows represent inputs. matrix columns represent outputs.
+
+
+
+- additional mod matrix notes:
+  changing a patchpoint's  input or output will disable the patchpoint for safety. since the k3 button enables the patchpoint from any of the 3 menus, it is easy to reenable the patchpoint quickly when switching to a new input/output.
+ 
+  the patchpoint circles give you a visual understanding of the state of each patchpoint:
+    * dimly lit shape means disabled
+    * medium lit shape means patchpoint is selected for editing
+    * brightly lit shape means patchpoint is enabled
+    * empty circle: no input/output defined for the patchpoint
+    * left half of circle filled: input defined for the patchpoint
+    * right half of circle filled: output defined for the patchpoint
+    *  circle completely filled: input and output defined for the patchpoint
 * the *in* and *out* values at the bottom indicate the input/output parameters selected for the selected patchpoint
   * the first value to appear ("-------------") provides indication that you are at the start of the list
   * a value with dashes at the front and end (e.g. "--LORENZ--") indicates a param separator.
