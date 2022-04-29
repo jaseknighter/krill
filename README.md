@@ -83,13 +83,13 @@ note: when the script is first loaded, just the second and third UI sections are
 
   when the krell sequencer is active, seven parameters are accessible from the main UI's *seq* menu:
 
-  # *seq mode* (sequencing mode): switch between the two sequencing modes
-  # *env sclr* (envelope scalar): scale the rise and fall time of the SuperCollider engine's envelope proportionally
-  # *rise(ms)* (rise time): envelope rise time
-  # *fall (ms)* (fall time): envelope fall time
-  # *env level* (envelope level): envelope amplitude
-  # *env shp* (envelope shape): envelope shape (smaller values create pluckier envelopes)
-  # *num octs* (# octaves): the number of octaves available to sequence
+  1. *seq mode* (sequencing mode): switch between the two sequencing modes
+  2. *env sclr* (envelope scalar): scale the rise and fall time of the SuperCollider engine's envelope proportionally
+  3. *rise(ms)* (rise time): envelope rise time
+  4. *fall (ms)* (fall time): envelope fall time
+  5. *env level* (envelope level): envelope amplitude
+  6. *env shp* (envelope shape): envelope shape (smaller values create pluckier envelopes)
+  7. *num octs* (# octaves): the number of octaves available to sequence
 
 - *vuja de* sequencer
 
