@@ -1,3 +1,4 @@
+![](images/1-1-0-start.png)
 # krill
 a lorenz system sequencer and mod matrix running @okyeron's UGen linux port of Mutable Instruments Rings for monome norns.
 
