@@ -54,7 +54,9 @@ the krill script has two basic views:
 use k1+e1 to switch back and forth between the views
 
 ### sequencer
-sequencer view is divided into three UI sections (from left to right):
+![](images/1-2-0-start_w_grid.png)
+
+the sequencer view is divided into three UI sections (from left to right):
 
 1. controls 
 2. lorenz system visualization
