@@ -9,7 +9,7 @@
    id="svg5"
    inkscape:version="1.2-dev (9ee32be, 2021-06-19)"
    sodipodi:docname="krill_screens.svg"
-   inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+   inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -110,8 +110,8 @@
   <g
      inkscape:groupmode="layer"
      id="layer6"
-     inkscape:label="background"
-     style="display:inline">
+     inkscape:label="1-background"
+     style="display:none">
     <rect
        style="vector-effect:non-scaling-stroke;fill:#808080;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
        id="rect291"
@@ -326,6 +326,16 @@
      id="layer9"
      inkscape:label="2-1-0-start"
      style="display:inline">
+    <rect
+       style="display:inline;vector-effect:non-scaling-stroke;fill:#808080;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect291-9"
+       width="211.66667"
+       height="112.19366"
+       x="0"
+       y="16.375799"
+       inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/2-1-0-start.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <image
        width="502.35559"
        height="348.19168"
