@@ -105,9 +105,9 @@ note: when the script is first loaded, just the second and third UI sections are
 
       note: the default divisions (*vjd div[1-6]*) can be modified for each of the 6 available patterns by editing a static variable found in `/lib/globals.lua` called `VJD_PAT_DEFAULT_DIVS`. custom divisions may also be set while the script is running (see *division patterns* in the **sequencer param listing** below)
 
-- other sequencer params
+  *other sequencer params*
 
-  there are additional params for the sequencer that may be found in the main norns PARAMETERS>EDIT menu: 
+  additional sequencer params may be found in the main norns PARAMETERS>EDIT menu: 
 
   ***SCALES+NOTES* section**: param settings related to scale, quantization, and number of octaves. this section of the params menu also displays the active note of the sequencer 
 
