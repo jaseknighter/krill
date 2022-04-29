@@ -1,5 +1,7 @@
-![](images/1-1-0-start.png)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-1-0-start.png" />
+
 # krill
+
 a lorenz system sequencer and mod matrix running @okyeron's UGen linux port of Mutable Instruments Rings for monome norns.
 
 for beginner scripters: i've put some notes at the end of this documentation that covers some of the coding techniques used in this script. i hope that folks interested in learning more about norns coding will find these somewhat random notes helpful.
@@ -54,8 +56,7 @@ the krill script has two basic views:
 use k1+e1 to switch back and forth between the views
 
 ### sequencer
-![](images/1-2-0-start_w_grid.png)
-
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-0-start_w_grid.png" width="500" />
 the sequencer view is divided into three UI sections (from left to right):
 
 1. controls 
