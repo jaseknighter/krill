@@ -63,18 +63,10 @@ the sequencer view is divided into three UI sections (from left to right):
 2. lorenz system visualization
 3. lorenz x/y and lfos
 
-when the script is first loaded, just the second and third UI sections are visible. when an encoder is turned, the first section becomes temporarily  visible, along with a grid overlaying the lorenz system visualization.
+e1/e2/e3 are used to navigate the controls section. all of the UI controls found in the sequencer view are also found in the main norns params menu J(PARAMETERS>EDIT).
 
-to make the grid overlay and UI controls section always visible, there is a PARAMETER called `grid display` in the main norns params menu (PARAMETERS>EDIT)that can be set to `always show`. 
+note: when the script is first loaded, just the second and third UI sections are visible. when an encoder is turned, the first section becomes temporarily visible, along with a grid overlaying the lorenz system visualization. to make the grid overlay and UI controls section always visible, there is a PARAMETER called `grid display` in the main norns params menu (PARAMETERS>EDIT)that can be set to `always show`. 
 
-all of the UI controls found in the sequencer view are also found in the main norns params menu.
-
-### sequencer controls
-  a. e1: main menu selector
-
-  b. e2: sub-menu selector
-  
-  c. e3: sub-menu value 
 
 #### sequencer menu/submenu options
 
