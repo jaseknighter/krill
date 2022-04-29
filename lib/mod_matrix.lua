@@ -661,7 +661,9 @@ function mod_matrix:display_params()
       screen.move(72,54)
       screen.text(output_text)
       screen.move(5,62)
-      screen.text("in val: " .. mod_matrix.active_input_val)
+      local in_val = ""
+      in_val = type(mod_matrix.active_input_val) == "number" and fn.round_decimals(tonumber(mod_matrix.active_input_val),3) or mod_matrix.active_input_val
+      screen.text("in val: " .. in_val)
       screen.move(72,62)
       if self.active_gui_sector < 4 then
         screen.text("out val: " .. mod_matrix.active_output_val)
@@ -681,7 +683,9 @@ function mod_matrix:display_params()
       screen.move(5,54)
       screen.text(output_text)
       screen.move(5,62)
-      screen.text("out val: " .. mod_matrix.active_output_val)
+      local out_val = ""
+      out_val = type(mod_matrix.active_output_val) == "number" and fn.round_decimals(tonumber(mod_matrix.active_output_val),3) or mod_matrix.active_output_val
+      screen.text("out val: " .. out_val)
     end
   end
 end
@@ -735,7 +739,9 @@ function mod_matrix:display_patch_points()
     for j=1,self.num_outputs,1 do
       local output = self.outputs[j] 
       local level
+      local dot_level
       if self.patch_points[i] and self.patch_points[i][j] then
+        
         local enabled
         if mod_matrix.active_gui_sector < 4 then
           enabled = self.patch_points[i][j].enabled == 2
@@ -744,10 +750,16 @@ function mod_matrix:display_patch_points()
         else
           enabled = self.patch_points[i][j].midi_cc_enabled == 2
         end
-        if enabled then 
+
+        if enabled and self.active_input == i and self.active_output == j then 
           level = 15
+          dot_level = 0
+        elseif enabled then
+          level = 5
+          dot_level = 5
         elseif self.active_input == i and self.active_output == j then
           level = 5
+          dot_level = 15
         else
           level = 1
         end
@@ -768,13 +780,21 @@ function mod_matrix:display_patch_points()
         screen.fill()
         screen.stroke()
       end
+
       if self.lookup[output] and self.lookup[output].id then
         screen.move(9*(j+1)+51,(9*i)+9)
         screen.arc(9*(j+1)+51,(9*i)+6,3,math.rad(270),math.rad(90))  
         screen.fill()
         screen.stroke()
       end
-      -- screen.fill()
+
+      if dot_level then
+        screen.level(dot_level)
+        screen.move(9*(j+1)+51,(9*i)+9)
+        screen.circle(9*(j+1)+51,(9*i)+6,1)  
+        screen.fill()
+        screen.stroke()
+      end
     end
   end
 end
