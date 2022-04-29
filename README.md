@@ -105,25 +105,25 @@ note: when the script is first loaded, just the second and third UI sections are
 
       note: the default divisions (*vjd div[1-6]*) can be modified for each of the 6 available patterns by editing a static variable found in `/lib/globals.lua` called `VJD_PAT_DEFAULT_DIVS`. custom divisions may also be set while the script is running (see *division patterns* in the **sequencer param listing** below)
 
-  *other sequencer params*
+  **other sequencer params**
 
-  additional sequencer params may be found in the main norns PARAMETERS>EDIT menu: 
+    additional sequencer params may be found in the main norns PARAMETERS>EDIT menu: 
 
-  ***SCALES+NOTES* section**: param settings related to scale, quantization, and number of octaves. this section of the params menu also displays the active note of the sequencer 
+    ***SCALES+NOTES* section**: param settings related to scale, quantization, and number of octaves. this section of the params menu also displays the active note of the sequencer 
 
-  ***VUJA DE* section**:  *vjd num divs* *: sets the number of active patterns (1-6)
+    ***VUJA DE* section**:  *vjd num divs* *: sets the number of active patterns (1-6)
 
-  ****div pat assignments* sub-menu***:  the outputs available to the script (krill SuperCollider engine, midi, crow, W/, and Just Friends) may be assigned to up to two of the vuja de division patterns. 
+    ****div pat assignments* sub-menu***:  the outputs available to the script (krill SuperCollider engine, midi, crow, W/, and Just Friends) may be assigned to up to two of the vuja de division patterns. 
 
-  *** *division pattern[1-6]* sub-menu ***
-  * *vjd divX*: same as the *vjd div[1-6]* referenced above
-  * *vjd div numX*: sets a custom numerator for the pattern's division
-  * *vjd div denX*: sets a custom denominator for the pattern's division
-  * *vjd jitterX*: sets a positive or negative jitter to the pattern division
-  * *vjd oct offset*: offsets the octave of the notes played by this pattern
-
-  *** *rthm patterns[1-6]* sub-menu ***
-  each pattern contains three rhythms that are defined as 8-step cellular automata patterns
+    *** *division pattern[1-6]* sub-menu ***
+    * *vjd divX*: same as the *vjd div[1-6]* referenced above
+    * *vjd div numX*: sets a custom numerator for the pattern's division
+    * *vjd div denX*: sets a custom denominator for the pattern's division
+    * *vjd jitterX*: sets a positive or negative jitter to the pattern division
+    * *vjd oct offset*: offsets the octave of the notes played by this pattern
+  
+    *** *rthm patterns[1-6]* sub-menu ***
+    each pattern contains three rhythms that are defined as 8-step cellular automata patterns
 
      * *active rthm patX*: sets which of the three rhythm patterns are active
      * *vjd rthm stepX*: change the step size of the rhythm patterns from default 1 to 8
