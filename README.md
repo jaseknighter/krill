@@ -222,7 +222,7 @@ note: when the script is first loaded, just the second and third UI sections are
     the above parameter descriptions are copied with gratitude from @geplanteobsoleszenz SuperCollider help documentation.
 
 ### mod matrix
-<img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0-start.png" width="500" />
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0.png" width="500" />
 
 
 * alt+k1: switch to/from mod_matrix 
