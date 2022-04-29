@@ -232,17 +232,15 @@ it is divided into four UI sections:
 3. input output labels and values
 4. patchpoints
 
-
-#### mod matrix menu options
 the mod matrix has 5 menus (e1 navigates between them):
 
-1. *row/col* (patchpoint navigator)
-  e2/e3 navigates the patchpoint matrix. a dot will appear in the center of the patchpoints to show the row and column that is currently selected.
+#### *row/col* (patchpoint navigator)
+  - e2/e3 navigates the patchpoint matrix. a dot will appear in the center of the patchpoints to show the row and column that is currently selected.
 
   note: when other menus are active, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
 
-2. *in/out* (input/output selection)
-  e2/e3 selects the input/output for the selected patchpoint matrix row/column
+#### *in/out* (input/output selection)
+  - e2/e3 selects the input/output for the selected patchpoint matrix row/column
 
   k1+e2 and k+e3 just display parameter folders names for fast navigation
 
