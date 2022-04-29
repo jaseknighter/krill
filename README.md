@@ -227,10 +227,10 @@ the mod matrix allows any parameter to be used to modulate any other parameter
 <br><br>
 it is divided into four UI sections:
 
-a. menu name
-b. control parameters
-c. input output labels and values
-d. patchpoints
+a. menu name<br>
+b. control parameters<br>
+c. input output labels and values<br>
+d. patchpoints<br>
 
 the mod matrix has 5 menus (e1 navigates between them):
 
