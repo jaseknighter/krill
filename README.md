@@ -204,8 +204,9 @@ note: when the script is first loaded, just the second and third UI sections are
       ** *ens*: ensemble
       ** *rev2*: chorus 2
       * *trig type*: sets excitation signal to *internal* or *external.* if set to external, an audio signal is required from the norns audio input jack(s)
-  * *freq slew*: sets a slew value for the pitch of notes played by the SuperCollider engine
-  * *fslw enbl* (frequency slew enable): enables/disables frequency slew
+  * slew controls
+    * *freq slew*: sets a slew value for the pitch of notes played by the SuperCollider engine
+    * *fslw enbl* (frequency slew enable): enables/disables frequency slew
   * model controls
     * *pos* (position): specifies the position where the model's structure is excited
     * *str* (structure base): with the modal and non-linear string models, controls the inharmonicity of the spectrum (which directly impacts the perceived “material”); with the sympathetic strings model, controls the intervals between strings.
