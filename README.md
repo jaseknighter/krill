@@ -71,7 +71,9 @@ all of the UI controls found in the sequencer view are also found in the main no
 
 ### sequencer controls
   a. e1: main menu selector
+
   b. e2: sub-menu selector
+  
   c. e3: sub-menu value 
 
 #### sequencer menu/submenu options
