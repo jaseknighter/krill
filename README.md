@@ -224,7 +224,7 @@ note: when the script is first loaded, just the second and third UI sections are
 ### mod matrix
 <img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0.png" width="500" />
 the mod matrix allows any parameter to be used to modulate any other parameter
-<br>
+<br><br>
 it is divided into four UI sections:
 
 1. menu name
