@@ -235,34 +235,50 @@ d. patchpoints<br>
 the mod matrix has 5 menus (e1 navigates between them):
 
 #### *row/col* (patchpoint navigator)
-  e2/e3 navigates the patchpoint matrix. a dot will appear in the center of the patchpoints to show the row and column that is currently selected.
-
-  note: when other menus are active, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
-
+  e2/e3 navigates the patchpoint matrix. on all mod matrix screens, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
+  
+  the patchpoint circles indicate the state of each patchpoint:
+    * dimly lit:  disabled
+    * with a dot in the middle: the patchpoint is selected for editing
+    * brightly lit: patchpoint is enabled
+    * left half of circle filled: an input is defined for the patchpoint
+    * right half of circle filled: an output is defined for the patchpoint
+    *  circle completely filled: an input and output is defined for the patchpoint 
+  
 #### *in/out* (input/output selection)
-  e2/e3 selects the input/output for the selected patchpoint matrix row/column
+  e2/e3 selects the inputs/outputs for the selected row/column of the matrix
 
   k1+e2 and k+e3 just display parameter folders names for fast navigation
 
-  matrix rows represent inputs. matrix columns represent outputs.
+  matrix rows (a-d) represent inputs. matrix columns (1-7) represent outputs.
+
+  changing a patchpoint's input or output will disable all the patchpoints in the selected row/column.
+  
+  a value with carrots at the front and end (e.g. "<<lorenz view>>") indicates a param sub-menu.
+
+  a value with dashes at the front and end (e.g. "--LORENZ--") indicates a param separator.
 
 
+#### *pp opt* (patchpoint options)
+  the patchpoint options menu updates three controls for the selected patchpoint:
 
-- additional mod matrix notes:
-  changing a patchpoint's  input or output will disable the patchpoint for safety. since the k3 button enables the patchpoint from any of the 3 menus, it is easy to reenable the patchpoint quickly when switching to a new input/output.
+  * *enbl* (enable): enables modulation of the output by the input (assuming they have been set for the selected patchpoint)
+  * *lvl* (level) the value of the patchpoint output is multiplied by the lvl value. setting lvl to 0 is the same as setting the patchpoint's enbl value to off.
+  * *lvlr* (level range): adds a positive or negative random value between 0 and the lvlr value. if lvlr is set to 0, nothing will be added.
+
+#### *crow* (crow output settings)
+  the crow options menu allows editing of three crow controls for the selected patchpoint:
+
+  * *enbl* (enable): sends the patchpont's modulation to crow
+  * *out* (crow out): selects which crow output to send voltages for the selected patchpoint
+  * *slew* (crow slew): tells crow to slew the voltages it sends for the selected patchpoint
  
-  the patchpoint circles give you a visual understanding of the state of each patchpoint:
-    * dimly lit shape means disabled
-    * medium lit shape means patchpoint is selected for editing
-    * brightly lit shape means patchpoint is enabled
-    * empty circle: no input/output defined for the patchpoint
-    * left half of circle filled: input defined for the patchpoint
-    * right half of circle filled: output defined for the patchpoint
-    *  circle completely filled: input and output defined for the patchpoint
-* the *in* and *out* values at the bottom indicate the input/output parameters selected for the selected patchpoint
-  * the first value to appear ("-------------") provides indication that you are at the start of the list
-  * a value with dashes at the front and end (e.g. "--LORENZ--") indicates a param separator.
-  * a value with carrots at the front and end (e.g. "<\<lorenz view>>") indicates a param sub-menu.
+
+#### *crow* (crow output settings)
+  the crow options menu allows editing of three crow controls for the selected patchpoint:
+
+  *
+  
 
 ### DATA MANAGEMENT
 
