@@ -6,6 +6,7 @@ a lorenz system sequencer and mod matrix running @okyeron's UGen linux port of M
 
 for beginner scripters: i've put some notes at the end of this documentation that covers some of the coding techniques used in this script. i hope that folks interested in learning more about norns coding will find these somewhat random notes helpful.
 
+
 ## requirements
 
 * norns (required)
@@ -47,9 +48,11 @@ additional thanks and credits go out to:
 * @pinchettes for creating the MI Rings module for eurorack
 * @midouest for developing a [really splendid SuperCollider envelope](https://llllllll.co/t/supercollider-tips-q-a/3185/371) that captures rise and fall as individual events
 * @justmat for creating lua lfo's which i borrowed from his [otis script](https://github.com/justmat/otis)
+* @tyleretters for creating the lattice module and porting to norns the sequins module by @whimsicalraps
 
 
-
+## caution!!!
+the mod matrix built into the krill script allows any parameter to modulate any other parameter. unexpected results may result (e.g. when modulating the compressor's gain settings), so please proceed with care and caution when using this feature.
 
 ## documentation
 
@@ -58,8 +61,7 @@ the krill script has two basic views:
 * sequencer view
 * mod matrix view
 
-*use k1+e1 to switch back and forth between the views*
-
+w
 ### sequencer
 <img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-0-start_w_grid.png" width="500" />
 the sequencer view is divided into three UI sections (from left to right):
@@ -228,6 +230,8 @@ note: when the script is first loaded, just the second and third UI sections are
 <img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0.png" width="500" />
 the mod matrix allows any parameter to be used to modulate any other parameter. 
 
+use k1+e1 to switch to the mod matrix view.
+
 mod matrix settings are saved at the end of each krill session. multiple mod matrix configurations can also be saved. see the *DATA MANAGEMENT* section below for additional details.
 
 the mod matrix UI is divided into four sections:
@@ -310,3 +314,38 @@ there is a static variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. 
 * publish the mod matrix as a mod that other scripts can use
 
 ## notes on the code (for aspiring scripters)
+
+the notes below demonstrate a few solutions to common problems that frequently arise when coding norns scripts. they written for beginning scripters and assume a basic understanding of how norns scripts are put together. 
+
+these notes assume just the most basic understanding of norns scripting, one that can easily be obtained by first reviewing the splendid [first light tutorial](https://monome.org/docs/norns/study-0/) on the monome website.
+
+i hope these notes are helpeful and result in more people getting started with scripting on the norns platform.
+
+### study 1: converting ranges
+the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
+
+the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
+
+as an example, let's use @justmat's lfos incorporated into the script to modulate the reverb's return levels.
+
+at a high level, there are 5 data points required to modulate one param with another:
+
+1. the input param's current value
+2. the input param's minimum value
+3. the input param's maximum value
+5. the output param's minimum value
+6. the output param's maximum value
+
+these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
+
+* `1lfo`
+* `rev_return_level`
+
+if you have the krill script running, you can get the current value of the two parameters by typing the `params:get` command in [maiden](https://monome.org/docs/norns/maiden). to do this, open maiden, click on the `>>` bar at the bottom and enter these two lines of code:
+
+```
+    params:get("1lfo")
+    params:get("rev_return_level")
+```
+
+assuming, you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo` and the same value each time for `rev_return_level`. 
