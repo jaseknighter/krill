@@ -319,15 +319,15 @@ there is a static variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. 
 
 ### background
 
-the notes below demonstrate an example of a solution to common problem that frequently arise swhen coding norns scripts. i've written it for beginning scripters and assume a basic understanding of how norns scripts are put together. 
+- the notes below demonstrate an example of a solution to common problem that frequently arise swhen coding norns scripts. i've written it for beginning scripters and assume a basic understanding of how norns scripts are put together. 
 
-these notes assume just the most basic understanding of norns scripting, one that can easily be obtained by first reviewing the splendid [first light tutorial](https://monome.org/docs/norns/study-0/) on the monome website.
+  these notes assume just the most basic understanding of norns scripting, one that can easily be obtained by first reviewing the splendid [first light tutorial](https://monome.org/docs/norns/study-0/) on the monome website.
 
-i hope these notes are helpful and result in more people getting started with scripting on the norns platform. 
+  i hope these notes are helpful and result in more people getting started with scripting on the norns platform. 
 
 ### krill study 1: converting ranges
 #### **high-level problem and solution**
-  the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
+  - the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
 
   the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
 
