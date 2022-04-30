@@ -326,7 +326,7 @@ these notes assume just the most basic understanding of norns scripting, one tha
 i hope these notes are helpful and result in more people getting started with scripting on the norns platform. 
 
 ### krill study 1: converting ranges
-**high-level problem and solution**
+#### **high-level problem and solution**
 the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
 
 the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
@@ -341,7 +341,7 @@ at a high level, there are 5 data points required to modulate one param with ano
 5. the output param's minimum value
 6. the output param's maximum value
 
-**gathering the data**
+#### **gathering the data**
 these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
 
 * `1lfo_value`
@@ -410,7 +410,7 @@ output_max = rev_return_level_cs.maxval
 
 we are almost there!!! well kinda almost...
 
-**mapping values**
+#### **mapping values**
 in order to map the value of the lfo param to the reverb's return level we need to find a method. happily, there are a number of functions available in the norns [util module](http://fatesblue.local/doc/modules/lib.util.html) for this.
 
 the function we will use here is the [`linlin`](http://fatesblue.local/doc/modules/lib.util.html#linlin) function. it takes an input and the input's lower/upper range and maps to an output based on the outputs lower/upper ranges. 
@@ -437,7 +437,7 @@ now, let's run the same function with the variables we've collected above for th
 util.linlin(input_min, input_max, output_min, output_max, input_val)
 ```
 
-**Ruh-roh**
+#### **Ruh-roh**
 here's where we hit a snag...rather than returning a mapped value as a number, we get a return value of `nan` which means 'not a number'
 
 the first step to figuring this out is to look at the value of all the variables we provide to the function:
@@ -448,7 +448,7 @@ print(input_min, input_max, output_min, output_max, input_val)
 
 printing out our variables, we see numerical values returned for everything but the third variable, `output_min`, which has a value of `-inf`. apparently, the `linlin` function doesn't know what to do with negative infinite values. go figure...
 
-**digging deeper into controlspecs**
+#### **digging deeper into controlspecs**
 when i was building the mod matrix it took me a while to figure how how to account for mapping parameters that, like the reverb return level, have odd min or max values like `-inf`. i finally found the solution by reviewing the documentation for the [controlspec module](http://fatesblue.local/doc/modules/controlspec.html). this module is used to create (type 3) control parameters.
 
 in the controlspec docs, i found a `map` function that, according to the doc, will 'transform an incoming value between 0 and 1 through this ControlSpec'.
