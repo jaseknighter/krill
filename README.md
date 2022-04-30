@@ -326,6 +326,7 @@ these notes assume just the most basic understanding of norns scripting, one tha
 i hope these notes are helpful and result in more people getting started with scripting on the norns platform. 
 
 ### krill study 1: converting ranges
+**high-level problem and solution**
 the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
 
 the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
@@ -340,6 +341,7 @@ at a high level, there are 5 data points required to modulate one param with ano
 5. the output param's minimum value
 6. the output param's maximum value
 
+**gathering the data**
 these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
 
 * `1lfo_value`
@@ -354,6 +356,13 @@ params:get("rev_return_level")
 
 assuming, you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo_value` and the same value each time for `rev_return_level`. (note, if you aren't seeing `1lfo_value` change each time you query it, it might because you turned it off in the params menu.)
 
+by using the `params:get("1lfo_value")` command we have one of the 5 data points we need, the input param's current value. we'll want to just the first value for the lfo, so lets set it to a variable that we'll use after we determine the min and max values for each param:
+
+```
+input_val = params:get("1lfo_value")
+```
+
+
 to get the params `min` and `max` values we can lookup the param itself (not just its value) with the `lookup_param` command and attach the table that is returned to a variable, like this:
 
 ```
@@ -367,6 +376,110 @@ now, the variables `lfo` and `rev_return_level` point to all the data that compr
 tab.print(lfo)
 tab.print(rev_return_level)
 ```
+
+the info we see here gives us tells a bit about the params (e.g. their `name` and `id`), but nothing about the remaining four data points listed above that we are looking for (the params min and max values). this is because these two params are both types of params called *control* params. control params are created with *controlspecs*. we can know this from two pieces of information we received from running the `tab.print` commands:
+
+1. the existance of a table called `controlspec`
+2. the value of `t` in each param's out is `3`
+
+in regards to the `t`, this stands for type. searching through the [norns codebase](https://github.com/monome/norns/tree/main/lua/core/params), we see there are 10 types of params and each type is given a unique value for `t`. here are a just a few of the other param types and their `t` values:
+
+* separator: 0
+* number: 1
+* option: 2
+* group: 7
+
+(note: you can see all the param types and their `t` values in the `ParamSet` table set in the [paramset.lua](https://github.com/monome/norns/blob/main/lua/core/paramset.lua) file on GitHub.)
+
+back to the issue at hand, finding the params' `min` and `max` values, we can run tab.print again on the params controlspecs, but first, let's create two new variables for the controlspecs and then print out their contents:
+
+```
+lfo_cs = lfo.controlspec
+rev_return_level_cs = rev_return_level.controlspec
+tab.print(lfo_cs)
+tab.print(rev_return_level_cs)
+```
+now, when we look at the `tab.print` outputs of these new variables, we see what we are looking for: both have the variables `minval` and `maxval`. so now we can put these min/max vals into their own variables and start working on the mapping:
+
+```
+input_min = lfo_cs.minval
+input_max = lfo_cs.maxval
+output_min = rev_return_level_cs.minval
+output_max = rev_return_level_cs.maxval
+```
+
+we are almost there!!! well kinda almost...
+
+**mapping values**
+in order to map the value of the lfo param to the reverb's return level we need to find a method. happily, there are a number of functions available in the norns [util module](http://fatesblue.local/doc/modules/lib.util.html) for this.
+
+the function we will use here is the [`linlin`](http://fatesblue.local/doc/modules/lib.util.html#linlin) function. it takes an input and the input's lower/upper range and maps to an output based on the outputs lower/upper ranges. 
+
+here's a simple example:
+
+  input min: 0
+  input max: 10
+  output min: 0
+  output max: 100
+  input to convert: 5
+
+with these example variables we can map inputs to outputs with the linlin function like this:
+
+```
+util.linlin(0,10,100,5)
+```
+
+running this function in the matron REPL should return a result of `50`.
+
+now, let's run the same function with the variables we've collected above for the lfo and reverb return level params:
+
+```
+util.linlin(input_min, input_max, output_min, output_max, input_val)
+```
+
+**Ruh-roh**
+here's where we hit a snag...rather than returning a mapped value as a number, we get a return value of `nan` which means 'not a number'
+
+the first step to figuring this out is to look at the value of all the variables we provide to the function:
+
+```
+print(input_min, input_max, output_min, output_max, input_val)
+```
+
+printing out our variables, we see numerical values returned for everything but the third variable, `output_min`, which has a value of `-inf`. apparently, the `linlin` function doesn't know what to do with negative infinite values. go figure...
+
+**digging deeper into controlspecs**
+when i was building the mod matrix it took me a while to figure how how to account for mapping parameters that, like the reverb return level, have odd min or max values like `-inf`. i finally found the solution by reviewing the documentation for the [controlspec module](http://fatesblue.local/doc/modules/controlspec.html). this module is used to create (type 3) control parameters.
+
+in the controlspec docs, i found a `map` function that, according to the doc, will 'transform an incoming value between 0 and 1 through this ControlSpec'.
+
+so in order to perform this mapping to the reverb return level param, i first need to get the lfo value into a range between 0 and 1. i was able to do this using the same `linlin` function we just reviewed, and so i came up with some code like to set the lfo's value in the proper range and then map it, like so:
+
+```
+mapper_value = util.linlin(input_min,input_max,0,1,input_val)
+```
+
+printing this variable, (`print(mapper_value)`) we can see the lfo param's value is now mapped to a number between 0 and 1 and now we can use the controlspec map function to map it to the correct value within the min and max range of the reverb return level param. here we'll reuse the variable we created earlier for the reverb return value param's controlspec, `rev_return_level_cs`
+
+
+```
+output_val = rev_return_level_cs:map(mapper_value)
+```
+
+(note that the `map` function needs to be called using a semicolon (`:`) instead of a comma (`:`). using a semicolon in lua leverages something called 'syntactic sugar'. explaining this is beyond the scope of this study, mostly because i don't understand it very well, but it is a good subject for a future study.)
+
+longwinded notes aside, if we enter our `output_val` variable in the matron REPL we'll get a new value that represents our succefully mapping the lfo param's value to the reverb return level param. with this value we can now use it to set the value of the reverb return level. 
+
+but first, so you can hear it, make sure you have the krill script running and the reverb is turned on in the params menu.
+
+then, run this command:
+
+`param:set("rev_return_level",output_val)`
+
+...and you should hear a change in the reverb.
+
+that's it! you did it! now, i need to do the dishes. :P
+
 
 ### final thoughts 
 what i've tried to demonstrate here is not just the solution to a few coding problems, but a bit about the process of solving the problem itself. for me, the joy of coding is as much about figuring out solutions to problems as it is about arriving at solutions. when i am trying to solve a problem, often the solution comes after i've decided i've done all i can and have more or less given up all hope. frequently, after i've given up, i decide to take a walk and then the solution just shows itself to me in my mind and sometimes the solution actually works! 
