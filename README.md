@@ -41,9 +41,10 @@ bunches and bunchs of credit are due to Matt Allison and SPIKE the Percussionist
 
 additional thanks and credits go out to:
 
-* @galapagoose for publishing a lorenz algorithm in lua as part of the [crow bowery](https://github.com/monome/bowery/blob/3dd5c520c6ea401db5e1b01e0bddae396da4ed53/lorenz.lua)
-* @okyeron for creating a linux version of Volker Bohm's (@geplanteobsoleszenz) MI Modules for SuperCollider
-* @geplanteobsoleszenz for porting the modules to SuperCollider
+* @whimsicalraps for publishing a lorenz algorithm in lua as part of the [crow bowery](https://github.com/monome/bowery/blob/3dd5c520c6ea401db5e1b01e0bddae396da4ed53/lorenz.lua)
+* @okyeron for creating a linux version of Volker Bohm's (@geplanteobsoleszenz) SuperCollider port of the MI modules
+* @geplanteobsoleszenz for porting the MI modules to SuperCollider
+* @pinchettes for creating the MI Rings module for eurorack
 * @midouest for developing a [really splendid SuperCollider envelope](https://llllllll.co/t/supercollider-tips-q-a/3185/371) that captures rise and fall as individual events
 * @justmat for creating lua lfo's which i borrowed from his [otis script](https://github.com/justmat/otis)
 
