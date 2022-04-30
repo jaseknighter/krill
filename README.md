@@ -327,19 +327,19 @@ i hope these notes are helpful and result in more people getting started with sc
 
 ### krill study 1: converting ranges
 #### **high-level problem and solution**
-the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
+  the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
 
-the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
+  the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
 
-as an example, let's use @justmat's lfos incorporated into the script to modulate the reverb's return levels.
+  as an example, let's use @justmat's lfos incorporated into the script to modulate the reverb's return levels.
 
-at a high level, there are 5 data points required to modulate one param with another:
+  at a high level, there are 5 data points required to modulate one param with another:
 
-1. the input param's current value
-2. the input param's minimum value
-3. the input param's maximum value
-5. the output param's minimum value
-6. the output param's maximum value
+  1. the input param's current value
+  2. the input param's minimum value
+  3. the input param's maximum value
+  5. the output param's minimum value
+  6. the output param's maximum value
 
 #### **gathering the data**
 these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
@@ -417,11 +417,11 @@ the function we will use here is the [`linlin`](http://fatesblue.local/doc/modul
 
 here's a simple example:
 
-  input min: 0
-  input max: 10
-  output min: 0
-  output max: 100
-  input to convert: 5
+  * input min: 0
+  * input max: 10
+  * output min: 0
+  * output max: 100
+  * input to convert: 5
 
 with these example variables we can map inputs to outputs with the linlin function like this:
 
