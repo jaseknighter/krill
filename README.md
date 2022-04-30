@@ -459,18 +459,19 @@ so in order to perform this mapping to the reverb return level param, i first ne
 mapper_value = util.linlin(input_min,input_max,0,1,input_val)
 ```
 
-printing this variable, (`print(mapper_value)`) we can see the lfo param's value is now mapped to a number between 0 and 1 and now we can use the controlspec map function to map it to the correct value within the min and max range of the reverb return level param. here we'll reuse the variable we created earlier for the reverb return value param's controlspec, `rev_return_level_cs`
+printing this variable in the REPL, (`print(mapper_value)`) we can see the lfo param's value is now mapped to a number between 0 and 1 and now we can also use the `controlspec: map` function to set it to the correct value within the min and max range of the reverb return level param. 
 
+here we'll reuse the variable we created earlier for the reverb return value param's controlspec, `rev_return_level_cs`
 
 ```
 output_val = rev_return_level_cs:map(mapper_value)
 ```
 
-(note that the `map` function needs to be called using a semicolon (`:`) instead of a comma (`:`). using a semicolon in lua leverages something called 'syntactic sugar'. explaining this is beyond the scope of this study, mostly because i don't understand it very well, but it is a good subject for a future study.)
+(note: you may have noticed above that the `map` function needs to be called using a semicolon (`:`) instead of a dot (`.`). using a semicolon in lua leverages something called 'syntactic sugar'. explaining this is beyond the scope of this study, mostly because i don't understand it very well, but it is a good subject for a future study.)
 
-longwinded notes aside, if we enter our `output_val` variable in the matron REPL we'll get a new value that represents our succefully mapping the lfo param's value to the reverb return level param. with this value we can now use it to set the value of the reverb return level. 
+longwinded notes aside, if we enter our `output_val` variable in the matron REPL we will get a new value that represents the lfo param value being successfully mapped to the reverb return level param. with this value we can now use it to set the value of the reverb return level. 
 
-but first, so you can hear it, make sure you have the krill script running and the reverb is turned on in the params menu.
+but first, so you can hear it, make sure you have the krill script running and the reverb turned on in the params menu.
 
 then, run this command:
 
@@ -478,10 +479,10 @@ then, run this command:
 
 ...and you should hear a change in the reverb.
 
-that's it! you did it! now, i need to do the dishes. :P
+that's it! phew! now, i need to do the dishes. :P
 
 
-### final thoughts 
+### final thoughts after having done the dishes 
 what i've tried to demonstrate here is not just the solution to a few coding problems, but a bit about the process of solving the problem itself. for me, the joy of coding is as much about figuring out solutions to problems as it is about arriving at solutions. when i am trying to solve a problem, often the solution comes after i've decided i've done all i can and have more or less given up all hope. frequently, after i've given up, i decide to take a walk and then the solution just shows itself to me in my mind and sometimes the solution actually works! 
 
 coding, especially i think for beginners, can be extremely challenging and often requires quite a bit of patience and perseverence. however, i think the effort is worth it and there is a very large community attached to monome that is here to help!
