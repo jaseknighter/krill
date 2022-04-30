@@ -37,7 +37,7 @@ this script's use of a chaotic lorenz system algorithm differentiates it from th
 
 ## credits
 
-obvious credit is due to Matt Allison for the original concept and script name. i am deeply grateful to him and SPIKE the Percussionist for working with me over many hours and days testing and discussing the script. 
+bunches and bunchs of credit are due to Matt Allison and SPIKE the Percussionist. Matt came up with the the original concept for the script and its name. i am deeply grateful to the two of them for working with me over many hours and days testing and discussing the script. 
 
 additional thanks and credits go out to:
 
