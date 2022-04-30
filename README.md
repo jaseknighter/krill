@@ -344,8 +344,8 @@ these data points can easily be obtained by querying the params. param's typical
 if you have the krill script running, you can get the current value of the two parameters by typing the `params:get` command in [maiden](https://monome.org/docs/norns/maiden). to do this, open maiden, click on the `>>` bar at the bottom and enter these two lines of code:
 
 ```
-    params:get("1lfo")
-    params:get("rev_return_level")
+params:get("1lfo")
+params:get("rev_return_level")
 ```
 
 assuming, you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo` and the same value each time for `rev_return_level`. 
