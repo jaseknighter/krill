@@ -315,6 +315,8 @@ there is a static variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. 
 
 ## notes on the code (for aspiring scripters)
 
+### background
+
 the notes below demonstrate a few solutions to common problems that frequently arise when coding norns scripts. they written for beginning scripters and assume a basic understanding of how norns scripts are put together. 
 
 these notes assume just the most basic understanding of norns scripting, one that can easily be obtained by first reviewing the splendid [first light tutorial](https://monome.org/docs/norns/study-0/) on the monome website.
