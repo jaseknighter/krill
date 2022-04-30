@@ -30,7 +30,7 @@ the install process requires 3 steps to properly install!
 
   
 ## about the script
-the idea for the script and its name came from @mattallison and is inspired by [Todd Barton's Krell patch] (https://vimeo.com/48382205). originally, i was thinking of making something like a krell acid patch, using @infinitedigits [acid test engine](https://llllllll.co/t/acid-test/52201), but eventually i replaced the acid engine with @okyeron's MIRings UGen.
+the idea for the script and its name came from @mattallison and is inspired by [Todd Barton\'s Krell patch] (https://vimeo.com/48382205). originally, i was thinking of making something like a krell acid patch, using @infinitedigits [acid test engine](https://llllllll.co/t/acid-test/52201), but eventually i replaced the acid engine with @okyeron's MIRings UGen.
 
 this script's use of a chaotic lorenz system algorithm (vs using more random values)  differentiates it from the classic Krell patch, which (in theory at least) creates modulations that lie in a space between random and predictable, whereas the classic Krell patch's use of random voltages makes it's sounds more random and less predictable.  
 
