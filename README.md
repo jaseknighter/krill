@@ -319,7 +319,7 @@ there is a static variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. 
 
 ### background
 
-  the notes below demonstrate an example of a solution to common problem that frequently arise swhen coding norns scripts. i've written it for beginning scripters and assume a basic understanding of how norns scripts are put together. 
+  - the notes below demonstrate an example of a solution to common problem that frequently arise swhen coding norns scripts. i've written it for beginning scripters and assume a basic understanding of how norns scripts are put together. 
 
   these notes assume just the most basic understanding of norns scripting, one that can easily be obtained by first reviewing the splendid [first light tutorial](https://monome.org/docs/norns/study-0/) on the monome website.
 
@@ -342,12 +342,12 @@ there is a static variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. 
   6. the output param's maximum value
 
 #### **gathering the data**
-these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
+  - these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
 
-* `1lfo_value`
-* `rev_return_level`
+  * `1lfo_value`
+  * `rev_return_level`
 
-if you have the krill script running, you can get the current value of these two parameters by typing the `params:get` command in [maiden](https://monome.org/docs/norns/maiden). to do this, open maiden, click on the `>>` bar at the bottom and enter these two lines of code (one at a time):
+  if you have the krill script running, you can get the current value of these two parameters by typing the `params:get` command in [maiden](https://monome.org/docs/norns/maiden). to do this, open maiden, click on the `>>` bar at the bottom and enter these two lines of code (one at a time):
 
 ```
 params:get("1lfo_value")
