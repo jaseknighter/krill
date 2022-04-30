@@ -423,7 +423,7 @@ here's a simple example:
   * output max: 100
   * input to convert: 5
 
-with these example variables we can map inputs to outputs with the linlin function like this:
+with these example variables we can map inputs to outputs with the `linlin` function like this:
 
 ```
 util.linlin(0,10,100,5)
