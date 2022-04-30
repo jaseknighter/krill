@@ -354,7 +354,7 @@ params:get("1lfo_value")
 params:get("rev_return_level")
 ```
 
-assuming, you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo_value` and the same value each time for `rev_return_level`. (note, if you aren't seeing `1lfo_value` change each time you query it, it might because you turned it off in the params menu.)
+assuming you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo_value` and the same value each time for `rev_return_level`. (note, if you aren't seeing `1lfo_value` change each time you query it, it might because you turned it off in the params menu.)
 
 by using the `params:get("1lfo_value")` command we have one of the 5 data points we need, the input param's current value. we'll want to just the first value for the lfo, so lets set it to a variable that we'll use after we determine the min and max values for each param:
 
