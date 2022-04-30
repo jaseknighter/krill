@@ -61,7 +61,7 @@ the krill script has two basic views:
 * sequencer view
 * mod matrix view
 
-w
+
 ### sequencer
 <img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-0-start_w_grid.png" width="500" />
 the sequencer view is divided into three UI sections (from left to right):
@@ -81,6 +81,8 @@ note: when the script is first loaded, just the second and third UI sections are
   the grid is subdivided by note/octave to determine pitch, which is sent to the internal krill SuperCollider engine and/or the other supported outputs (midi, crow, Just Friends, and W/).
 
   there are two sequencer modes: *krell* and *vuja de*
+
+  by default, when the script first loads, the *vuja de* sequencer is running.
 
 - *krell* sequencer
 
@@ -317,13 +319,13 @@ there is a static variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. 
 
 ### background
 
-the notes below demonstrate a few solutions to common problems that frequently arise when coding norns scripts. they written for beginning scripters and assume a basic understanding of how norns scripts are put together. 
+the notes below demonstrate an example of a solution to common problem that frequently arise swhen coding norns scripts. i've written it for beginning scripters and assume a basic understanding of how norns scripts are put together. 
 
 these notes assume just the most basic understanding of norns scripting, one that can easily be obtained by first reviewing the splendid [first light tutorial](https://monome.org/docs/norns/study-0/) on the monome website.
 
-i hope these notes are helpeful and result in more people getting started with scripting on the norns platform.
+i hope these notes are helpful and result in more people getting started with scripting on the norns platform. 
 
-### study 1: converting ranges
+### krill study 1: converting ranges
 the mod matrix built into the krill script allows any parameter defined by the krill script to modulate any other parameter. 
 
 the fundamental problem that needed to be solved for this feature was the ability to translate one parameter's range into another's. 
@@ -340,14 +342,33 @@ at a high level, there are 5 data points required to modulate one param with ano
 
 these data points can easily be obtained by querying the params. param's typically have a *name* and an *id*. the param's name is what is displayed in the ui. the param's id is used by the code to query and update the param. in this example, here are the ids of the two params we are interested in:
 
-* `1lfo`
+* `1lfo_value`
 * `rev_return_level`
 
-if you have the krill script running, you can get the current value of the two parameters by typing the `params:get` command in [maiden](https://monome.org/docs/norns/maiden). to do this, open maiden, click on the `>>` bar at the bottom and enter these two lines of code:
+if you have the krill script running, you can get the current value of these two parameters by typing the `params:get` command in [maiden](https://monome.org/docs/norns/maiden). to do this, open maiden, click on the `>>` bar at the bottom and enter these two lines of code (one at a time):
 
 ```
-params:get("1lfo")
+params:get("1lfo_value")
 params:get("rev_return_level")
 ```
 
-assuming, you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo` and the same value each time for `rev_return_level`. 
+assuming, you haven't enabled anything in the mod matrix, if you enter these commands multiple times, you should get a different value each time for `1lfo_value` and the same value each time for `rev_return_level`. (note, if you aren't seeing `1lfo_value` change each time you query it, it might because you turned it off in the params menu.)
+
+to get the params `min` and `max` values we can lookup the param itself (not just its value) with the `lookup_param` command and attach the table that is returned to a variable, like this:
+
+```
+lfo = params:lookup_param("1lfo_value")
+rev_return_level = params:lookup_param("rev_return_level")
+```
+
+now, the variables `lfo` and `rev_return_level` point to all the data that comprises these two params. we can get a glimpse of this data with the `tab.print` comand, like this:
+
+```
+tab.print(lfo)
+tab.print(rev_return_level)
+```
+
+### final thoughts 
+what i've tried to demonstrate here is not just the solution to a few coding problems, but a bit about the process of solving the problem itself. for me, the joy of coding is as much about figuring out solutions to problems as it is about arriving at solutions. when i am trying to solve a problem, often the solution comes after i've decided i've done all i can and have more or less given up all hope. frequently, after i've given up, i decide to take a walk and then the solution just shows itself to me in my mind and sometimes the solution actually works! 
+
+coding, especially i think for beginners, can be extremely challenging and often requires quite a bit of patience and perseverence. however, i think the effort is worth it and there is a very large community attached to monome that is here to help!
