@@ -68,6 +68,11 @@ the krill script has two basic views:
 
 ### sequencer
 <img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-0-start_w_grid.png" width="500" />
+the sequencer view is divided into three UI sections (from left to right):
+
+1. controls 
+2. Lorenz system visualization
+3. Lorenz x/y and lfos
 
 #### encoder and key controls
 e1/e2/e3 are used to navigate the controls section. 
@@ -83,12 +88,6 @@ to make the grid overlay and UI controls section always visible after the script
 
 alternatively, to make grid overlay and UI controls section always visible every time the script is loaded, open the */lib/globals.lua* file and change the value of the `UI_DISPLAY_DEFAULT` variable to `3`.
 
-#### ui
-the sequencer view is divided into three UI sections (from left to right):
-
-1. controls 
-2. Lorenz system visualization
-3. Lorenz x/y and lfos
 
 
 #### *seq* (sequencer controls)
