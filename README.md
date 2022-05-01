@@ -4,7 +4,8 @@
 
 a [Lorenz system](https://en.wikipedia.org/wiki/Lorenz_system) sequencer and mod matrix running @okyeron's UGen linux port of Mutable Instruments Rings for monome norns.
 
-*krill studies for beginner scripters*: the last section of this document contains notes and and simple code that can be run in maiden's matron REPL related to a problem (one of many) i had to solve while putting this script together. i hope it is informative and useful for folks interested in learning more about coding on the norns platform.
+## krill studies for beginner scripters
+i have created a [study](krill_study1.lua) to accomany the krill script. the study includes notes and and simple code that can be run in maiden's matron REPL. it relates to a problem (one of many) i had to solve while putting this script together. i hope it is informative and useful for folks interested in learning more about coding on the norns platform.
 
 
 ## requirements
