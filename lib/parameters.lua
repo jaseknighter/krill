@@ -386,15 +386,15 @@ function parameters.init()
   params:add{type = "number", id = "vjd_div_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_engine2", name = "engine asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_midi1", name = "midi asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_midi2", name = "midi asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_div_asn_midi2", name = "midi asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_crow1", name = "crow asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_crow2", name = "crow asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_div_asn_crow2", name = "crow asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_jf1", name = "jf asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_jf2", name = "jf asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_div_asn_jf2", name = "jf asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_wsyn1", name = "wsyn asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_div_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_wdelkarp1", name = "wdelkarp asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=1}
+  params:add{type = "number", id = "vjd_div_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=2}
   
   -- params:add_separator("")
   -- params:add_separator("divisions")
