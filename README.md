@@ -225,7 +225,7 @@ use e1 to switch between sequencer menus.
   finally, the read-only *lfo value* param displays the current value of the lfo.
 
 ##### *eng* (MI Rings SuperCollider engine controls)
-<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-5-menus-eng.png" width="500" />
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-6-menus-eng.png" width="500" />
   the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
 
   * mode controls
