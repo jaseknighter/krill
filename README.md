@@ -21,10 +21,11 @@ the install process requires 3 steps to properly install!
 2. in the same "matron" tab install the MIRings UGen with this command:
 
 ```
-    os.execute("wget -T 180 -q -P /tmp/ https://github.com/okyeron/mi-UGens/raw/master/linux-norns-binaries/mi-UGens-linux-v.03.tar && tar -xvf /tmp/mi-UGens-linux-v.03.tar -C /tmp && cp -r /tmp/mi-UGens-linux-v.03/* /home/we/.local/share/SuperCollider/Extensions/ && rm -r /tmp/mi-UGens-linux-v.03 && rm -r /tmp/mi-UGens-linux-v.03.tar")
+os.execute("wget -T 180 -q -P /tmp/ https://github.com/okyeron/mi-UGens/raw/master/linux-norns-binaries/mi-UGens-linux-v.03.tar && tar -xvf /tmp/mi-UGens-linux-v.03.tar -C /tmp && cp -r /tmp/mi-UGens-linux-v.03/* /home/we/.local/share/SuperCollider/Extensions/ && rm -r /tmp/mi-UGens-linux-v.03 && rm -r /tmp/mi-UGens-linux-v.03.tar")
 ```
    
-    note: you may skip step 2 above if the MIRings UGen was previously installed with either (1) @okyeron's [MI-UGens for Norns](https://llllllll.co/t/mi-ugens-for-norns/31781) or (2) the resonator pedal that is part of @21echoes [Pedalboard](https://llllllll.co/t/pedalboard-chainable-fx-for-norns/31119).
+
+note: you may skip step 2 above if the MIRings UGen was previously installed with either (1) @okyeron's [MI-UGens for Norns](https://llllllll.co/t/mi-ugens-for-norns/31781) or (2) the resonator pedal that is part of @21echoes [Pedalboard](https://llllllll.co/t/pedalboard-chainable-fx-for-norns/31119).
 
 3. restart your norns.
 
