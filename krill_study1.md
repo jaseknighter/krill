@@ -11,7 +11,7 @@ after going through this study, i highly recommend exploring the splendid [first
 i hope this study helps people get started with the known and unknown pleasures of scripting on the norns platform. 
 
 ### technical requirements
-to fully take advantage of the study's contents, you will want to first install the krill script following the installation instructions above and have it running while you are exploring  the contents below. 
+to fully take advantage of the study's contents, you will want to first install the krill script following the installation instructions in the [README file](README.md) and have it running while you are exploring  the contents below. 
 
 ### krill study 1: converting parameter ranges for the mod matrix
 #### **high-level problem and solution**
