@@ -74,7 +74,6 @@ variables act as placeholders or pointers to something else. in this case, the v
 it is interesting to note that if you enter the variable `input_val` into the REPL multiple times you'll always get the same value back in return. on the other hand, if you enter `params:get("1lfo_value")` into the REPL multiple times, you'll get a new value each time. this is because the `input_val` variable is set to the value of the param at the time you created the variable by entering `input_val = params:get("1lfo_value")` in the REPL. this could be an issue in some cases, but for our purposes here it doesn't really matter.
 
 #### **gathering the data: part ii**
-
 to get the params' `min` and `max` values we can lookup the param itself (not just its value). we can do this using the `lookup_param` command and set a variable to the data that is returned when calling `lookup_param`, like this:
 
 ```
@@ -143,9 +142,11 @@ going back to the simple table we created with the command `simple_table = {1,3,
 simple_table[4] = "fruit"
  -->
 
-
 #### back to the issue at hand
-finding the params' `min` and `max` values, we can run tab.print again on the params controlspecs, but first, let's create two new variables for the controlspecs and then print out their contents:
+as a reminder, we are looking for the `min` and `max` values
+of the lfo and reverb return level params. we didn't find them when we used the `tab.print` command two variables we created referencing the params (`lfo` and `rev_return_level`). however, they may be found in the params' controlspecs 
+
+let's create two new variables for the params' controlspecs and then print out their contents:
 
 ```
 lfo_cs = lfo.controlspec
@@ -153,7 +154,7 @@ rev_return_level_cs = rev_return_level.controlspec
 tab.print(lfo_cs)
 tab.print(rev_return_level_cs)
 ```
-now, when we look at the `tab.print` outputs of these new variables, we see what we are looking for: both have the variables `minval` and `maxval`. so now we can put these min/max vals into their own variables and start working on the mapping:
+now, when we look at the `tab.print` outputs of these new variables, we see what we are looking for: both have the variables `minval` and `maxval`. as a result, we can now  put these min/max vals into their own variables and start working on the mapping:
 
 ```
 input_min = lfo_cs.minval
@@ -165,71 +166,91 @@ output_max = rev_return_level_cs.maxval
 we are almost there!!! well kinda almost...
 
 #### **mapping values**
-in order to map the value of the lfo param to the reverb's return level we need to find a method. happily, there are a number of functions available in the norns [util module](http://fatesblue.local/doc/modules/lib.util.html) for this.
+our next step is to map the value of the lfo param to the reverb return level param. happily, there are a number of functions available in the norns [util module](http://fatesblue.local/doc/modules/lib.util.html) for this.
 
-the function we will use here is the [`linlin`](http://fatesblue.local/doc/modules/lib.util.html#linlin) function. it takes an input and the input's lower/upper range and maps to an output based on the outputs lower/upper ranges. 
+#### sidebar 5: what is a function?
+whereas variables are like names in Lua (i.e. the represent and point to other things), functions act more like verbs. a function defines an action that can produce a result. for example, all norns scripts have a function called `init` that is called when the script first loads. it is used for setup and initialization of the script. 
 
-here's a simple example:
+#### back to the issue at hand once more
+the function we will use here to map the value of the lfo param to the reverb return level param is the [`linlin`](http://fatesblue.local/doc/modules/lib.util.html#linlin) function. it takes an input's value and the input's lower/upper ranges and maps this value to an output based on the outputs lower/upper ranges. 
 
+before we apply this function to the lfo and reverb return level params, let's start with a simpler example of an input param that as a value of 5 with min/max levels of 0 and 10 and an output param with min/max levels of 0 and 100
+
+  * input value: 5
   * input min: 0
   * input max: 10
   * output min: 0
   * output max: 100
-  * input to convert: 5
 
-with these example variables we can map inputs to outputs with the `linlin` function like this:
+with these five data points at hand, we can map inputs to outputs with the `linlin` function like this:
 
 ```
 util.linlin(0,10,100,5)
 ```
 
-running this function in the matron REPL should return a result of `50`.
+running this `linlin` function in the matron REPL, you should receive a result of `50`. in this example, the input value of 5 is exactly half way between the input params min/max values of 0 and 10 and so when the `linlin` function runs it maps this input value of 5 to 50 since 50 is exactly half-way between 0 and 100. if you like, play around with these values to see what results you get (for example, change the input value from 5 to 7.5).
 
-now, let's run the same function with the variables we've collected above for the lfo and reverb return level params:
+now let's run the same `linlin` function with the variables we've collected above for the lfo and reverb return level params:
 
 ```
 util.linlin(input_min, input_max, output_min, output_max, input_val)
 ```
 
 #### **Ruh-roh**
-here's where we hit a snag...rather than returning a mapped value as a number, we get a return value of `nan` which means 'not a number'
+here's where we hit a snag...rather than returning a mapped value as a number, we get a return value of `nan`, which means 'not a number'. 
 
-the first step to figuring this out is to look at the value of all the variables we provide to the function:
+the first step to figuring out how where this `nan` return value is coming from is to look at the value of all the variables we provided to the `linlin` function:
 
 ```
 print(input_min, input_max, output_min, output_max, input_val)
 ```
 
-printing out our variables, we see numerical values returned for everything but the third variable, `output_min`, which has a value of `-inf`. apparently, the `linlin` function doesn't know what to do with negative infinite values. go figure...
+printing out our variables, we see numerical values returned for everything but the third variable, `output_min`, which has a value of `-inf`. 
+
+apparently, the `linlin` function doesn't know what to do with negative infinite values. go figure...
 
 #### **digging deeper into controlspecs**
-when i was building the mod matrix it took me a while to figure how how to account for mapping parameters that, like the reverb return level, have odd min or max values like `-inf`. i finally found the solution by reviewing the documentation for the [controlspec module](http://fatesblue.local/doc/modules/controlspec.html). this module is used to create (type 3) control parameters.
+when i was building the mod matrix it took me a while to figure how how to account for mapping parameters that, like the reverb return level, have odd min or max values like `-inf`. 
 
-in the controlspec docs, i found a `map` function that, according to the doc, will 'transform an incoming value between 0 and 1 through this ControlSpec'.
+i finally found the solution by reviewing the documentation for the [controlspec module](http://fatesblue.local/doc/modules/controlspec.html). this module is used to create control parameters. 
 
-so in order to perform this mapping to the reverb return level param, i first need to get the lfo value into a range between 0 and 1. i was able to do this using the same `linlin` function we just reviewed, and so i came up with some code like to set the lfo's value in the proper range and then map it, like so:
+#### sidebar 5: what is a module?
+norns has many modules that makes norns scripts easier to create. you can find the documentation for these modules on your norns device itself by pointing your browser to *norns.local/doc*. (note: if you've rename your norns device to something else you'll need to replace *norns* with whatever name you've given the device.)
+
+#### **finally, the solution is upon us!**
+when i was reviewing the docs for the controlspec module, i found a [`map` function](http://fatesblue.local/doc/modules/controlspec.html#ControlSpec:map) that according to the doc will 'transform an incoming value between 0 and 1 through this ControlSpec'.
+
+so, in order to map the lfo param's value to the reverb return level param's min/max, we first need to get the lfo value into a range between 0 and 1. we can do this using the same `linlin` function we just reviewed. 
+
+here's the code i came up with to set the lfo's value in the proper range:
 
 ```
 mapper_value = util.linlin(input_min,input_max,0,1,input_val)
 ```
 
-printing this variable in the REPL, (`print(mapper_value)`) we can see the lfo param's value is now mapped to a number between 0 and 1 and now we can also use the `controlspec: map` function to set it to the correct value within the min and max range of the reverb return level param. 
+printing this variable in the REPL, (`print(mapper_value)`) we can see the lfo param's value is now mapped to a number between 0 and 1 and now we can use the `controlspec:map` function to set it to the correct value within the min and max range of the reverb return level param. 
 
-here we'll reuse the variable we created earlier for the reverb return value param's controlspec, `rev_return_level_cs`
+here, we'll reuse the variable we created earlier for the reverb return value param's controlspec, `rev_return_level_cs`
 
 ```
 output_val = rev_return_level_cs:map(mapper_value)
 ```
+<!-- 
+#### sidebar 6: may i have some syntactic sugar with my coffee?
+you may have noticed that the `map` function we just used needs to be called with a semicolon `:` instead of a dot (`.`). using a semicolon in lua leverages something called 'syntactic sugar'. explaining this is beyond the scope of this study, mostly because i don't understand it very well, but it is a good subject for a future study.)
 
-(note: you may have noticed above that the `map` function needs to be called using a semicolon (`:`) instead of a dot (`.`). using a semicolon in lua leverages something called 'syntactic sugar'. explaining this is beyond the scope of this study, mostly because i don't understand it very well, but it is a good subject for a future study.)
+longwinded notes aside...
+ -->
 
-longwinded notes aside, if we enter our `output_val` variable in the matron REPL we will get a new value that represents the lfo param value being successfully mapped to the reverb return level param. with this value we can now use it to set the value of the reverb return level. 
+if we enter our `output_val` variable in the matron REPL we will get a new value that represents a mapping of the lfo param's value to the reverb return level param. with this newly mapped value, we can use it to set the value of the reverb return level. 
 
 but first, so you can hear it, make sure you have the krill script running and the reverb turned on in the params menu.
 
-then, run this command:
+...then, run this command:
 
-`param:set("rev_return_level",output_val)`
+```
+param:set("rev_return_level",output_val)
+```
 
 ...and you should hear a change in the reverb.
 
@@ -237,6 +258,10 @@ that's it! phew! now, i need to do the dishes. :P
 
 
 ### final thoughts after having done the dishes 
-what i've tried to demonstrate here is not just the solution to a few coding problems, but a bit about the process of solving the problem itself. for me, the joy of coding is as much about figuring out solutions to problems as it is about arriving at solutions. when i am trying to solve a problem, often the solution comes after i've decided i've done all i can and have more or less given up all hope. frequently, after i've given up, i decide to take a walk and then the solution just shows itself to me in my mind and sometimes the solution actually works! 
+what i've tried to demonstrate here is not just the solution to a few coding problems, but a bit about the process of solving the problem itself. for me, the joy of coding is as much about figuring out solutions to problems as it is about arriving at the solutions themselves. 
 
-coding, especially i think for beginners, can be extremely challenging and often requires quite a bit of patience and perseverence. however, i think the effort is worth it and there is a very large community attached to monome that is here to help!
+often when i am trying to solve a problem, the solution comes after i've decided i've done all i can and have more or less given up all hope if ever figuring out a solution. 
+
+frequently, after this has happened, i decide to take a walk dejectedly. but then, after not much time at all has passed, the solution just shows itself to me in a flash. and once in a while after i've returned home and attempted to write the idea into code, the code i've written actually works! 
+
+coding, needless to say, can be extremely frustrating and often requires quite a bit of patience and perseverence. however, i think the pleasure of solving problems and sharing the results with the monome community is totally worth it. plus, there is are a ton of folks in the community who are eager and able to help you along this journey!
