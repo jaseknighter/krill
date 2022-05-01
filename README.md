@@ -168,6 +168,8 @@ use e1 to switch between sequencer menus.
      * *vjd rthm activeX*: indicates whether the selected rhythm is active. note, this "read only" param will only indicate a selected rhythm is active if the sequence mode (*seq mode*) is set to *vuja de*.
 
 ##### *scr* (Lorenz system visualization controls)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-3-menus-scr.png" width="500" />
+
   the *scr* (screen) sub-menu's params control how the Lorenz system is displayed, which effects sequence generation:
 
 - *x/y input***
@@ -204,6 +206,7 @@ use e1 to switch between sequencer menus.
   *USE CAUTION* when changing the params in these two sub-menus as unexpected results may occur that sometimes cause the Lorenz system algorithm visualization to disappear and when this happens the sequencer tends to stop playing, requiring a restart of the script. 
 
 ##### *lfo* (lfo controls)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-4-menus-lfo.png" width="500" />
   the *lfo* sub-menu's params control two lfos:
 
   * *lfo*: turns the lfo on and off
@@ -222,6 +225,7 @@ use e1 to switch between sequencer menus.
   finally, the read-only *lfo value* param displays the current value of the lfo.
 
 ##### *eng* (MI Rings SuperCollider engine controls)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-5-menus-eng.png" width="500" />
   the *eng* sub-menu's params control the settings for the MI Rings SuperCollider engine:
 
   * mode controls
