@@ -206,7 +206,7 @@ use e1 to switch between sequencer menus.
   *USE CAUTION* when changing the params in these two sub-menus as unexpected results may occur that sometimes cause the Lorenz system algorithm visualization to disappear and when this happens the sequencer tends to stop playing, requiring a restart of the script. 
 
 ##### *lfo* (lfo controls)
-<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-4-menus-lfo.png" width="500" />
+<img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-5-menus-lfo.png" width="500" />
   the *lfo* sub-menu's params control two lfos:
 
   * *lfo*: turns the lfo on and off
