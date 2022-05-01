@@ -31,13 +31,14 @@
      width="586.344px"
      inkscape:zoom="0.73"
      inkscape:cx="400"
-     inkscape:cy="299.31507"
+     inkscape:cy="300.68493"
      inkscape:window-width="1293"
      inkscape:window-height="847"
      inkscape:window-x="54"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer9" />
+     inkscape:current-layer="layer2"
+     showguides="false" />
   <defs
      id="defs2">
     <mask
@@ -151,12 +152,12 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="1-2-0-start_w_grid"
-     style="display:none">
+     style="display:inline">
     <g
        inkscape:groupmode="layer"
        id="layer7"
        inkscape:label="labels"
-       style="display:inline">
+       style="display:none">
       <ellipse
          style="vector-effect:non-scaling-stroke;fill:#999999;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
          id="path385"
@@ -307,6 +308,10 @@
        id="layer3"
        inkscape:label="1-2-0-start_w_grid mask"
        style="display:inline" />
+    <g
+       inkscape:groupmode="layer"
+       id="layer10"
+       inkscape:label="menu rect" />
     <image
        width="502.35559"
        height="348.19168"
@@ -320,12 +325,26 @@
        inkscape:export-filename="/Users/jms/Documents/GitHub/krill/images/1-2-0-start_w_grid.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
+    <rect
+       style="vector-effect:non-scaling-stroke;fill:#ff0000;fill-opacity:0;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect303"
+       width="33.707191"
+       height="19.209475"
+       x="84.449196"
+       y="-47.842464" />
+    <rect
+       style="fill:none;stroke:#ff0000;stroke-width:0.256508;stroke-opacity:1"
+       id="rect319"
+       width="56.54903"
+       height="14.497717"
+       x="27.175285"
+       y="45.305367" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer9"
      inkscape:label="2-1-0-start"
-     style="display:inline">
+     style="display:none">
     <rect
        style="display:inline;vector-effect:non-scaling-stroke;fill:#808080;stroke:#000000;stroke-width:0.0254;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:5.89723;stroke-opacity:0;paint-order:stroke fill markers;stop-color:#000000"
        id="rect291-9"
