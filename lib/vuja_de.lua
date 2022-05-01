@@ -30,17 +30,17 @@ function vuja_de:get_note(div_id)
   local new_prob = math.random()
   local active_sector=sound_controller:get_active_sector()
   if active_sector and self.prob <= 0 and new_prob > math.abs(tonumber(self.prob)/10) then
-    local octave =  active_sector.row
+    local octave =  active_sector.row - 1
     local note =    active_sector.col
     local doo_param = params:lookup_param("vuja_de_oct_offset"..div_id)
     local doo_options = doo_param.options
     local div_oct_offset = doo_options[params:get("vuja_de_oct_offset"..div_id)]
-    -- local next_note = ((octave*div_oct_offset)*note)-14+midi_pitch_offset
-    local next_note = ((octave*div_oct_offset)*note)+params:get("root_note")-1
+    local notes_per_octave = fn.get_num_notes_per_octave()
+    
+    local next_note = (((octave+div_oct_offset)*notes_per_octave)+note)+(params:get("root_note")-1)
+    -- print("active_sector.row, active_sector.col,octave,next_note,div_oct_offset",active_sector.row, active_sector.col,octave, next_note,div_oct_offset)
     local next_seq_ix = util.clamp(self.seq.ix+1,1,self.seq.length)
     self.seq[next_seq_ix] = next_note
-    -- print("next_note",next_note,self.prob,new_prob)
-  
   elseif self.prob > 0 and new_prob > tonumber(self.prob)/10 then
     -- local next_seq_ix = util.clamp(self.seq.ix+1,1,self.seq.length)
     local next_seq_ix = util.clamp(math.ceil(new_prob*self.seq.length),1,self.seq.length)

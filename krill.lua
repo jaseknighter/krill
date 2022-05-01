@@ -1,26 +1,41 @@
--- krill v1.0.0
--- krell for krill.
+-- krill v1.0.0 @jaseknighter
+-- chaotic sequencer, MI Rings engine, and mod matrix
 --
 -- llllllll.co/t/XXXXXX
 --
 -- 
 --
---    ▼ instructions below (NEEDS UPDATING!!!!) ▼
+--    ▼ basic instructions  ▼
 --
--- K2 modifies current sequence
--- K3 toggles start/stop
--- K1+E1 selects saved sequence
--- K1+K3 loads saved sequence
--- K1+K2 toggles markov mode
+-- K1+E1 toggles sequencer/mod matrix
 --
--- ///     note mode   \\\
--- E2 selects note
--- E3 changes note
+-- ///   sequencer mode   \\\
+-- E1 select menu
+-- E2 select param
+-- E3 change param value
+-- K1+E3 change param value
 --
--- ///    markov mode   \\\
--- E1 selects markov chain
--- E2 selects transition
--- E3 changes probability
+-- ///    mod matrix (mm)  \\\
+-- E1 select menu
+-- K2+K3 clear patchpoint
+--
+-- ///    mm: row/col   \\\
+-- E2 select row
+-- E3 select col
+--
+-- ///    mm: in/out   \\\
+-- E2/E3 select input/output
+-- K1+E2 fast input navigation
+-- K1+E3 fast output navigation
+--
+-- ///    mm: other menus   \\\
+-- E2 select param
+-- E3 +/- param value
+-- K2+E3 coarse +/- param value
+--
+-- see docs for more details
+--   
+
 
 engine.name="Krill"
 
@@ -48,19 +63,6 @@ mod_matrix = include("lib/mod_matrix")
 save_load = include("lib/save_load")
 cellular_automata = include("lib/cellular_automata")
 scroll_text = include("lib/scroll_text")
-
-
--- engine.name="AcidTest"
-
-note_last=nil
-fade_text=""
-fade_time=0
-shift=false
-markov_mode=false
-sel_note=1
-disable_transport=false
-chaos_x={}
-chaos_y={}
         
 
 initializing = true
@@ -281,11 +283,11 @@ function finish_init()
   params:set("engine_mode",2)
   params:set("rings_pos",0.5)
   params:set("rings_structure_base",0.5)
-  params:set("rings_structure_range",0.5)
+  -- params:set("rings_structure_range",0.5)
   params:set("rings_brightness_base",0.75)
   params:set("rings_damping_base",0.25)
-  params:set("rings_damping_range",0.6)
-  params:set("rings_poly",4)
+  -- params:set("rings_damping_range",0.6)
+  -- params:set("rings_poly",4)
   params:set("internal_trigger_type",2)
   params:set("internal_trigger_type",1)
   params:set("vuja_pat_defaults1",4)

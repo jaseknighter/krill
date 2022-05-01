@@ -82,7 +82,7 @@ function sound_controller:get_active_sector()
     for j=1,#sound_controller.sectors[i],1 do
       local s = sound_controller.sectors[i][j]
       if x>s.x and x<s.x+s.w and y>s.y and y<s.y+s.h then
-        return {col=i,row=j}
+        return {row=i,col=j}
       end
     end
   end
@@ -151,7 +151,6 @@ end
 
 function sound_controller:play_vuja_de_note(div_id)
   local note_to_play = vuja_de:get_note(div_id)
-
   local note_tab = {
     pitch = note_to_play,
     level = params:get("env_max_level"),

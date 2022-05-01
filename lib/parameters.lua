@@ -364,7 +364,7 @@ function parameters.init()
   end}
 
   params:add{type = "number", id = "vuja_de_prob", name = "vjd prob",
-  min=-10, max=10, default=-5,
+  min=-10, max=10, default=0,
   action = function(x)
   end}
 
@@ -386,15 +386,15 @@ function parameters.init()
   params:add{type = "number", id = "vjd_div_asn_engine1", name = "engine asn 1", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_engine2", name = "engine asn 2", min=1, max=3, default=2}
   params:add{type = "number", id = "vjd_div_asn_midi1", name = "midi asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_midi2", name = "midi asn 2", min=1, max=3, default=2}
+  params:add{type = "number", id = "vjd_div_asn_midi2", name = "midi asn 2", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_crow1", name = "crow asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_crow2", name = "crow asn 2", min=1, max=3, default=2}
+  params:add{type = "number", id = "vjd_div_asn_crow2", name = "crow asn 2", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_jf1", name = "jf asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_jf2", name = "jf asn 2", min=1, max=3, default=2}
+  params:add{type = "number", id = "vjd_div_asn_jf2", name = "jf asn 2", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_wsyn1", name = "wsyn asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=2}
+  params:add{type = "number", id = "vjd_div_asn_wsyn2", name = "wsyn asn 2", min=1, max=3, default=1}
   params:add{type = "number", id = "vjd_div_asn_wdelkarp1", name = "wdelkarp asn 1", min=1, max=3, default=1}
-  params:add{type = "number", id = "vjd_div_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=2}
+  params:add{type = "number", id = "vjd_div_asn_wdelkarp2", name = "wdelkarp asn 2", min=1, max=3, default=1}
   
   -- params:add_separator("")
   -- params:add_separator("divisions")
@@ -439,7 +439,7 @@ function parameters.init()
     end}
 
     params:add{type = "option", id = "vuja_de_oct_offset"..i, name = "vjd oct offset"..i,
-      options={-4,-3,-2,-1,1,2,3,4}, default=5,
+      options={-4,-3,-2,-1,0,1,2,3,4}, default=5,
       action = function(x)
     end}
 
@@ -1044,7 +1044,7 @@ function parameters.init()
     }
   end
   -- just friends
-  params:add_group("just friends",8)
+  params:add_group("just friends",9)
   params:add{type = "option", id = "output_jf", name = "just friends",
     options = {"off","on"},
     default = 1,

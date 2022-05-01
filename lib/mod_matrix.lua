@@ -114,7 +114,8 @@ function mod_matrix:enrich_param_actions()
       p.action = function(x)
         -- do something
         p.og_action_mod_matrix(x)
-        self:process_updated_param(p_ix,p_id,params:get(p_ix))
+        self:process_updated_param(p_id)
+        -- self:process_updated_param(p_ix,p_id,params:get(p_ix))
       end
     end
   end
@@ -375,7 +376,7 @@ function mod_matrix:get_param_props(param)
     return {val=val,min=min,max=max,type=param.t}
 end
 
-function mod_matrix:process_updated_param(ix,id,value)
+function mod_matrix:process_updated_param(id)
   local active_input_val  = ""
   local active_output_val = ""
   local active_output_crow_val = ""
@@ -404,6 +405,7 @@ function mod_matrix:process_updated_param(ix,id,value)
                               
               --mod matrix out
               if self.patch_points[i][j].enabled == 2 then
+                -- print("in/out",input_id, output_id)
                 local output           = params:lookup_param(output_id)
                 local output_obj       = mod_matrix:get_param_props(output)
                 

@@ -66,7 +66,7 @@ externals.note_on = function(voice_id, note_tab, target,mode)
   local note_tab = fn.deep_copy(note_tab)
   if initializing == false then
     if type(note_tab) == "table" and note_tab.pitch then
-      note_tab.pitch = util.clamp(note_tab.pitch,1,#notes)
+      note_tab.pitch = util.clamp(note_tab.pitch,1,notes[#notes])
       if params:get("quantize") == 2 then          
         note_tab.pitch = fn.quantize(note_tab.pitch) 
         -- note_tab.pitch = fn.quantize(note_tab.pitch+7) 
@@ -244,7 +244,9 @@ externals.crow_note_on = function(voice_id, note_tab, target)
     for i=1,4,1 do
       local output_crow = params:get("output_crow"..i)
       if output_crow == 2 then
+
         local volts = (note_tab.pitch-midi_pitch_offset)/12
+        -- print("volts,note_tab.pitch,midi_pitch_offset",volts,note_tab.pitch,midi_pitch_offset)
         -- local volts = (note_tab.pitch-midi_pitch_offset+24)/12
         crow.output[i].volts = volts 
         crow.output[i]() 
