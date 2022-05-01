@@ -60,11 +60,13 @@ the mod matrix built into the krill script allows any parameter to modulate any 
 
 ## documentation
 
+### views
 the krill script has two basic views:
 
 * sequencer view
 * mod matrix view
 
+use k1+e1 to navigate between views.
 
 ### sequencer
 <img src="https://github.com/jaseknighter/krill/blob/main/images/1-2-0-start_w_grid.png" width="500" />
