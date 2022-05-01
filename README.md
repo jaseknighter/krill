@@ -70,7 +70,12 @@ the sequencer view is divided into three UI sections (from left to right):
 2. Lorenz system visualization
 3. Lorenz x/y and lfos
 
-e1/e2/e3 are used to navigate the controls section. all of the UI controls found in the sequencer view are also found in the main norns params menu J(PARAMETERS>EDIT).
+#### encoder and key controls
+e1/e2/e3 are used to navigate the controls section. 
+
+all of the UI controls found in the sequencer view are also found in the main norns params menu J(PARAMETERS>EDIT).
+
+when changing numerical values, k2+e3 can be used to change values faster by a factor of 10.
 
 **notes on the grid overlay** 
 - when the script is first loaded, just the second and third UI sections are visible. when an encoder is turned, the first section becomes temporarily visible, along with a grid overlaying the Lorenz system visualization. 
@@ -239,10 +244,15 @@ alternatively, to make grid overlay and UI controls section always visible every
 <img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0.png" width="500" />
 the mod matrix allows any parameter to be used to modulate any other parameter. 
 
+#### encoder and key controls
 use k1+e1 to switch to the mod matrix view.
 
+when changing numerical values, k2+e3 can be used to change values faster by a factor of 10.
+
+#### data management
 mod matrix settings are saved at the end of each krill session. multiple mod matrix configurations can also be saved. see the *DATA MANAGEMENT* section below for additional details.
 
+#### ui
 the mod matrix UI is divided into four sections:
 
 a. menu name<br>
