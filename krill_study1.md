@@ -93,7 +93,7 @@ the data returned by calling `tab.print` tells us something about the params (e.
 we can tell these are control params from two pieces of information we received when we ran the `tab.print` commands above:
 
 1. the existance of a table called `controlspec`
-2. the value of `t` for each param's `3`
+2. the value of `t` for each param is the number *3*
 
 in regards to the `t`, this stands for *type*. it took me a while to figure this out, but searching through the norns codebase, i found a [directory of files]((https://github.com/monome/norns/tree/main/lua/core/params) that told me there are are 10 types of params and after exploring these files i figured out that each type is given a unique value for `t`. here are a just a few of the other param types and their `t` values:
 
