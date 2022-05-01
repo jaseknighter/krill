@@ -282,7 +282,7 @@ when changing numerical values, k2+e3 can be used to change values faster by a f
 mod matrix settings are saved at the end of each krill session. multiple mod matrix configurations can also be saved. see the *DATA MANAGEMENT* section below for additional details.
 
 #### mod matrix menus
-<img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0-start.png" />
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0-start.png"  width="500" />
 
 the mod matrix has 5 menus:
 
