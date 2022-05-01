@@ -79,7 +79,7 @@ the sequencer view is divided into three UI sections (from left to right):
 #### encoder and key controls
 e1/e2/e3 are used to navigate the controls section. 
 
-all of the UI controls found in the sequencer view are also found in the main norns params menu J(PARAMETERS>EDIT).
+all of the UI controls found in the sequencer view are also found in the main norns params menu (PARAMETERS>EDIT).
 
 when changing numerical values, k2+e3 can be used to change values faster by a factor of 10.
 
@@ -90,7 +90,17 @@ to make the grid overlay and UI controls section always visible after the script
 
 alternatively, to make grid overlay and UI controls section always visible every time the script is loaded, open the */lib/globals.lua* file and change the value of the `UI_DISPLAY_DEFAULT` variable to `3`.
 
+#### sequencer menus
 
+five menus are available from the sequencer view:
+
+* *seq* (sequencer controls)
+* *scr* (Lorenz system visualization controls)
+* *lrz* (Lorenz system algorithm controls)
+* *lfo* (lfo controls)
+* *eng* (MI Rings SuperCollider engine controls)
+
+use e1 to switch between sequencer menus. 
 
 #### *seq* (sequencer controls)
 
@@ -250,6 +260,13 @@ alternatively, to make grid overlay and UI controls section always visible every
 <img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0.png" width="500" />
 the mod matrix allows any parameter to be used to modulate any other parameter. 
 
+the mod matrix UI is divided into four sections:
+
+a. menu name<br>
+b. control parameters<br>
+c. input output labels and values<br>
+d. patchpoints<br>
+
 #### encoder and key controls
 use k1+e1 to switch to the mod matrix view.
 
@@ -258,15 +275,17 @@ when changing numerical values, k2+e3 can be used to change values faster by a f
 #### data management
 mod matrix settings are saved at the end of each krill session. multiple mod matrix configurations can also be saved. see the *DATA MANAGEMENT* section below for additional details.
 
-#### ui
-the mod matrix UI is divided into four sections:
+#### mod matrix menus
 
-a. menu name<br>
-b. control parameters<br>
-c. input output labels and values<br>
-d. patchpoints<br>
+the mod matrix has 5 menus:
 
-the mod matrix has 5 menus (e1 navigates between them):
+* *row/col* (patchpoint navigator)
+* *in/out* (input/output selection)
+* *pp opt* (patchpoint options)
+* *crow* (crow output settings)
+* *midi* (midi output settings)
+
+use e1 to switch between mod matrix menus.
 
 #### *row/col* (patchpoint navigator)
   e2/e3 navigates the patchpoint matrix. on all mod matrix screens, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
@@ -295,11 +314,15 @@ the mod matrix has 5 menus (e1 navigates between them):
   the input and output for the row/column of the selected patchpoint can be cleared by pressing k2 + k3.
 
 #### *pp opt* (patchpoint options)
+
   the patchpoint options menu updates three controls for the selected patchpoint:
 
   * *enbl* (enable): enables modulation of the output by the input (assuming they have been set for the selected patchpoint)
   * *lvl* (level) the value of the patchpoint output is multiplied by the lvl value. setting lvl to 0 is the same as setting the patchpoint's enbl value to off.
   * *lvlr* (level range): adds a positive or negative random value between 0 and the lvlr value. if lvlr is set to 0, nothing will be added.
+
+  e2 selects the patchpoint option controls. e3 updates them.
+  
 
 #### *crow* (crow output settings)
   there are three crow controls for the selected patchpoint:
@@ -307,6 +330,8 @@ the mod matrix has 5 menus (e1 navigates between them):
   * *enbl* (crow enable): sends the patchpont's modulation to crow
   * *out* (crow out): selects which crow output to send voltages for the selected patchpoint
   * *slew* (crow slew): tells crow to slew the voltages it sends for the selected patchpoint
+
+  e2 selects the crow output controls. e3 updates them.
  
 #### *midi* (midi output settings)
   there are three midi controls for the selected patchpoint:
@@ -317,6 +342,7 @@ the mod matrix has 5 menus (e1 navigates between them):
 
   note: to send mod matrix outputs to midi, a midi out device needs to be set in the midi sub-menu of the main norns parameters menu (PARAMETERS>EDIT). 
 
+  e2 selects the midi output controls. e3 updates them.
 
 ## misc parameters
 ### read only params
