@@ -297,12 +297,12 @@ use e1 to switch between mod matrix menus.
   e2/e3 navigates the patchpoint matrix. on all mod matrix screens, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
   
   the patchpoint circles indicate the state of each patchpoint:
-    * dimly lit:  disabled
-    * with a dot in the middle: the patchpoint is selected for editing
-    * brightly lit: patchpoint is enabled
-    * left half of circle filled: an input is defined for the patchpoint
-    * right half of circle filled: an output is defined for the patchpoint
-    *  circle completely filled: an input and output is defined for the patchpoint 
+  * dimly lit:  disabled
+  * with a dot in the middle: the patchpoint is selected for editing
+  * brightly lit: patchpoint is enabled
+  * left half of circle filled: an input is defined for the patchpoint
+  * right half of circle filled: an output is defined for the patchpoint
+  *  circle completely filled: an input and output is defined for the patchpoint 
   
 #### *in/out* (input/output selection)
   e2/e3 selects the inputs/outputs for the selected row/column of the matrix.
