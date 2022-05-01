@@ -33,7 +33,7 @@ the idea for the script and its name came from @mattallison and is inspired by [
 this script's use of a chaotic Lorenz system algorithm differentiates it from the classic Krell patch. in theory at least, using chaos instead of randomness produces patterns that reside in a space between the random and the predictable. 
 
 ## krill studies for beginner scripters
-i have created a [study](krill_study1.md) to accomany the krill script. the study includes notes and and simple code that can be run in maiden's matron REPL. it relates to a problem (one of many) i had to solve while putting this script together. i hope it is informative and useful for folks interested in learning more about coding on the norns platform.
+i have created a [study](krill_study1.md) to accomany the krill script. the study includes notes and simple code that can be run in maiden's matron REPL. it relates to a problem (one of many) i had to solve while putting this script together. i hope it is informative and useful for folks interested in learning more about coding on the norns platform.
 
 
 ## credits
