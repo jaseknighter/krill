@@ -411,7 +411,11 @@ function mod_matrix:process_updated_param(id)
                 
                 local new_output_value
                 
-                if output_obj.type == 3 then
+                if output_obj.type == 3 then --unmap input vals for control input params
+                  input_obj.val = params:lookup_param(output_id).controlspec:unmap(input_obj.val)
+                end 
+
+                if output_obj.type == 3 then --map output vals for control output params
                   local mapper_index = util.linlin(input_obj.min,input_obj.max,0,1,input_obj.val)
                   new_output_value = output.controlspec:map(mapper_index)
                 else
@@ -425,8 +429,8 @@ function mod_matrix:process_updated_param(id)
                 local random_range     = util.linlin(0,1,-1,1,math.random())*pp_level_range
                 pp_level = pp_level + random_range
                 new_output_value = new_output_value * pp_level
-                new_output_value = output_obj.type == 2 and fn.round_decimals(new_output_value,0) or new_output_value
-                if output_obj.type == 1 then
+                
+                if output_obj.type == 1 or output_obj.type == 2 then
                   new_output_value = fn.round_decimals(new_output_value, 0)
                 end
                 new_output_value = fn.constrain_decimals(new_output_value, params:get(output_id))
@@ -679,7 +683,9 @@ function mod_matrix:display_params()
       screen.move(5,54)
       screen.text(input_text)
       screen.move(5,62)
-      screen.text("in val: " .. mod_matrix.active_input_val)
+      local in_val = ""
+      in_val = type(mod_matrix.active_input_val) == "number" and fn.round_decimals(tonumber(mod_matrix.active_input_val),3) or mod_matrix.active_input_val
+      screen.text("in val: " .. in_val)
     else
       screen.level((self.active_gui_sector == 2 and self.lookup[output].name and self.lookup[output].id) and 15 or 10)
       screen.move(5,54)
