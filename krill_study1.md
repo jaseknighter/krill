@@ -175,7 +175,7 @@ whereas variables are like names in Lua (i.e. the represent and point to other t
 #### back to the issue at hand once more
 the function we will use here to map the value of the lfo param to the reverb return level param is the [`linlin`](http://fatesblue.local/doc/modules/lib.util.html#linlin) function. it takes an input's value and the input's lower/upper ranges and maps this value to an output based on the outputs lower/upper ranges. 
 
-before we apply this function to the lfo and reverb return level params, let's start with a simpler example of an input param that as a value of 5 with min/max levels of 0 and 10 and an output param with min/max levels of 0 and 100
+before we apply this function to the lfo and reverb return level params, let's start with a simpler example of an input param that has a value of 5 with min/max levels of 0 and 10 and an output param with min/max levels of 0 and 100
 
   * input value: 5
   * input min: 0
