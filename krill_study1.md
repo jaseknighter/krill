@@ -1,5 +1,5 @@
 ## krill studies
-<img src="https://github.com/jaseknighter/krill/blob/main/images/krill-studies-1-start.png" />
+<img src="https://github.com/jaseknighter/krill/blob/main/images/krill-studies-1-start.png" width="800" />
 
 ### background
 
