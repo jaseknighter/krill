@@ -191,10 +191,9 @@ end
 function gui:display_lorenz()
   -- print("disp")
   screen.aa(0)
-  if params:get("grid_display") > 1 and gui_level > 0 then 
-    sound_controller:display() 
-  end
-
+  -- if params:get("grid_display") > 1 and gui_level > 0 then 
+    -- sound_controller:display() 
+  -- end
 
   -- display left menu 
   screen.level(math.floor(gui_level*3))
@@ -256,16 +255,9 @@ function gui:display_lorenz()
     end
   end
 
-
-    
-  -- end
-
   squiggle_ix = squiggle_ix+1
   if squiggle_ix > squiggle_width then
-    -- screen.clear()
     squiggle_ix = 1
-  else
-    -- screen.clear()
   end 
 
   screen.aa(0)

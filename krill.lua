@@ -85,7 +85,7 @@ function init()
   ext = externals:new(active_notes)
 
   sound_controller:init(NUM_OCTAVES_DEFAULT,fn.get_num_notes_per_octave())
-  lorenz:reset()
+  -- lorenz:clear()
   -- input[1].mode('change', 1,0.1,'rising')
   -- input[2].mode('stream',0.001)
   
@@ -233,10 +233,8 @@ function init()
   clock.run( function()
     while true do
       if initializing == false then
-        if norns.menu.status()  == false then
-          -- screen.aa(0)
+        if norns.menu.status() == false then
           gui:display()
-          -- ca.display()
         else
           lorenz.display(false)
         end
@@ -298,35 +296,14 @@ function finish_init()
 
   clock.run(gui.update_menu_display)
   play_enabled = true
-
-
-  -- og_print = fn.clone_function(tab.print)
-  -- tab.print = function(x)
-  --   -- do something
-  --   print("custom print: ")
-  --   og_print(x)
-  -- end
 end
 
 function init_polling()
-  -- pitch_poll = poll.set("pitch_poll", function(value)
-  --   if note_start == true then
-  --     note_start = false
-      
-  --   end
-  -- end)
 
   next_note_poll = poll.set("next_note_poll", function(value)
-    -- sound_controller:play_krill_note(value)
-
-
     if params:get("sequencing_mode") == 1 then
       clock.run(sound_controller.play_krill_note,value)
-      -- print("sound_controller:play_krill_note()", value)
     end
-
-    -- note_start = true
-    -- print("note_start_poll",rise,fall)
   end)
 
   env_pos_poll = poll.set("env_pos_poll", function(value)
@@ -343,45 +320,21 @@ function init_polling()
   end)
 
   rise_poll = poll.set("rise_poll", function(value)
-    -- print("rise done",value)
     prev_rise = rise
-
-    if params:get("sequencing_mode") == 1 then
-      -- sound_controller:play_krill_note(value)
-    else
-      -- sound_controller:play_vuja_de_note()
-    end
-
     rise = value * params:get("env_scalar")/100
   end)
 
   fall_poll = poll.set("fall_poll", function(value)
-    -- print("fall done",value)
     engine.note_off(1)
     prev_fall = fall
     fall = value * params:get("env_scalar")/100
-    -- local rise_fall = rise/fall
-    -- print("rise_fall",rise_fall)
-
-    if params:get("sequencing_mode") == 1 then
-      -- sound_controller:play_krill_note()
-      -- sound_controller:play_krill_note(rise_fall)
-    else
-      -- sound_controller:play_vuja_de_note()
-    end
-
-    -- crow.output[2].volts = 0
-    -- crow.output[2].execute()
   end)
 
 
   function adjust_engine_pitch(note)
-    -- engine.note_off()
     engine.adjust_engine_pitch(note)
   end
 
-  -- pitch_poll:start()
-  -- next_note_poll:start()
   next_note_poll:start()
   env_pos_poll:start()
   env_level_poll:start()

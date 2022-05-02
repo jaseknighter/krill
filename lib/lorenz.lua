@@ -16,7 +16,6 @@ pixels.active = nil
 
 function pixels.update(display)
   local lb = lorenz.get_boundary()
-  -- print(#pixels)
   for i=1,#pixels,1 do
     pixels[i]:update(display)
   end
@@ -170,14 +169,17 @@ function lorenz.get_boundary()
   return boundary
 end
 
-function lorenz:reset()
-  for i=1,#pixels,1 do pixels[i] = nil end
-  screen:clear()
-  -- for i=1,3 do self.state[i] = self.origin[i] end
+function lorenz:clear()
+  if norns.menu.status() == false then 
+    local gd = sound_controller:get_dimensions()
+    screen.level(0)
+    screen.rect(gd.x,gd.y,gd.w,gd.h)
+    screen.fill()
+    screen.stroke()
+  end
 end
 
 lorenz.display = function(display)
-  -- screen.move(42,1)
   pixels.update(display) 
 end
 
@@ -196,11 +198,6 @@ lorenz.update = function()
   lorenz.second = math.floor(xyz[2])
   lorenz.third = math.floor(xyz[3])
 
-  -- lorenz.x_map = lorenz.first
-  -- lorenz.y_map = lorenz.second
-  -- lorenz.x_map = params:get("x_input")
-  -- lorenz.y_map = params:get("y_input")
-  -- print("lorenz.first",lorenz.first)
   local x_input = params:get("x_input")      
   if x_input == 1 then lorenz.x_map = lorenz.first 
   elseif x_input == 2 then lorenz.x_map = lorenz.second
@@ -215,16 +212,8 @@ lorenz.update = function()
 
   local x = (lorenz.x_map) 
   local y = (lorenz.y_map) 
-  
-  -- screen.level(3)
-  -- screen.aa(0)
+
   if lorenz.x_map~=0 and lorenz.y_map ~= 0 then
-  -- if x~=64 + x_offset and y~=32 +  y_offset then
-  -- if x~=64 and y~=32 then
-  --   screen.move(x,y)
-  --   screen.pixel(x,y)
-    -- local num_pixels = pixels and #pixels+1 or 1
-    -- print()
     local xy_exists = false
     for i=1,#pixels,1 do
       local prev_x = pixels[i].x
@@ -234,49 +223,10 @@ lorenz.update = function()
       end
     end
     if xy_exists == false then
-      lb = lorenz.get_boundary()
-      -- local central_x = lb[1]
-      -- local central_y = lb[2]
-      -- local central_x = lb[1]+(lb[1]+lb[3])/2
-      -- local central_y = lb[2]+(lb[2]+lb[4])/2
-      -- local central_vector = vector:new(central_x,central_y)
-      -- local central_vector = vector:new(central_x-params:get("x_offset"),central_y-params:get("y_offset"))
-      -- local xy_vector = vector:new(x,y)
-      -- xy_vector:rotate_around(central_vector, math.rad(params:get("rotation")))
-      -- print(x,y,xy_vector.x,xy_vector.y)
-      -- x=math.floor(xy_vector.x)
-      -- y=math.floor(xy_vector.y)
       local px = pixel:new(x,y)
       pixels[#pixels+1] = px
     end
   end
-
-
-    -- local outputs = 10*(sum+25)/80 - 5
-    -- output[i].volts = 10*(sum+25)/80 - 5
 end
-
--- input[1].change = function(s)
---   lorenz:reset()
--- end
-
--- input[2].stream = function(volts)
---   lorenz.dt = math.exp((volts-1)/3)/1000-0.00005
--- end
-
---[[
-function init()
-  lorenz:reset()
-  -- input[1].mode('change', 1,0.1,'rising')
-  -- input[2].mode('stream',0.001)
-  clock.run( function()
-    while true do
-      lorenz:process()
-      update()
-      clock.sleep(0.001)
-    end
-  end)
-end
-]]
 
 return lorenz

@@ -135,39 +135,30 @@ function parameters.init()
   params:add_separator("")
   params:add_separator("LORENZ")
   params:add_group("lorenz view",7)
-  -- params:add{
-  --   type="control", id = "rotation", name = "rotation",
-  --   controlspec=cs.new(-360, 360, 'lin', 1, 0, "",1/720,true),
-  --   action=function(x) 
-  --     --lorenz:reset()
-  --   end
-  -- }
 
   params:add{
     type="option", id = "x_input", name = "x input", options={"first","second","third"},default = 1,
     action=function(x) 
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
   params:add{
     type="option", id = "y_input", name = "y input", options={"first","second","third"},default = 2,
     action=function(x) 
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
   params:add{
     type="number", id = "x_offset", name = "x offset",min=-128, max=128, default = 0,
     action=function(x) 
-      -- lorenz:reset()
-      screen:clear()
+      lorenz:clear()
     end
   }
   params:add{
     type="number", id = "y_offset", name = "y offset",min=-64, max=64, default = 0,
     action=function(x) 
-      -- lorenz:reset()
-      screen:clear()
+      lorenz:clear()
     end
   }
 
@@ -176,24 +167,21 @@ function parameters.init()
     action=function(x) 
       params:set("x_offset",x)
       params:set("y_offset",x)
-      -- lorenz:reset()
-      screen:clear()
+      lorenz:clear()
     end
   }
 
   params:add{
     type="taper", id = "x_scale", name = "x scale",min=0.01, max=10, default = 1,
     action=function(x) 
-      -- lorenz:reset()
-      screen:clear()
+      lorenz:clear()
     end
   }
   
   params:add{
     type="taper", id = "y_scale", name = "y scale",min=0.01, max=10, default = 1,
     action=function(x) 
-      -- lorenz:reset()
-      screen:clear()
+      lorenz:clear()
     end
   }
 
@@ -204,7 +192,7 @@ function parameters.init()
   --     -- params:set("y_scale",x)
   --     params:set("x_scale",params:get("x_scale") * x)
   --     params:set("y_scale",params:get("y_scale") * x)
-  --     -- lorenz:reset()
+  --     -- lorenz:clear()
   --     screen:clear()
   --   end
   -- }
@@ -247,7 +235,7 @@ function parameters.init()
         local denominator = util.linexp(1,100,1,1000,x)
         lorenz_pattern.division = 1/denominator
       end
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
@@ -256,7 +244,7 @@ function parameters.init()
     type="taper", id = "origin1", name = "origin1",min=0.000, max=20, default = 0.01,
     action=function(x) 
       lorenz.origin[1]=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
   
@@ -264,7 +252,7 @@ function parameters.init()
     type="taper", id = "origin2", name = "origin2",min=0.000, max=20, default = 0.5,
     action=function(x) 
       lorenz.origin[2]=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
@@ -272,7 +260,7 @@ function parameters.init()
     type="taper", id = "origin3", name = "origin3",min=0.000, max=20, default = 0.0,
     action=function(x) 
       lorenz.origin[3]=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
@@ -280,7 +268,7 @@ function parameters.init()
     type="taper", id = "sigma", name = "sigma",min=0.001, max=10, default = 2.333,
     action=function(x) 
       lorenz.dt=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
@@ -288,7 +276,7 @@ function parameters.init()
     type="number", id = "rho", name = "rho",min=1, max=50, default = 28,
     action=function(x) 
       lorenz.rho=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
@@ -299,7 +287,7 @@ function parameters.init()
     -- min=0.01, max=2, default = 4/3, 
     action=function(x) 
       lorenz.beta=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
@@ -309,7 +297,7 @@ function parameters.init()
     -- min=0.000, max=2, default = 0.1,
     action=function(x) 
       lorenz.state[1]=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
   
@@ -319,7 +307,7 @@ function parameters.init()
     -- min=0.000, max=2, default = 0.0,
     action=function(x) 
       lorenz.state[3]=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
   
@@ -329,7 +317,7 @@ function parameters.init()
     -- min=0.000, max=2, default = 0.0,
     action=function(x) 
       lorenz.state[3]=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
   
@@ -338,14 +326,14 @@ function parameters.init()
     type="number", id = "steps", name = "steps",min=1, max=100, default = 1,
     action=function(x) 
       lorenz.steps=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
   params:add{
     type="taper", id = "dt", name = "dt",min=0.001, max=0.05, default = 0.015,
     action=function(x) 
       lorenz.dt=x
-      --lorenz:reset()
+      lorenz:clear()
     end
   }
 
