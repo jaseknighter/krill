@@ -23,18 +23,22 @@ function enc(n, d)
         clock.run(gui.update_menu_display)
       end
     elseif n== 3 then
+      
       local p_type = params:t(param_name)
       local param = params:lookup_param(param_name)
       if p_type == 2 then --option param
         params:set(param_name,params:get(param_name)+d)
       elseif p_type == 1 then -- number param
+        d = k2_active == true and d*10 or d
         params:set(param_name,params:get(param_name)+d)
       elseif p_type == 3 then -- control param
+        d = k2_active == true and d*10 or d
         local new_d = params:get(param_name)+(d*param.controlspec.step)
         -- local new_d = params:get(param_name)+(d*param.controlspec.step)
         params:set(param_name,new_d)
         -- print("p_type,new_d",p_type,new_d,d,param.controlspec.step)
       elseif p_type == 5 then -- taper param
+        d = k2_active == true and d*10 or d
         local new_d
         local max = param.max and param.max or param.controlspec.maxval
         if max < 1 then 
@@ -75,6 +79,8 @@ function key(n,z)
   -- end
   if n == 1 then
     if z == 0 then k1_active = false else k1_active = true end
+  elseif n == 2 then
+    if z == 0 then k2_active = false else k2_active = true end
   end
   if k1_active == false then
     if page==2 then

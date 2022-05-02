@@ -849,7 +849,7 @@ function mod_matrix:display_patch_point_options()
       screen.text("out: " .. output)
       screen.stroke()
       screen.move(8,40)
-      screen.level(mod_matrix.active_crow_pp_option == 4 and 15 or 5)
+      screen.level(mod_matrix.active_crow_pp_option == 3 and 15 or 5)
       screen.text("slew: " .. slew)
       screen.stroke()
     elseif self.active_gui_sector == 5 then -- midi gui
