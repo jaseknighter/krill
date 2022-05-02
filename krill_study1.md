@@ -216,7 +216,7 @@ when i was building the mod matrix it took me a while to figure how how to accou
 i finally found the solution by reviewing the documentation for the [controlspec module](http://fatesblue.local/doc/modules/controlspec.html). this module is used to create control parameters. 
 
 #### sidebar 5: what is a module?
-norns has many modules that were developed in order to make new norns scripts easier to create. you can find the documentation for these modules on your norns device itself by pointing your browser to *norns.local/doc*. (note: if you've renamed your norns device to something else you'll need to replace *norns* with whatever name you've given the device.)
+norns has many modules that were developed in order to make new norns scripts easier to create. you can think of modules as collections of related functions. there are, for example, modules related to midi, crow, music utilities, grid, arc, and clock. you can find the documentation for these modules on your norns device itself by pointing your browser to *norns.local/doc*. (note: if you've renamed your norns device to something else you'll need to replace *norns* with whatever name you've given the device.)
 
 #### **finally, the solution is upon us!**
 when i was reviewing the docs for the controlspec module, i found a [`map` function](http://fatesblue.local/doc/modules/controlspec.html#ControlSpec:map) that according to the doc will 'transform an incoming value between 0 and 1 through this ControlSpec'.
