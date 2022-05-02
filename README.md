@@ -282,7 +282,7 @@ when changing numerical values, k2+e3 can be used to change values faster by a f
 mod matrix settings are saved at the end of each krill session. multiple mod matrix configurations can also be saved. see the *DATA MANAGEMENT* section below for additional details.
 
 #### mod matrix menus
-<img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0-start.png"  width="500" />
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-1-0-start.png" width="500" />
 
 the mod matrix has 5 menus:
 
@@ -295,6 +295,7 @@ the mod matrix has 5 menus:
 use e1 to switch between mod matrix menus.
 
 #### *row/col* (patchpoint navigator)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-2-1-row-col.png" width="500" />
   e2/e3 navigates the patchpoint matrix. on all mod matrix screens, k1+e2 and k1+e3 are used to navigate the patchpoint matrix.
   
   the patchpoint circles indicate the state of each patchpoint:
@@ -306,6 +307,8 @@ use e1 to switch between mod matrix menus.
   *  circle completely filled: an input and output is defined for the patchpoint 
   
 #### *in/out* (input/output selection)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-2-2-in-out.png" width="500" />
+
   e2/e3 selects the inputs/outputs for the selected row/column of the matrix.
 
   k1+e2 and k+e3 display parameter folders names for fast navigation between the various sections found in the main norns params menu (PARAMETERS>EDIT).
@@ -321,6 +324,7 @@ use e1 to switch between mod matrix menus.
   the input and output for the row/column of the selected patchpoint can be cleared by pressing k2 + k3.
 
 #### *pp opt* (patchpoint options)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-2-3-pp-opt.png" width="500" />
 
   the patchpoint options menu updates three controls for the selected patchpoint:
 
@@ -332,6 +336,8 @@ use e1 to switch between mod matrix menus.
   
 
 #### *crow* (crow output settings)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-2-4-crow.png" width="500" />
+
   there are three crow controls for the selected patchpoint:
 
   * *enbl* (crow enable): sends the patchpont's modulation to crow
@@ -341,6 +347,8 @@ use e1 to switch between mod matrix menus.
   e2 selects the crow output controls. e3 updates them.
  
 #### *midi* (midi output settings)
+<img src="https://github.com/jaseknighter/krill/blob/main/images/2-2-5-midi.png" width="500" />
+
   there are three midi controls for the selected patchpoint:
 
   * *enbl* (midi enable): sends the patchpont's modulation to midi
