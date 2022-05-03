@@ -50,7 +50,7 @@ additional thanks and credits go out to:
 * @pichenettes for creating the MI Rings module for eurorack
 * @midouest for developing a [really splendid SuperCollider envelope](https://llllllll.co/t/supercollider-tips-q-a/3185/371) that captures rise and fall as individual events
 * @justmat for creating lua lfo's which i borrowed from his [otis script](https://github.com/justmat/otis)
-* @tyleretters for creating the lattice module and porting to norns the sequins module by @whimsicalraps
+* @tyleretters for creating the lattice module and porting @whimsicalraps's sequins module to norns
 
 
 ## caution!!!
