@@ -25,8 +25,8 @@
 --
 -- ///    mm: in/out   \\\
 -- E2/E3 select input/output
--- K1+E2 fast input navigation
--- K1+E3 fast output navigation
+-- K2+E2 fast input navigation
+-- K2+E3 fast output navigation
 --
 -- ///    mm: other menus   \\\
 -- E2 select param
