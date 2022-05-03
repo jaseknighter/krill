@@ -170,7 +170,7 @@ we are almost there!!! well kinda almost...
 our next step is to map the value of the lfo param to the reverb return level param. happily, there are a number of functions available in the norns [util module](http://fatesblue.local/doc/modules/lib.util.html) for this.
 
 #### sidebar 5: what is a function?
-whereas variables are like names in Lua (i.e. the represent and point to other things), functions act more like verbs. a function defines an action that can produce a result. for example, all norns scripts have a function called `init` that is called when the script first loads. it is used for setup and initialization of the script. 
+whereas variables are like names in Lua (i.e. they represent and point to other things), functions act more like verbs. a function defines an action that can produce a result. for example, all norns scripts have a function called `init` that is called when the script first loads. it is used for setup and initialization of the script. 
 
 #### back to the issue at hand once more
 the function we will use here to map the value of the lfo param to the reverb return level param is the [`linlin`](http://fatesblue.local/doc/modules/lib.util.html#linlin) function. it takes an input's value and the input's lower/upper ranges and maps this value to an output based on the outputs lower/upper ranges. 
