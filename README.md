@@ -41,7 +41,7 @@ i have created a [study](krill_study1.md) to accomany the krill script. the stud
 
 ## credits
 
-bunches and bunchs of credit are due to Matt Allison and SPIKE the Percussionist. Matt came up with the the original concept for the script and its name. i am deeply grateful to the two of them for working with me over many hours and days testing and discussing the script. 
+bunches and bunchs of credit are due to Matt Allison and SPIKE the Percussionist. i am deeply grateful to the two of them for working with me over many hours and days testing and discussing the script. 
 
 additional thanks and credits go out to:
 
