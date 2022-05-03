@@ -376,6 +376,6 @@ there is a variable in the `globals.lua` file called `AUTOSAVE_DEFAULT`. setting
 
 ## feature roadmap
 * fix issues with functionality, documentation, and usability 
-* vuja de set loop length and probability separately for each pattern
+* set vuja de loop length and probability separately for each pattern
 * publish the mod matrix as a mod that other scripts can use
 
