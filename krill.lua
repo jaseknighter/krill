@@ -13,7 +13,7 @@
 -- E1 select menu
 -- E2 select param
 -- E3 change param value
--- K1+E3 change param value
+-- K2+E3 coarse value change 
 --
 -- ///    mod matrix (mm)  \\\
 -- E1 select menu
@@ -273,7 +273,6 @@ function finish_init()
   params:set("vuja_de_div_numerator3",1)
   params:set("vuja_de_div_denominator3",2)
   params:set("vjd_div_asn_engine2",1)
-  params:set("sequencing_mode",2)
   params:set("env_scalar",100)
   params:set("rise_time",10)
   params:set("fall_time",150)
@@ -289,11 +288,12 @@ function finish_init()
   params:set("internal_trigger_type",2)
   params:set("internal_trigger_type",1)
   params:set("vuja_pat_defaults1",4)
-  params:set("rise_time",250)
-  params:set("fall_time",500)
+  params:set("rise_time",150)
+  params:set("fall_time",100)
 
   params:set("1lfo_freq",1)
-
+  params:set("sequencing_mode",2)
+  params:set("sequencing_mode",1)
   clock.run(gui.update_menu_display)
   play_enabled = true
 end
