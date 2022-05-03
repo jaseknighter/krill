@@ -12,7 +12,7 @@ a [Lorenz system](https://en.wikipedia.org/wiki/Lorenz_system) sequencer and mod
 
 ## installation
 
-the install process requires 3 steps to properly install!
+the install process requires three steps to properly install:
 
 1. open maiden and below the "matron" tab, enter:
 
