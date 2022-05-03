@@ -25,7 +25,7 @@ os.execute("wget -T 180 -q -P /tmp/ https://github.com/okyeron/mi-UGens/raw/mast
 ```
    
 
-note: you may skip step 2 above you previously installed the MIRings UGen with either @okyeron's [MI-UGens for Norns](https://llllllll.co/t/mi-ugens-for-norns/31781) or the resonator pedal that is part of @21echoes' [Pedalboard](https://llllllll.co/t/pedalboard-chainable-fx-for-norns/31119).
+note: you may skip step 2 above if you previously installed the MIRings UGen with either @okyeron's [MI-UGens for Norns](https://llllllll.co/t/mi-ugens-for-norns/31781) or the resonator pedal that is part of @21echoes' [Pedalboard](https://llllllll.co/t/pedalboard-chainable-fx-for-norns/31119).
 
 3. restart your norns.
 
