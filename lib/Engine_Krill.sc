@@ -1,5 +1,5 @@
 // Engine_Krill
-// Implementation of MiRings UGen as norns engine
+// Implementation of  @okyeron's MiRings UGen port for norns 
 // Jonathan Snyder @jaseknighter
 //
 // Mi-Ugens by volker böhm, 2020 - https://vboehm.net
@@ -14,7 +14,7 @@ Engine_Krill : CroneEngine {
 	var nextNotePoll,nextNotePollFunc;
 	var frequency_slew=0;
 	var sh1=1, sh2=1;
-	var rise=0.05, fall=0.5, rise_time=0.05, fall_time=0.5, env_scalar=1;
+	var env_active=1, rise=0.05, fall=0.5, rise_time=0.05, fall_time=0.5, env_scalar=1; 
 	var env_shape=0,env_level=1;
 	var lorenz_sample = 1;
 	var minRiseFall = 0.005;
@@ -38,6 +38,7 @@ Engine_Krill : CroneEngine {
 			hz=220,amp=0.5, 
 			rise=0.05,fall=0.5, rise_time=0.05, fall_time=1, 
 			gate=1,trig=1,
+			env_active=1,
 			env_scalar=1, env_shape=0, env_level=1,
 			sh1=1,sh2=1,
 			sequencing_mode=1, trigger_mode=1, trigger_type=1, engine_mode=1,
@@ -102,9 +103,14 @@ Engine_Krill : CroneEngine {
 			// sig = LFSaw.ar(pitch.midicps, 2, -1);
 			// sig = 	VAKorg35.ar(sig, freq: pitch.midicps, res:rise, overdrive: rise.unipolar, type:0);
 
-			amp_env_gen = EnvGen.ar(rise_fall_env, gate);
-			sig = LeakDC.ar((sig * amp_env_gen * amp).tanh/2.7);
-
+      amp_env_gen = EnvGen.ar(rise_fall_env, gate);
+			sig = LeakDC.ar((
+			  sig * 
+			  ((env_active * amp_env_gen) + (1-env_active)) * 
+			  amp
+		  ).tanh/2.7);
+      
+    
 			SendReply.kr(Impulse.kr(50), '/triggerEnvPosPoll', env_pos);
 			SendReply.kr(Impulse.kr(50), '/triggerEnvLevelPoll', rise_fall_env_gen);
 
@@ -255,6 +261,12 @@ Engine_Krill : CroneEngine {
 			// krillVoice.set(\trig,0);
 			// krillVoice.set(\gate,0);
     });
+	  
+	  
+		this.addCommand("env_active","f",{ arg msg;
+			env_active = msg[1];
+			krillVoice.set(\env_active,env_active);
+		});
 	  
 		this.addCommand("env_scalar","f",{ arg msg;
 			env_scalar = msg[1];

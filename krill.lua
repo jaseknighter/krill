@@ -1,4 +1,4 @@
--- krill v1.0.0 @jaseknighter
+-- krill v1.0.1 @jaseknighter
 -- chaotic sequencer, MI Rings engine, and mod matrix
 --
 -- llllllll.co/t/54975

@@ -703,9 +703,16 @@ function parameters.init()
   --------------------------------
   -- envelope params
   --------------------------------
-  params:add_group("envelope params",8)
+  params:add_group("envelope params",9)
 
-
+  params:add{
+    type="option", id = "env_active", name = "env actv", default=2,
+    options = {"off","on"},
+    action=function(x) 
+      engine.env_active(x-1)
+    end
+  }
+  
   params:add{
     type="control", id = "env_max_level", name = "env lvl",
     
@@ -714,7 +721,7 @@ function parameters.init()
       engine.env_level(x/10)
     end
   }
-
+  
   params:add{
     type="number", id = "env_scalar", name = "env sclr",min=100, max=2000, default = 100,
     action=function(x) 
