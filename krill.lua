@@ -294,6 +294,7 @@ function finish_init()
   params:set("1lfo_freq",1)
   params:set("sequencing_mode",2)
   params:set("sequencing_mode",1)
+  params:set("env_active",1)
   clock.run(gui.update_menu_display)
   play_enabled = true
 end
