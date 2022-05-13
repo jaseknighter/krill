@@ -103,7 +103,6 @@ end
 ---------------------------------------
 externals.midi_note_on = function(voice_id, note_tab, target)
   local output_midi = params:get("output_midi")
-  
   if (target == "midi" and output_midi == 2) then
     local mode = note_tab.mode and note_tab.mode or 1
     if mode == 1 then -- play_voice
@@ -163,7 +162,7 @@ externals.play_midi_cc_lfos = function(source,volts)
     local ch = params:get("1midi_lfo_chan")
     ch = ch > 0 and ch or nil
     if midi_out_device then  
-      midi_out_device:cc (cc, cc_val, ch)
+      midi_out_device:cc(cc, cc_val, ch)
     end
     -- print("x",cc_val)
   elseif source == "2lfo" and play_midi_lfo2 == 2 then -- lz y output
@@ -172,7 +171,7 @@ externals.play_midi_cc_lfos = function(source,volts)
     local ch = params:get("2midi_lfo_chan")
     ch = ch > 0 and ch or nil
     if midi_out_device then
-      midi_out_device:cc (cc, cc_val, ch)
+      midi_out_device:cc(cc, cc_val, ch)
     end
   end
 end

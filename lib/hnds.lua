@@ -121,11 +121,9 @@ function lfo.setup_params()
     -- MIDI_LFO1 = 102 -- set in globals.lua
     -- MIDI_LFO2 = 103 -- set in globals.lua
     params:add_separator("::midi settings::")
-    params:add_option(i .. "play_midi_lfo_cc", i .. " lfo cc out", {"off", "on"}, 2)
+    params:add_option(i .. "play_midi_lfo_cc", i .. " lfo cc out", {"off", "on"}, 1)
     params:add_number(i .. "midi_lfo_cc", i .. " lfo cc", 0, 127, MIDI_LFO_CC_DEFAULT+i)
-    params:add_number(i .. "midi_lfo_chan", i .. " lfo chan", 0, 127, MIDI_LFO_CHANNEL_DEFAULT+i)
-
-
+    params:add_number(i .. "midi_lfo_chan", i .. " lfo chan", 0, 127, MIDI_LFO_CHANNEL_DEFAULT + i)
     params:add_separator("::read only::")
     params:add_control(i .. "lfo_value", i .. " lfo value", controlspec.new(-1, 1, "lin", 0.001, 0.0001, ""))
   end

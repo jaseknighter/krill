@@ -706,7 +706,7 @@ function parameters.init()
   params:add_group("envelope params",9)
 
   params:add{
-    type="option", id = "env_active", name = "env actv", default=2,
+    type="option", id = "env_active", name = "env actv", default=1,
     options = {"off","on"},
     action=function(x) 
       engine.env_active(x-1)
