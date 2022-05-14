@@ -250,7 +250,7 @@ but first, so you can hear it, make sure you have the krill script running and t
 ...then, run this command:
 
 ```
-param:set("rev_return_level",output_val)
+params:set("rev_return_level",output_val)
 ```
 
 ...and you should hear a change in the reverb.
