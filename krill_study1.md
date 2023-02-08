@@ -186,7 +186,7 @@ before we apply this function to the lfo and reverb return level params, let's s
 with these five data points at hand, we can map inputs to outputs with the `linlin` function like this:
 
 ```
-util.linlin(0,10,100,5)
+util.linlin(0,10,0,100,5)
 ```
 
 running this `linlin` function in the matron REPL, you should receive a result of `50`. in this example, the input value of 5 is exactly half way between the input params min/max values of 0 and 10 and so when the `linlin` function runs it maps this input value of 5 to 50 since 50 is exactly half-way between 0 and 100. if you like, play around with these values to see what results you get (for example, change the input value from 5 to 7.5).
@@ -250,7 +250,7 @@ but first, so you can hear it, make sure you have the krill script running and t
 ...then, run this command:
 
 ```
-param:set("rev_return_level",output_val)
+params:set("rev_return_level",output_val)
 ```
 
 ...and you should hear a change in the reverb.
