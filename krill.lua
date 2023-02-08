@@ -66,6 +66,7 @@ scroll_text = include("lib/scroll_text")
         
 
 initializing = true
+
 function init()
   screen.clear()
   screen.update()
@@ -258,7 +259,8 @@ function init()
     save_load.load_krill_data(folder_path.."autosave.krl")
   end  
   
-  initializing = false  clock.run(finish_init)
+  initializing = false  
+  clock.run(finish_init)
 end
 
 function finish_init()

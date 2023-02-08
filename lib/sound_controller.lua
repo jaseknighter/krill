@@ -129,7 +129,7 @@ end
 
 sound_controller.sleepy_timing = false
 function sound_controller.play_krill_note(value)
-  if sound_controller.sleepy_timing == false then
+  if lorenz_sample_val and sound_controller.sleepy_timing == false then
     local sleepy_time = (((rise+fall)*(params:get("env_scalar")/100) * lorenz_sample_val)) * (math.random()) 
     sound_controller.sleepy_timing=true
     clock.sleep(0.05+sleepy_time)
