@@ -1,4 +1,4 @@
--- krill v1.0.2 @jaseknighter
+-- krill v1.0.3 @jaseknighter
 -- chaotic sequencer, MI Rings engine, and mod matrix
 --
 -- llllllll.co/t/54975
@@ -96,7 +96,7 @@ function init()
     ppqn = 96
   }
   
-  -- mod_matrix_pattern = krill_lattice:new_pattern{
+  -- mod_matrix_pattern = krill_lattice:new_sprocket{
   --   action = function(t) 
   --     if initializing == false then
   --       mod_matrix:process_matrix()
@@ -106,7 +106,7 @@ function init()
   --   enabled = true
   -- }
   
-  lorenz_pattern = krill_lattice:new_pattern{
+  lorenz_pattern = krill_lattice:new_sprocket{
     action = function(t) 
       lorenz:process()
       lorenz:update()
@@ -125,7 +125,7 @@ function init()
     enabled = true
   }
   
-  lorenz_output_pattern_x = krill_lattice:new_pattern{
+  lorenz_output_pattern_x = krill_lattice:new_sprocket{
     action = function(t) 
       if pixels[pixels.active] then
         local lb = lorenz.get_boundary()
@@ -143,7 +143,7 @@ function init()
     enabled = true
   }
   
-  lorenz_output_pattern_y = krill_lattice:new_pattern{
+  lorenz_output_pattern_y = krill_lattice:new_sprocket{
     action = function(t) 
       if pixels[pixels.active] then
         local lb = lorenz.get_boundary()
@@ -160,7 +160,7 @@ function init()
     enabled = true
   }
 
-  lfo_output_patterns = krill_lattice:new_pattern{
+  lfo_output_patterns = krill_lattice:new_sprocket{
     action = function(t) 
       if pixels[pixels.active] then
         local lfo_slope1 = mod_matrix.lfo[1].slope
@@ -200,7 +200,7 @@ function init()
       vuja_de_rthm_sequins[i][j] = Sequins{table.unpack(rs)}
       
     end
-    vuja_de_patterns[i]= krill_lattice:new_pattern{
+    vuja_de_patterns[i]= krill_lattice:new_sprocket{
       action = function(t) 
         local active_rthm_pat = vuja_de_rthm_sequins[i].active_rthm_pattern
         -- play note from quant grid
